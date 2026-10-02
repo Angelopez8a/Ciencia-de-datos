@@ -213,10 +213,12 @@
     return {
       s: [css("--s1"), css("--s2"), css("--s3"), css("--s4"), css("--s5"), css("--s6"), css("--s7"), css("--s8")],
       muted: css("--muted-series"), ink1: css("--ink-1"), ink2: css("--ink-2"), ink3: css("--ink-3"),
-      grid: css("--hair"), axis: css("--axis"), surface: css("--surface-1"), surface2: css("--surface-2"),
+      grid: css("--grid"), axis: css("--axis"), surface: css("--bg"), surface2: css("--bg-hi"),
       good: css("--good"), crit: css("--crit"), warn: css("--warn"),
     };
   }
+  const FONT = '"Nunito", "Segoe UI", system-ui, sans-serif';
+  if (window.Chart) { window.Chart.defaults.font.family = FONT; window.Chart.defaults.font.weight = "600"; }
   function alpha(hex, a) {
     const h = hex.replace("#", "");
     const n = parseInt(h.length === 3 ? h.split("").map(function (c) { return c + c; }).join("") : h, 16);
@@ -230,14 +232,14 @@
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: P.surface, titleColor: P.ink1, bodyColor: P.ink2, borderColor: P.axis, borderWidth: 1,
-          padding: 10, cornerRadius: 8, boxPadding: 4, usePointStyle: true,
-          titleFont: { family: "system-ui", weight: "600" }, bodyFont: { family: "system-ui" },
+          backgroundColor: P.surface2, titleColor: P.ink1, bodyColor: P.ink2, borderColor: P.axis, borderWidth: 1,
+          padding: 11, cornerRadius: 12, boxPadding: 5, usePointStyle: true,
+          titleFont: { family: FONT, weight: "800" }, bodyFont: { family: FONT, weight: "600" },
         },
       },
       scales: {
-        x: { grid: { color: P.grid, drawTicks: false }, border: { color: P.axis }, ticks: { color: P.ink3, padding: 6, font: { size: 11 } }, title: { color: P.ink2, font: { size: 12 } } },
-        y: { grid: { color: P.grid, drawTicks: false }, border: { color: P.axis }, ticks: { color: P.ink3, padding: 6, font: { size: 11 } }, title: { color: P.ink2, font: { size: 12 } } },
+        x: { grid: { color: P.grid, drawTicks: false }, border: { color: P.axis }, ticks: { color: P.ink3, padding: 7, font: { size: 11, family: FONT } }, title: { color: P.ink2, font: { size: 12, family: FONT, weight: "700" } } },
+        y: { grid: { color: P.grid, drawTicks: false }, border: { color: P.axis }, ticks: { color: P.ink3, padding: 7, font: { size: 11, family: FONT } }, title: { color: P.ink2, font: { size: 12, family: FONT, weight: "700" } } },
       },
     };
     return deepMerge(o, extra || {});

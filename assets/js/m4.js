@@ -194,7 +194,7 @@
     const vals = (b) => { const r = Math.floor(b / 2) * 2, c = (b % 2) * 2; return [X[r][c], X[r][c + 1], X[r + 1][c], X[r + 1][c + 1]]; };
     const draw = (hb) => {
       const mode = $("pool-mode").value;
-      const tint = (b, strong) => `background:color-mix(in srgb, ${col[b]} ${strong ? 45 : 18}%, var(--surface-1))`;
+      const tint = (b, strong) => `background:color-mix(in srgb, ${col[b]} ${strong ? 45 : 18}%, var(--bg))`;
       $("pool-input").style.gridTemplateColumns = "repeat(4, auto)";
       $("pool-input").innerHTML = X.map((r, i) => r.map((v, j) => `<div class="cell" style="${tint(blk(i, j), hb === blk(i, j))}">${v}</div>`).join("")).join("");
       $("pool-output").style.gridTemplateColumns = "repeat(2, auto)";
@@ -266,7 +266,7 @@
       id: "pointLabels",
       afterDatasetsDraw(chart) {
         const ctx = chart.ctx, meta = chart.getDatasetMeta(0), P = Viz.palette();
-        ctx.save(); ctx.font = "11px system-ui"; ctx.fillStyle = P.ink2;
+        ctx.save(); ctx.font = "600 11px Nunito, system-ui, sans-serif"; ctx.fillStyle = P.ink2;
         meta.data.forEach((pt, i) => {
           const d = D[i]; if (!labelThese.has(d[0])) return;
           const right = pt.x < chart.chartArea.right - 120;
@@ -356,9 +356,9 @@
       Object.entries(runs).forEach(([name, pts]) => {
         s += `<polyline fill="none" stroke="${colors[name]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((p) => { const q = clip(p); return sx(q[0]).toFixed(1) + "," + sy(q[1]).toFixed(1); }).join(" ")}"/>`;
         const e = clip(pts[pts.length - 1]);
-        s += `<circle cx="${sx(e[0])}" cy="${sy(e[1])}" r="5" fill="${colors[name]}" stroke="var(--surface-1)" stroke-width="2"/>`;
+        s += `<circle cx="${sx(e[0])}" cy="${sy(e[1])}" r="5" fill="${colors[name]}" stroke="var(--bg)" stroke-width="2"/>`;
       });
-      s += `<circle cx="${sx(-4.5)}" cy="${sy(1.2)}" r="5" fill="var(--ink-2)" stroke="var(--surface-1)" stroke-width="2"/><text x="${sx(-4.5) + 8}" y="${sy(1.2) - 8}" class="d-text-3">inicio</text>`;
+      s += `<circle cx="${sx(-4.5)}" cy="${sy(1.2)}" r="5" fill="var(--ink-2)" stroke="var(--bg)" stroke-width="2"/><text x="${sx(-4.5) + 8}" y="${sy(1.2) - 8}" class="d-text-3">inicio</text>`;
       svg.innerHTML = s;
       $("opt-readout").textContent = Object.entries(runs).map(([n, pts]) => { const p = pts[pts.length - 1]; const v = f(p[0], p[1]); return `${n.padEnd(9)} f = ${isFinite(v) ? fmt(v) : "∞ (divergió)"}   en (${fmt(p[0], 3)}, ${fmt(p[1], 3)})`; }).join("\n") +
         `\nFijos: Momentum α = 0.02, β = 0.85 · RMSProp α = 0.15 · Adam α = 0.15. SGD usa el α del control (diverge si α ≥ 0.1).`;
@@ -406,7 +406,7 @@
       });
       [[A, "var(--s1)"], [B, "var(--s2)"]].forEach(([w, c]) => {
         const [x, y] = W[w], px = cx + x * sc, py = cy - y * sc;
-        s += `<line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" stroke="${c}" stroke-width="2.5"/><circle cx="${px}" cy="${py}" r="6" fill="${c}" stroke="var(--surface-1)" stroke-width="2"/><text x="${px + 9}" y="${py - 7}" class="d-text" font-weight="700">${w}</text>`;
+        s += `<line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" stroke="${c}" stroke-width="2.5"/><circle cx="${px}" cy="${py}" r="6" fill="${c}" stroke="var(--bg)" stroke-width="2"/><text x="${px + 9}" y="${py - 7}" class="d-text" font-weight="700">${w}</text>`;
       });
       svg.innerHTML = s;
       const c = cos(W[A], W[B]), ang = (Math.acos(Math.max(-1, Math.min(1, c))) * 180) / Math.PI;
@@ -429,7 +429,7 @@
       id: "ann",
       afterDatasetsDraw(chart) {
         const { ctx, scales } = chart, P = Viz.palette();
-        ctx.save(); ctx.font = "11px system-ui"; ctx.fillStyle = P.ink2;
+        ctx.save(); ctx.font = "600 11px Nunito, system-ui, sans-serif"; ctx.fillStyle = P.ink2;
         ctx.fillText("↑ comienzo superior", scales.x.getPixelForValue(0.6), scales.y.getPixelForValue(0.42));
         ctx.fillText("pendiente más alta", scales.x.getPixelForValue(5), scales.y.getPixelForValue(0.66));
         ctx.textAlign = "right"; ctx.fillText("asíntota superior ↑", scales.x.getPixelForValue(40), scales.y.getPixelForValue(0.935));

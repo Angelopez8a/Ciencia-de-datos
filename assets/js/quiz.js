@@ -129,26 +129,38 @@
   const save = () => { if (window.SafeStore) window.SafeStore.set(KEY, JSON.stringify(answers)); };
   let order = Q.map((_, i) => i), onlyWrong = false;
 
+  // Orden de opciones barajado pero estable por pregunta (así la correcta no cae siempre en la misma letra).
+  // data-k guarda el índice original, de modo que las respuestas guardadas no dependen del orden mostrado.
+  function perm(i) {
+    const p = [0, 1, 2, 3];
+    let s = (i + 1) * 2654435761 % 4294967296;
+    for (let j = p.length - 1; j > 0; j--) { s = (s * 1664525 + 1013904223) % 4294967296; const r = s % (j + 1); [p[j], p[r]] = [p[r], p[j]]; }
+    return p;
+  }
+  function verdict(i, a, ok) {
+    return `<span class="verdict ${a === ok ? "ok" : "bad"}">${a === ok ? "✓ Correcto." : "✗ Incorrecto. La respuesta es " + "ABCD"[perm(i).indexOf(ok)] + "."}</span> `;
+  }
+
   function render() {
     const box = $("quiz"); if (!box) return;
     const tema = $("qz-filter").value;
     const ids = order.filter((i) => (!tema || Q[i][0] === tema) && (!onlyWrong || (answers[i] != null && answers[i] !== Q[i][3])));
-    if (!ids.length) { box.innerHTML = `<p class="callout tip">${onlyWrong ? "¡No tienes preguntas falladas con este filtro! 🎉" : "No hay preguntas con este filtro."}</p>`; updateScore(); return; }
+    if (!ids.length) { box.innerHTML = `<p class="callout tip">${onlyWrong ? "No hay preguntas falladas con este filtro." : "No hay preguntas con este filtro."}</p>`; updateScore(); return; }
     box.innerHTML = ids.map((i, n) => {
       const [t, q, opts, ok, ex] = Q[i], a = answers[i], done = a != null;
       return `<div class="q${done ? " answered" : ""}" data-i="${i}">
         <div class="q-top"><span class="q-num">Pregunta ${n + 1} de ${ids.length}</span><span class="q-tema">${t}</span></div>
         <div class="q-text">${q}</div>
-        <div class="opts">${opts.map((o, k) => `<button class="opt${done && k === ok ? " correct" : ""}${done && k === a && a !== ok ? " wrong" : ""}" type="button" data-k="${k}"${done ? " disabled" : ""}><span class="letter">${"ABCD"[k]})</span><span>${o}</span></button>`).join("")}</div>
-        <div class="explain">${done ? `<span class="verdict ${a === ok ? "ok" : "bad"}">${a === ok ? "✓ Correcto." : "✗ Incorrecto. La respuesta es " + "ABCD"[ok] + "."}</span> ` : ""}${ex}</div>
+        <div class="opts">${perm(i).map((k, pos) => `<button class="opt${done && k === ok ? " correct" : ""}${done && k === a && a !== ok ? " wrong" : ""}" type="button" data-k="${k}"${done ? " disabled" : ""}><span class="letter">${"ABCD"[pos]})</span><span>${opts[k]}</span></button>`).join("")}</div>
+        <div class="explain">${done ? verdict(i, a, ok) : ""}${ex}</div>
       </div>`;
     }).join("");
     box.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
       const qi = +b.closest(".q").dataset.i; answers[qi] = +b.dataset.k; save();
-      const el = b.closest(".q"), [, , opts, ok, ex] = Q[qi], a = answers[qi];
+      const el = b.closest(".q"), [, , , ok, ex] = Q[qi], a = answers[qi];
       el.classList.add("answered");
-      el.querySelectorAll(".opt").forEach((o, k) => { o.disabled = true; if (k === ok) o.classList.add("correct"); if (k === a && a !== ok) o.classList.add("wrong"); });
-      el.querySelector(".explain").innerHTML = `<span class="verdict ${a === ok ? "ok" : "bad"}">${a === ok ? "✓ Correcto." : "✗ Incorrecto. La respuesta es " + "ABCD"[ok] + "."}</span> ${ex}`;
+      el.querySelectorAll(".opt").forEach((o) => { const k = +o.dataset.k; o.disabled = true; if (k === ok) o.classList.add("correct"); if (k === a && a !== ok) o.classList.add("wrong"); });
+      el.querySelector(".explain").innerHTML = verdict(qi, a, ok) + ex;
       updateScore();
     }));
     updateScore();
@@ -165,7 +177,7 @@
 
   function cards() {
     const w = $("flash"); if (!w) return;
-    w.innerHTML = CARDS.map(([a, b]) => `<div class="flash" tabindex="0" role="button" aria-label="Tarjeta: ${a}"><div class="flash-inner"><div class="flash-face flash-front">${a}</div><div class="flash-face flash-back">${b}</div></div></div>`).join("");
+    w.innerHTML = CARDS.map(([a, b]) => `<div class="flash" tabindex="0" role="button" aria-label="Tarjeta: ${a.replace(/"/g, "&quot;")}"><div class="flash-inner"><div class="flash-face flash-front">${a}</div><div class="flash-face flash-back">${b}</div></div></div>`).join("");
     w.querySelectorAll(".flash").forEach((c) => {
       const flip = () => c.classList.toggle("flipped");
       c.addEventListener("click", flip);

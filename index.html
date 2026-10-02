@@ -8,11 +8,13 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=neo1">
 </head>
 <body>
 <header class="topbar">
-  
   <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
   <nav class="topnav" aria-label="Módulos"><a href="index.html" aria-current="page">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m1.html">Examen M1</a><a href="examen-m4.html">Examen M4</a></nav>
   <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
@@ -22,12 +24,12 @@
 <section class="home-hero">
   <div class="eyebrow">Diplomado en Ciencia de Datos · UNAM FES Acatlán</div>
   <h1>Apuntes interactivos del diplomado</h1>
-  <p class="lead" style="max-width:760px">Todo el material de las carpetas del curso convertido en una guía de estudio: explicaciones con intuición, fórmulas, diagramas, gráficas, simuladores y <strong>código Python con la salida exacta que te debe salir</strong>. Los módulos 1 y 4 tienen además una página completa de guía y práctica para el examen.</p>
-  <div class="meta-row" style="margin-top:18px">
-    <a class="btn primary" href="examen-m4.html" style="text-decoration:none">📝 Estudiar para el examen M4</a>
-    <a class="btn" href="modulo4.html" style="text-decoration:none">Ir al Módulo 4</a>
-    <a class="btn" href="modulo1.html" style="text-decoration:none">Empezar por el Módulo 1</a>
-    <a class="btn" href="examen-m1.html" style="text-decoration:none">📝 Práctica del M1</a>
+  <p class="lead" style="max-width:780px">Esta guía de estudio reúne el material de los cuatro módulos del curso. Cada tema combina una explicación conceptual, las fórmulas principales, diagramas, gráficas interactivas y programas en Python acompañados de <strong>la salida que producen al ejecutarse</strong>. Los módulos 1 y 4 cuentan, además, con una página de práctica para el examen.</p>
+  <div class="meta-row" style="margin-top:20px">
+    <a class="btn primary" href="examen-m4.html">Practicar para el examen del Módulo 4</a>
+    <a class="btn" href="modulo4.html">Ir al Módulo 4</a>
+    <a class="btn" href="modulo1.html">Comenzar por el Módulo 1</a>
+    <a class="btn" href="examen-m1.html">Práctica del Módulo 1</a>
   </div>
 </section>
 
@@ -35,77 +37,77 @@
   <a class="card" href="modulo1.html" style="--card-color: var(--s1)">
     <span class="num">MÓDULO 1</span>
     <h3>Fundamentos y preparación de datos</h3>
-    <p>Del dato crudo a la TAD y los primeros modelos.</p>
-    <ul><li>Conceptos base, proceso, TAD, ventanas de tiempo</li><li>pandas, integración, ingeniería de variables</li><li>Limpieza, KS, VarClus, estandarización, PCA, t-SNE, dummies</li><li>Credit scoring: WoE, IV, scorecard · OLTP/OLAP</li></ul>
+    <p>Del dato crudo a la Tabla Analítica de Datos (TAD) y los primeros modelos.</p>
+    <ul><li>Conceptos base, proceso de ciencia de datos, TAD y ventanas de tiempo</li><li>pandas, integración de fuentes e ingeniería de variables</li><li>Limpieza, prueba KS, VarClus, estandarización, PCA, t-SNE y variables dummy</li><li>Credit scoring con WoE, IV y scorecard; OLTP y OLAP</li></ul>
   </a>
   <a class="card" href="modulo2.html" style="--card-color: var(--s2)">
     <span class="num">MÓDULO 2</span>
     <h3>Modelación supervisada</h3>
-    <p>De la regresión lineal a los ensambles.</p>
-    <ul><li>Lineal y supuestos, logística, LASSO/Ridge</li><li>Gradiente, LDA, kernel, SVM, KNN, Bayes</li><li>Árboles, redes, ensambles</li><li>Métricas, ROC, KS, Lift, PSI</li></ul>
+    <p>De la regresión lineal a los métodos de ensamble.</p>
+    <ul><li>Regresión lineal y sus supuestos, regresión logística, LASSO y Ridge</li><li>Gradiente descendente, LDA, kernels, SVM, KNN y Bayes ingenuo</li><li>Árboles de decisión, redes neuronales y ensambles</li><li>Métricas, curva ROC, KS, Lift y PSI</li></ul>
   </a>
   <a class="card" href="modulo3.html" style="--card-color: var(--s3)">
     <span class="num">MÓDULO 3</span>
     <h3>Modelación no supervisada</h3>
-    <p>Reducción de dimensiones y clustering.</p>
-    <ul><li>PCA paso a paso</li><li>K-means, codo y silueta</li><li>Clustering jerárquico y dendrogramas</li><li>DBSCAN y ciclo de clustering</li></ul>
+    <p>Reducción de dimensiones y análisis de conglomerados.</p>
+    <ul><li>Componentes principales paso a paso</li><li>K-means con los criterios del codo y de la silueta</li><li>Clustering jerárquico y dendrogramas</li><li>DBSCAN y el ciclo completo de clustering</li></ul>
   </a>
   <a class="card" href="modulo4.html" style="--card-color: var(--s7)">
     <span class="num">MÓDULO 4 <span class="badge">EXAMEN</span></span>
     <h3>Deep Learning</h3>
-    <p>La guía más profunda, con 10 simuladores.</p>
-    <ul><li>MLP, activaciones, backprop</li><li>CNN: convolución, pooling, dropout, optimizadores</li><li>RNN, LSTM, GRU, word embeddings</li><li>Transfer learning (VGG, ResNet, word2vec)</li></ul>
+    <p>La guía más extensa del sitio, con diez simuladores.</p>
+    <ul><li>Perceptrón multicapa, funciones de activación y retropropagación</li><li>Redes convolucionales: convolución, pooling, dropout y optimizadores</li><li>Redes recurrentes, LSTM, GRU y word embeddings</li><li>Transfer learning con VGG, ResNet y word2vec</li></ul>
   </a>
   <a class="card featured" href="examen-m1.html" style="--card-color: var(--s1)">
     <span class="num">PRÁCTICA</span>
-    <h3>Examen M1</h3>
-    <p>Guía y práctica de preparación de datos.</p>
-    <ul><li>Guía de conceptos clave y fórmulas</li><li>15 ejercicios resueltos</li><li>78 preguntas (muchas de código)</li><li>39 tarjetas de repaso</li></ul>
+    <h3>Examen del Módulo 1</h3>
+    <p>Guía y práctica sobre la preparación de datos.</p>
+    <ul><li>Conceptos, fórmulas y decisiones clave, cada uno con su código</li><li>15 ejercicios resueltos</li><li>78 preguntas con explicación, muchas sobre código</li><li>39 tarjetas de repaso</li></ul>
   </a>
   <a class="card featured" href="examen-m4.html" style="--card-color: var(--s4)">
     <span class="num">PRÁCTICA</span>
-    <h3>Examen M4</h3>
-    <p>Para llegar seguro al segundo examen.</p>
+    <h3>Examen del Módulo 4</h3>
+    <p>Material de práctica para el segundo examen.</p>
     <ul><li>Hoja de fórmulas y tablas comparativas</li><li>14 ejercicios numéricos resueltos</li><li>70 preguntas con explicación</li><li>32 tarjetas de repaso</li></ul>
   </a>
 </section>
 
 <section class="section-wrap">
-  <h2 style="border:0">Cómo usar esta guía</h2>
+  <h2>Cómo usar esta guía</h2>
   <div class="kpis">
-    <div class="kpi"><div class="k-label">Programas Python verificados</div><div class="k-val">47</div></div>
+    <div class="kpi"><div class="k-label">Programas de Python verificados</div><div class="k-val">47</div></div>
     <div class="kpi"><div class="k-label">Simuladores interactivos</div><div class="k-val">13</div></div>
     <div class="kpi"><div class="k-label">Gráficas interactivas</div><div class="k-val">21</div></div>
     <div class="kpi"><div class="k-label">Preguntas de práctica</div><div class="k-val">148</div></div>
   </div>
   <div class="two-col">
-    <div class="callout tip"><div class="callout-title">💡 Cada tema tiene</div><ul style="margin:0"><li>explicación con intuición y lo que dijo la clase,</li><li>fórmulas (en notación matemática),</li><li>un diagrama, gráfica o simulador,</li><li>código que puedes copiar o descargar,</li><li>la <strong>salida real</strong> que produce ese código,</li><li>cajas amarillas <strong>"Para el examen"</strong>.</li></ul></div>
-    <div class="callout note"><div class="callout-title">▶️ Ejecutar los ejemplos en tu computadora</div>
-      <p>Descarga cualquier <code>.py</code> desde su bloque de código (o toda la carpeta <code>codigo/</code>) e instala las librerías una vez:</p>
-      <pre style="background:var(--code-bg);border-radius:8px"><code>pip install -r codigo/requirements.txt
+    <div class="callout tip"><div class="callout-title">Qué contiene cada tema</div><ul><li>Una explicación del concepto y de lo que se vio en clase.</li><li>Las fórmulas en notación matemática.</li><li>Un diagrama, una gráfica o un simulador.</li><li>Un programa que puede copiarse o descargarse.</li><li>La <strong>salida real</strong> que produce ese programa.</li><li>Recuadros <strong>«Para el examen»</strong> con lo más importante.</li></ul></div>
+    <div class="callout note"><div class="callout-title">Cómo ejecutar los ejemplos</div>
+      <p>Cada programa se descarga desde su bloque de código; también puede descargarse la carpeta <code>codigo/</code> completa. Las librerías se instalan una sola vez:</p>
+      <pre><code>pip install -r codigo/requirements.txt
 python codigo/modulo4/m4_04_convolucion_pooling.py</code></pre>
-      <p style="margin-top:8px">Los programas de Keras (<code>m4_k*.py</code>) necesitan TensorFlow; los demás solo numpy, pandas, scikit-learn, scipy, statsmodels y varclushi.</p>
+      <p style="margin-top:10px">Los programas de Keras (<code>m4_k*.py</code>) requieren TensorFlow; los demás solo utilizan NumPy, pandas, scikit-learn, SciPy, statsmodels y varclushi.</p>
     </div>
   </div>
   <figure class="figure">
     <svg viewBox="0 0 760 140" role="img" aria-label="Relación entre los cuatro módulos">
       <defs><marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
-      <rect x="10" y="40" width="160" height="60" rx="12" class="d-fill-1"/><text x="90" y="66" text-anchor="middle" class="d-text" font-weight="700">M1 · Datos</text><text x="90" y="84" text-anchor="middle" class="d-text-3">TAD lista para modelar</text>
-      <rect x="205" y="10" width="160" height="56" rx="12" class="d-fill-2"/><text x="285" y="34" text-anchor="middle" class="d-text" font-weight="700">M2 · Supervisado</text><text x="285" y="52" text-anchor="middle" class="d-text-3">predecir y</text>
-      <rect x="205" y="78" width="160" height="56" rx="12" class="d-fill-3"/><text x="285" y="102" text-anchor="middle" class="d-text" font-weight="700">M3 · No supervisado</text><text x="285" y="120" text-anchor="middle" class="d-text-3">estructura en X</text>
-      <rect x="400" y="40" width="190" height="60" rx="12" class="d-fill-7"/><text x="495" y="66" text-anchor="middle" class="d-text" font-weight="700">M4 · Deep Learning</text><text x="495" y="84" text-anchor="middle" class="d-text-3">redes para imágenes y texto</text>
-      <rect x="620" y="40" width="130" height="60" rx="12" class="d-fill-4"/><text x="685" y="66" text-anchor="middle" class="d-text" font-weight="700">Examen M4</text><text x="685" y="84" text-anchor="middle" class="d-text-3">práctica</text>
+      <rect x="10" y="40" width="160" height="60" rx="14" class="d-fill-1"/><text x="90" y="66" text-anchor="middle" class="d-text" font-weight="700">M1 · Datos</text><text x="90" y="84" text-anchor="middle" class="d-text-3">TAD lista para modelar</text>
+      <rect x="205" y="10" width="160" height="56" rx="14" class="d-fill-2"/><text x="285" y="34" text-anchor="middle" class="d-text" font-weight="700">M2 · Supervisado</text><text x="285" y="52" text-anchor="middle" class="d-text-3">predecir y</text>
+      <rect x="205" y="78" width="160" height="56" rx="14" class="d-fill-3"/><text x="285" y="102" text-anchor="middle" class="d-text" font-weight="700">M3 · No supervisado</text><text x="285" y="120" text-anchor="middle" class="d-text-3">estructura en X</text>
+      <rect x="400" y="40" width="190" height="60" rx="14" class="d-fill-7"/><text x="495" y="66" text-anchor="middle" class="d-text" font-weight="700">M4 · Deep Learning</text><text x="495" y="84" text-anchor="middle" class="d-text-3">redes para imágenes y texto</text>
+      <rect x="620" y="40" width="130" height="60" rx="14" class="d-fill-4"/><text x="685" y="66" text-anchor="middle" class="d-text" font-weight="700">Examen M4</text><text x="685" y="84" text-anchor="middle" class="d-text-3">práctica</text>
       <g class="d-arrow"><path d="M170 62 L202 42" marker-end="url(#ha)"/><path d="M170 80 L202 102" marker-end="url(#ha)"/><path d="M365 40 L397 60" marker-end="url(#ha)"/><path d="M365 104 L397 82" marker-end="url(#ha)"/><path d="M590 70 H617" marker-end="url(#ha)"/></g>
     </svg>
-    <figcaption>El diplomado es acumulativo: la preparación de datos (M1) alimenta a los modelos (M2, M3) y el deep learning (M4) generaliza las redes neuronales del M2.</figcaption>
+    <figcaption>El diplomado es acumulativo: la preparación de datos del Módulo 1 alimenta los modelos de los módulos 2 y 3, y el Módulo 4 generaliza las redes neuronales introducidas en el Módulo 2.</figcaption>
   </figure>
 </section>
 
 </main>
-<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM, FES Acatlán). Los programas se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
-<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/main.js?v=neo1" defer></script>
 </body>
 </html>

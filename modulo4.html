@@ -8,7 +8,10 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=neo1">
 </head>
 <body>
 <header class="topbar">
@@ -45,7 +48,7 @@
     </ul>
   </details>
   <div class="callout exam">
-    <div class="callout-title">📝 Para el examen</div>
+    <div class="callout-title">Para el examen</div>
     <p>Lee esta página en orden (sigue la misma secuencia que las clases). Cuando termines, ve a <a href="examen-m4.html">Examen M4</a>: ahí hay hoja de fórmulas, ejercicios numéricos resueltos, un cuestionario con 70 preguntas y tarjetas de repaso. Las cajas amarillas como esta resumen lo que más probablemente te pregunten.</p>
   </div>
 </section>
@@ -142,7 +145,7 @@ $$\theta_i \;\leftarrow\; \theta_i - \alpha\,\frac{\partial\,\text{loss function
 </div>
 
 <div class="callout exam">
-  <div class="callout-title">📝 Para el examen</div>
+  <div class="callout-title">Para el examen</div>
   <ul>
     <li><strong>Deep learning</strong> es un tipo de machine learning inspirado en el cerebro: entrena a la computadora para tareas "humanas" (reconocer voz, imágenes, predecir) <strong>aprendiendo patrones con muchas capas</strong> en lugar de ecuaciones predefinidas.</li>
     <li>Se usa en: reconocimiento de imágenes, de audio, NLP y sistemas de recomendación.</li>
@@ -279,7 +282,7 @@ W1 -= lr * dW1;  b1 -= lr * db1
 y_hat_nuevo = sigmoid(W2 @ sigmoid(W1 @ x + b1) + b2)
 loss_nuevo = -np.log(y_hat_nuevo)
 print(f&quot;Después de 1 paso: y_hat = {y_hat_nuevo:.4f}, pérdida = {loss_nuevo:.4f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>z1 (sumas ponderadas ocultas): [ 0.    0.75 -0.05]
+  <div class="output"><div class="out-label">Salida del programa</div><pre>z1 (sumas ponderadas ocultas): [ 0.    0.75 -0.05]
 a1 (activaciones ocultas):     [0.5    0.6792 0.4875]
 z2 = 0.4271  -&gt;  y_hat = 0.6052
 Pérdida (binary cross-entropy) = 0.5022
@@ -292,14 +295,14 @@ Después de 1 paso: y_hat = 0.6961, pérdida = 0.3622</pre></div>
 </div>
 
 <div class="callout tip">
-  <div class="callout-title">💡 Cómo leer la salida</div>
+  <div class="callout-title">Cómo leer la salida</div>
   <p>La red empezó prediciendo \(\hat{y}=0.6052\) para un ejemplo cuya clase real es 1 (pérdida 0.5022). Después de <strong>un solo paso</strong> de backprop con \(\alpha=0.5\), predice 0.6961 y la pérdida bajó a 0.3622. Eso es "aprender". Observa que <code>dL/dW1</code> de la neurona 2 es positivo: como su peso de salida \(w'_2=-0.1\) es negativo, el gradiente le pide moverse al revés que a las otras dos.</p>
 </div>
 
 <h3 id="profunda">2.4 ¿Cuándo una red es "profunda"?</h3>
 <p>Según el curso, una red se considera <strong>profunda a partir de 5 capas ocultas</strong>; con menos es una red <strong>superficial</strong> (<em>shallow neural network</em>). Pero ojo con la pregunta trampa:</p>
 <div class="callout warn">
-  <div class="callout-title">⚠️ ¿Más neuronas = mejor desempeño? No necesariamente.</div>
+  <div class="callout-title">¿Más neuronas = mejor desempeño? No necesariamente.</div>
   <p>Más capas y neuronas significan más parámetros: más riesgo de sobreajuste, más tiempo de cómputo y problemas de gradiente (que se desvanece o explota). <strong>La gran disrupción del deep learning no es el número de capas</strong>, sino que las capas ocultas pueden ser algo más que funciones de activación: por ejemplo, las primeras capas de una CNN son convoluciones que "resumen" la información de una imagen en valores más sencillos antes de pasarla a capas ocultas "comunes".</p>
 </div>
 <p>Aplicaciones conocidas de las redes profundas: <strong>computer vision, NLP, redes GAN (Generative Adversarial Networks), LSTM</strong> "y un muy largo etcétera".</p>
@@ -389,7 +392,7 @@ for epoca in range(1, 11):
         break
 
 print(&quot;Predicciones finales:&quot;, [predecir(xi) for xi in X])</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Época 1: errores = 1, w = [0.2 0.2], b = 0.2
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Época 1: errores = 1, w = [0.2 0.2], b = 0.2
 Época 2: errores = 3, w = [0.4 0.2], b = 0.0
 Época 3: errores = 3, w = [0.4 0.2], b = -0.2
 Época 4: errores = 2, w = [0.4 0.4], b = -0.2
@@ -430,7 +433,7 @@ Predicciones finales: [-1, -1, -1, 1]</pre></div>
 <h3 id="softmax">3.3 Softmax a detalle</h3>
 <p>La regresión logística da un valor entre 0 y 1: un 0.8 en un clasificador de spam significa 80 % spam y 20 % no spam (suman 1). <strong>Softmax extiende esa idea a varias clases</strong>: asigna una probabilidad a cada clase y todas suman 1.0, una restricción que además ayuda a que el entrenamiento converja más rápido. Se implementa en la capa justo antes de la salida y debe tener <strong>el mismo número de nodos que la capa de salida</strong>.</p>
 <div class="callout warn">
-  <div class="callout-title">⚠️ Softmax asume una sola clase por ejemplo</div>
+  <div class="callout-title">Softmax asume una sola clase por ejemplo</div>
   <p>Si cada imagen tiene exactamente una fruta (pera, naranja, manzana…), softmax es ideal. Si las imágenes son tazones con varias frutas a la vez, hay que usar <strong>múltiples regresiones logísticas</strong> (una sigmoide por clase).</p>
 </div>
 
@@ -480,7 +483,7 @@ p = softmax(logits)
 print(&quot;\nlogits :&quot;, logits)
 print(&quot;softmax:&quot;, p, &quot; suma =&quot;, p.sum().round(4))
 print(&quot;clase predicha:&quot;, np.argmax(p))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>z       : [-5. -1.  0.  1.  5.]
+  <div class="output"><div class="out-label">Salida del programa</div><pre>z       : [-5. -1.  0.  1.  5.]
 sigmoid : [0.0067 0.2689 0.5    0.7311 0.9933] -&gt; rango (0, 1)
 tanh    : [-0.9999 -0.7616  0.      0.7616  0.9999] -&gt; rango (-1, 1)
 ReLU    : [0. 0. 0. 1. 5.] -&gt; rango [0, inf)
@@ -495,7 +498,7 @@ clase predicha: 0</pre></div>
 </div>
 
 <div class="callout exam">
-  <div class="callout-title">📝 Para el examen</div>
+  <div class="callout-title">Para el examen</div>
   <ul>
     <li>La activación es "el elemento donde se agrega la no linealidad del modelo". Sin ella la red es equivalente a una regresión lineal.</li>
     <li>Sigmoid: (0,1), "función logística", más positiva la entrada → más cerca de 1. Tanh: (−1,1), misma forma de S. ReLU: la más común en ocultas porque es simple y <strong>menos susceptible al desvanecimiento del gradiente</strong>, pero puede tener unidades "muertas".</li>
@@ -548,7 +551,7 @@ print(f&quot;Accuracy en prueba: {acc:.3f}&quot;)
 probs = modelo.predict(X_test[:1], verbose=0)[0]
 print(&quot;Probabilidades del 1er dígito de prueba:&quot;, probs.round(3))
 print(&quot;Predicción:&quot;, probs.argmax(), &quot;| Real:&quot;, y_test[0])</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Model: &quot;sequential&quot;
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Model: &quot;sequential&quot;
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
@@ -817,7 +820,7 @@ print(&quot; 28x28, kernel 3, P=0, S=1 -&gt;&quot;, tam_salida(28, 3))
 print(&quot; 28x28, kernel 3, P=1, S=1 -&gt;&quot;, tam_salida(28, 3, P=1))
 print(&quot; 32x32, kernel 5, P=0, S=1 -&gt;&quot;, tam_salida(32, 5))
 print(&quot; 224x224, kernel 7, P=3, S=2 -&gt;&quot;, tam_salida(224, 7, P=3, S=2))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Mapa de características (5x5 * 3x3, stride 1, sin padding):
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Mapa de características (5x5 * 3x3, stride 1, sin padding):
 [[4 3 4]
  [2 4 3]
  [2 3 4]]
@@ -889,7 +892,7 @@ print(&quot;LSTM entrada 8, 16 unidades     :&quot;, lstm(8, 16))
 print(&quot;GRU entrada 8, 16 unidades      :&quot;, gru(8, 16))
 print(&quot;Embedding vocab 10000, dim 16   :&quot;, embedding(10000, 16))
 print(&quot;\nRelación LSTM / SimpleRNN (mismas dims):&quot;, lstm(8, 16) / simple_rnn(8, 16))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Dense 784 -&gt; 128              : 100480
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Dense 784 -&gt; 128              : 100480
 Dense 128 -&gt; 10               : 1290
 Dense 28*28*3=2352 -&gt; 100     : 235300
 Conv2D 3x3, 1 canal, 32 filtros : 320
@@ -903,14 +906,14 @@ Embedding vocab 10000, dim 16   : 160000
 Relación LSTM / SimpleRNN (mismas dims): 4.0</pre></div>
 </div>
 <div class="callout tip">
-  <div class="callout-title">💡 Compara</div>
+  <div class="callout-title">Compara</div>
   <p>Una capa densa de 100 neuronas sobre una imagen 28×28×3 usa <strong>235,300</strong> parámetros. Una Conv2D con 32 filtros 3×3 sobre la misma imagen usa solo <strong>896</strong>, y además funciona para cualquier tamaño de imagen. Eso es la "eficiencia computacional" y el "peso compartido" de las ventajas.</p>
 </div>
 
 <h3 id="cnn-ventajas">4.8 Ventajas, desventajas y aplicaciones</h3>
 <div class="two-col">
 <div class="callout tip">
-  <div class="callout-title">✅ Ventajas</div>
+  <div class="callout-title">Ventajas</div>
   <ol>
     <li>Detecta automáticamente características importantes <strong>sin supervisión humana</strong>.</li>
     <li>Computacionalmente eficiente (convolución y pooling comparten parámetros).</li>
@@ -920,7 +923,7 @@ Relación LSTM / SimpleRNN (mismas dims): 4.0</pre></div>
   </ol>
 </div>
 <div class="callout warn">
-  <div class="callout-title">❌ Desventajas</div>
+  <div class="callout-title">Desventajas</div>
   <ol>
     <li>Le cuesta clasificar con distintas posiciones: ángulos, fondos, iluminación.</li>
     <li><strong>Ejemplos adversarios</strong>: con un poco de ruido la CNN ve otra cosa, mientras un humano ve la misma imagen.</li>
@@ -981,7 +984,7 @@ print(&quot;Tensor de entrada:&quot;, X_train.shape)
 cnn.fit(X_train, y_train, epochs=25, batch_size=32, verbose=0)
 loss, acc = cnn.evaluate(X_test, y_test, verbose=0)
 print(f&quot;CNN dígitos 8x8 -&gt; accuracy en prueba: {acc:.3f}  (parámetros: {cnn.count_params()})&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Model: &quot;cnn_mnist&quot;
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Model: &quot;cnn_mnist&quot;
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
@@ -1047,7 +1050,7 @@ for paso in range(1, 4):
 
 print(&quot;\nEn PREDICCIÓN (model.predict) dropout se desactiva: se usan TODAS las neuronas.&quot;)
 print(&quot;Neuronas esperadas activas por paso en una capa de 8 con p=0.5:&quot;, 8 * (1 - p))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Paso 1: máscara = [1 1 1 0 0 1 0 1]  -&gt; neuronas activas: 5/8
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Paso 1: máscara = [1 1 1 0 0 1 0 1]  -&gt; neuronas activas: 5/8
          salida  = [1.6 0.2 1.  0.  0.  1.2 0.  1.4]
 Paso 2: máscara = [1 0 0 0 0 0 1 1]  -&gt; neuronas activas: 3/8
          salida  = [1.6 0.  0.  0.  0.  0.  0.4 1.4]
@@ -1097,7 +1100,7 @@ Neuronas esperadas activas por paso en una capa de 8 con p=0.5: 4.0</pre></div>
   <div class="data-table-wrap" id="tbl-arch"></div>
 </div>
 <div class="callout exam">
-  <div class="callout-title">📝 Lectura de la gráfica</div>
+  <div class="callout-title">Lectura de la gráfica</div>
   <p>Inception V1 (5 M de parámetros) supera a AlexNet (60 M); DenseNet-121 (8 M) empata con VGG-16 (138 M). <strong>La arquitectura importa más que el tamaño.</strong> Los mejores (BiT-L, NoisyStudent, Meta Pseudo Labels) combinan muchos parámetros con técnicas de entrenamiento con datos masivos.</p>
 </div>
 
@@ -1212,7 +1215,7 @@ for nombre, f in optimizadores:
 print(&quot;\nEfecto del learning rate en SGD (50 pasos):&quot;)
 for lr in [0.01, 0.1, 0.5, 0.9, 1.1]:
     print(f&quot;  lr = {lr:&lt;4} -&gt; θ final = {sgd(50, lr): .4e}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>θ después de N pasos (inicio θ0 = 5.0, mínimo θ* = 0)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>θ después de N pasos (inicio θ0 = 5.0, mínimo θ* = 0)
 Optimizador                      N=10       N=50      N=200
 SGD (lr=0.1)                   0.5369     0.0001     0.0000
 Momentum (lr=0.1, β=0.9)       0.0220    -0.1525    -0.0001
@@ -1229,7 +1232,7 @@ Efecto del learning rate en SGD (50 pasos):
   lr = 1.1  -&gt; θ final =  4.5502e+04</pre></div>
 </div>
 <div class="callout tip">
-  <div class="callout-title">💡 Cómo interpretar la tabla</div>
+  <div class="callout-title">Cómo interpretar la tabla</div>
   <p>En una parábola perfecta y sin ruido, SGD con un buen α gana. Adagrad se frena porque su acumulador solo crece; Adadelta arranca muy lento porque no tiene α y su "memoria" de pasos empieza en casi cero. Adam y RMSProp avanzan con pasos ≈ α constantes (normalizan por la magnitud del gradiente): su ventaja aparece en problemas reales con ruido, gradientes dispersos y escalas distintas por parámetro — exactamente el caso de las redes profundas. Con α = 0.5 SGD llega en un paso (\(\theta - 0.5\cdot2\theta = 0\)); con α = 1.1 diverge.</p>
 </div>
 
@@ -1348,7 +1351,7 @@ for t, x_t in enumerate(X, start=1):
 print(&quot;\nFactor^pasos (lo que le pasa al gradiente al retroceder en el tiempo):&quot;)
 for factor in [0.5, 0.9, 1.0, 1.1, 1.5]:
     print(f&quot;  {factor}^50 = {factor ** 50:.3e}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>t=1: x_t=[1. 0.], h_t=[0.4621 0.664 ], y_t=-0.2019
+  <div class="output"><div class="out-label">Salida del programa</div><pre>t=1: x_t=[1. 0.], h_t=[0.4621 0.664 ], y_t=-0.2019
 t=2: x_t=[0. 1.], h_t=[0.0118 0.2975], y_t=-0.2857
 t=3: x_t=[1. 1.], h_t=[0.3097 0.7957], y_t=-0.4861
 
@@ -1369,7 +1372,7 @@ Factor^pasos (lo que le pasa al gradiente al retroceder en el tiempo):
   <div class="chart-box"><canvas id="chart-vanish" aria-label="Gradiente que se desvanece o explota"></canvas></div>
 </div>
 <div class="callout exam">
-  <div class="callout-title">📝 Soluciones (la de la diapositiva y las que se usan en la práctica)</div>
+  <div class="callout-title">Soluciones (la de la diapositiva y las que se usan en la práctica)</div>
   <ul>
     <li><strong>La de la clase:</strong> reducir la cantidad de capas ocultas (quitar complejidad al modelo RNN).</li>
     <li>Usar celdas con puertas: <strong>LSTM</strong> (creada justo para el vanishing gradient) o <strong>GRU</strong>.</li>
@@ -1547,7 +1550,7 @@ E = rng.normal(size=(vocab_size, dim)).round(2)   # pesos entrenables (inician a
 oracion = [3, 7, 1]                        # palabras ya convertidas a enteros
 print(&quot;\nMatriz E:&quot;, E.shape, &quot;-&gt; parámetros =&quot;, E.size)
 print(&quot;Embedding de la oración [3, 7, 1]:\n&quot;, E[oracion])</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>one-hot &#x27;good&#x27; : [0. 0. 1. 0. 0.]
+  <div class="output"><div class="out-label">Salida del programa</div><pre>one-hot &#x27;good&#x27; : [0. 0. 1. 0. 0.]
 one-hot &#x27;great&#x27;: [0. 0. 0. 1. 0.]
 cos(good, great) = 0.0
 cos(day, Have)   = 0.0
@@ -1623,7 +1626,7 @@ print(&quot;Accuracy en entrenamiento:&quot;, round(modelo.evaluate(X, etiquetas
 nuevas = np.array([&quot;muy buena historia&quot;, &quot;pésima y aburrida&quot;])
 for frase, p in zip(nuevas, modelo.predict(vectorizador(nuevas), verbose=0).ravel()):
     print(f&quot;&#x27;{frase}&#x27; -&gt; P(positivo) = {p:.3f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>SimpleRNN  -&gt; [(&#x27;embedding&#x27;, 160000), (&#x27;simple_rnn&#x27;, 1568), (&#x27;dense&#x27;, 33)]  total = 161,601
+  <div class="output"><div class="out-label">Salida del programa</div><pre>SimpleRNN  -&gt; [(&#x27;embedding&#x27;, 160000), (&#x27;simple_rnn&#x27;, 1568), (&#x27;dense&#x27;, 33)]  total = 161,601
 LSTM       -&gt; [(&#x27;embedding_1&#x27;, 160000), (&#x27;lstm&#x27;, 6272), (&#x27;dense_1&#x27;, 33)]  total = 166,305
 GRU        -&gt; [(&#x27;embedding_2&#x27;, 160000), (&#x27;gru&#x27;, 4800), (&#x27;dense_2&#x27;, 33)]  total = 164,833
 
@@ -1647,7 +1650,7 @@ Accuracy en entrenamiento: 1.0
   <li><strong>Candidato \(\tilde c_t\):</strong> decide los contenidos que se escriben.</li>
   <li><strong>Salida \(G_o\):</strong> lee el estado de celda para producir la salida.</li>
 </ol>
-<div class="callout warn"><div class="callout-title">⚠️ ¿3 o 4 puertas?</div><p>La clase 05 dice "<strong>tres puertas</strong>: entrada, salida y olvido"; la clase 07 cuenta "<strong>4 puertas</strong>" porque incluye el bloque candidato \(\tilde c_t\) (que técnicamente usa tanh, no es una compuerta sigmoide). Si te preguntan, explica ambas: 3 compuertas sigmoides (\(G_f, G_u, G_o\)) + 1 candidato; por eso una LSTM tiene <strong>4 veces</strong> los parámetros de una RNN simple.</p></div>
+<div class="callout warn"><div class="callout-title">¿3 o 4 puertas?</div><p>La clase 05 dice "<strong>tres puertas</strong>: entrada, salida y olvido"; la clase 07 cuenta "<strong>4 puertas</strong>" porque incluye el bloque candidato \(\tilde c_t\) (que técnicamente usa tanh, no es una compuerta sigmoide). Si te preguntan, explica ambas: 3 compuertas sigmoides (\(G_f, G_u, G_o\)) + 1 candidato; por eso una LSTM tiene <strong>4 veces</strong> los parámetros de una RNN simple.</p></div>
 
 <div class="formula">
 $$\begin{aligned}
@@ -1752,7 +1755,7 @@ a_t2 = c_t2                                              # en GRU a_t = c_t
 print(&quot;\nGRU&quot;)
 print(&quot; G_r =&quot;, G_r, &quot; G_u =&quot;, G_u2, &quot; c~_t =&quot;, c_tilde2)
 print(&quot; c_t = a_t =&quot;, c_t2)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>LSTM
+  <div class="output"><div class="out-label">Salida del programa</div><pre>LSTM
  c~_t = [-0.1656 -0.0549]  G_u = [0.5431 0.4609]  G_f = [0.3925 0.7137]  G_o = [0.4086 0.6881]
  c_t  = [0.1064 0.1888]   a_t = [0.0433 0.1284]
 
@@ -1773,7 +1776,7 @@ GRU
 <tr><td>Secuencias muy largas</td><td>en teoría recuerda más y gana en relaciones a larga distancia</td><td>—</td></tr>
 <tr><td>Modificar / extender</td><td>más código</td><td>más simple de modificar (agregar puertas)</td></tr>
 </tbody></table></div>
-<div class="callout exam"><div class="callout-title">📝 Conclusión que pide la clase</div><p>El paper de evaluación de GRU muestra que ambas superan claramente a una RNN simple, pero <strong>no se puede concluir cuál de las dos es mejor</strong>: depende del problema y hay que probar.</p></div>
+<div class="callout exam"><div class="callout-title">Conclusión que pide la clase</div><p>El paper de evaluación de GRU muestra que ambas superan claramente a una RNN simple, pero <strong>no se puede concluir cuál de las dos es mejor</strong>: depende del problema y hay que probar.</p></div>
 
 <h3 id="recursivas">8.4 Redes neuronales recursivas (Recursive NN)</h3>
 <p>Una red <strong>recursiva</strong> es un símil de la recurrente: si el <strong>mismo conjunto de pesos se aplica de forma recursiva sobre una entrada estructurada</strong> (un árbol), nace la red recursiva. Trabajan sobre <strong>entradas estructuradas</strong>, especialmente <strong>grafos acíclicos</strong>, con topología de <strong>árbol profundo</strong>: permiten ramificaciones y jerarquías (por ejemplo, el árbol sintáctico de una oración completa).</p>
@@ -1805,13 +1808,13 @@ GRU
   <li><strong>Ventaja:</strong> pueden capturar dependencias de larga distancia: dos tokens lejanos en la secuencia pueden ser <strong>adyacentes en el árbol sintáctico</strong> (un verbo y su objeto directo separados por muchos adjetivos).</li>
   <li><strong>Desventajas:</strong> son intrínsecamente complejas y más costosas en todas las etapas; el análisis (parsing) es <strong>lento y dependiente del dominio</strong>, por eso no se adoptan tan ampliamente.</li>
 </ul>
-<div class="callout warn"><div class="callout-title">⚠️ Cuidado con las siglas</div><p>"RNN" se usa tanto para <em>Recurrent</em> como para <em>Recursive</em> Neural Network (la diapositiva lo hace). En el examen aclara: <strong>recurrente = secuencia/tiempo</strong>; <strong>recursiva = árbol/estructura</strong>.</p></div>
+<div class="callout warn"><div class="callout-title">Cuidado con las siglas</div><p>"RNN" se usa tanto para <em>Recurrent</em> como para <em>Recursive</em> Neural Network (la diapositiva lo hace). En el examen aclara: <strong>recurrente = secuencia/tiempo</strong>; <strong>recursiva = árbol/estructura</strong>.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="transfer">9. Transfer Learning ("just learning")</h2>
 
 <p>El <strong>aprendizaje por transferencia</strong> es un método en el que <strong>un modelo desarrollado para una tarea se reutiliza como punto de partida para un modelo en una segunda tarea relacionada</strong>. Es muy popular en visión por computadora y NLP porque entrenar esos modelos desde cero requiere enormes recursos de cómputo y tiempo (días o semanas con hardware moderno), y los modelos preentrenados dan saltos enormes de habilidad en problemas relacionados.</p>
-<div class="callout warn"><div class="callout-title">⚠️ Condición clave</div><p>Solo funciona en deep learning si las características aprendidas en la primera tarea son <strong>generales</strong> (adecuadas para la tarea base y la objetivo), no específicas de la tarea base. Por ejemplo, los bordes y texturas que aprende una red en ImageNet sirven para casi cualquier foto.</p></div>
+<div class="callout warn"><div class="callout-title">Condición clave</div><p>Solo funciona en deep learning si las características aprendidas en la primera tarea son <strong>generales</strong> (adecuadas para la tarea base y la objetivo), no específicas de la tarea base. Por ejemplo, los bordes y texturas que aprende una red en ImageNet sirven para casi cualquier foto.</p></div>
 
 <figure class="figure">
   <svg viewBox="0 0 760 270" role="img" aria-label="Entrenar desde cero vs transfer learning">
@@ -1823,7 +1826,7 @@ GRU
     <path d="M130 65 H156 M480 65 H506" class="d-arrow" marker-end="url(#ar9)"/>
     <text x="20" y="140" class="d-text" font-weight="700">Transfer learning</text>
     <rect x="20" y="154" width="110" height="50" rx="8" class="d-box"/><text x="75" y="184" text-anchor="middle" class="d-text-2">Tus pocas fotos</text>
-    <rect x="160" y="154" width="230" height="50" rx="8" class="d-fill-3"/><text x="275" y="176" text-anchor="middle" class="d-text-2">Base preentrenada (VGG16, ResNet…)</text><text x="275" y="193" text-anchor="middle" class="d-text-3">🔒 congelada: ya sabe "ver"</text>
+    <rect x="160" y="154" width="230" height="50" rx="8" class="d-fill-3"/><text x="275" y="176" text-anchor="middle" class="d-text-2">Base preentrenada (VGG16, ResNet…)</text><text x="275" y="193" text-anchor="middle" class="d-text-3">congelada: ya sabe extraer características</text>
     <rect x="410" y="154" width="90" height="50" rx="8" class="d-fill-7"/><text x="455" y="176" text-anchor="middle" class="d-text-2">Cabeza</text><text x="455" y="193" text-anchor="middle" class="d-text-3">nueva</text>
     <rect x="530" y="154" width="110" height="50" rx="8" class="d-fill-1"/><text x="585" y="184" text-anchor="middle" class="d-text-2">auto / camión</text>
     <path d="M130 179 H156 M390 179 H406 M500 179 H526" class="d-arrow" marker-end="url(#ar9)"/>
@@ -1924,7 +1927,7 @@ modelo.compile(optimizer=keras.optimizers.Adam(1e-5),   # LR 100 veces menor
                loss=&quot;categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
 resumen(modelo, &quot;Fase 2 (fine-tuning block5)&quot;)
 # modelo.fit(train_ds, validation_data=val_ds, epochs=5)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Salida de la base convolucional: (None, 7, 7, 512)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Salida de la base convolucional: (None, 7, 7, 512)
 Fase 1 (base congelada): entrenables = 132,099 | congelados = 14,714,688
 Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</pre></div>
   <div class="code-note">Fase 1: solo se entrenan 132,099 parámetros (la cabeza: 512·256+256 = 131,328 y 256·3+3 = 771) y quedan congelados los 14,714,688 de VGG16. Fase 2: se descongelan las 3 convoluciones de block5 (3 × 2,359,808 = 7,079,424). La salida se verificó con weights=None (mismos conteos, sin descargar); con weights='imagenet' Keras descarga los pesos (~58 MB) la primera vez.</div>
@@ -1945,7 +1948,7 @@ Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</p
 </tbody></table></div>
 
 <div class="callout exam">
-  <div class="callout-title">📝 Ahora practica</div>
+  <div class="callout-title">Ahora practica</div>
   <p>Ve a la página <a href="examen-m4.html"><strong>Examen M4</strong></a>: hoja de fórmulas, 14 ejercicios numéricos resueltos paso a paso, 70 preguntas de opción múltiple con explicación y tarjetas de repaso.</p>
 </div>
 
@@ -1957,12 +1960,12 @@ Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</p
 
 </main>
 </div>
-<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM, FES Acatlán). Los programas se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<script src="assets/js/main.js?v=54416b98" defer></script>
-<script src="assets/js/m4.js?v=56501269" defer></script>
+<script src="assets/js/main.js?v=neo1" defer></script>
+<script src="assets/js/m4.js?v=neo1" defer></script>
 </body>
 </html>

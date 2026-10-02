@@ -1,0 +1,10 @@
+# Librerías necesarias para ejecutar los programas de la carpeta codigo/
+# Las salidas que aparecen en el sitio se obtuvieron con Python 3.13 y las versiones indicadas en el README.
+numpy>=2.0
+pandas>=3.0
+scipy>=1.13
+scikit-learn>=1.6
+statsmodels>=0.14
+varclushi>=0.1
+# Solo para los programas de Keras (codigo/modulo4/m4_k*.py)
+tensorflow>=2.16

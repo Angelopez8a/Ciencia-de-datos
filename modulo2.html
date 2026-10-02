@@ -8,7 +8,10 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=neo1">
 </head>
 <body>
 <header class="topbar">
@@ -88,7 +91,7 @@ antig = rng.uniform(0, 15, 200)
 precio = 40 - 0.08 * millas - 1.2 * antig + rng.normal(0, 1.5, 200)
 m = LinearRegression().fit(np.c_[millas, antig], precio)
 print(f&quot;\nMúltiple: precio = {m.intercept_:.2f} {m.coef_[0]:+.3f}*millas {m.coef_[1]:+.3f}*antigüedad&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>A mano  : β0 = 31.8214, β1 = -2.3214
+  <div class="output"><div class="out-label">Salida del programa</div><pre>A mano  : β0 = 31.8214, β1 = -2.3214
 sklearn : β0 = 31.8214, β1 = -2.3214
 Residuales: [ 0.5   -0.179  0.143 -0.536 -0.214  0.107 -0.571  0.75 ] | suma = -0.0
 Interpretación: cada año extra de antigüedad, el precio baja 2.321 mil en promedio
@@ -145,7 +148,7 @@ diagnostico(&quot;Caso 2: ruido proporcional a x&quot;, 3 + 2 * x + rng.normal(0
 y2 = np.exp(0.5 + 0.2 * x + rng.normal(0, 0.3, 300))
 diagnostico(&quot;Caso 3: y exponencial (sin transformar)&quot;, y2)
 diagnostico(&quot;Caso 3 corregido: log(y)&quot;, np.log(y2))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Caso 1: y = 3 + 2x + ruido constante
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Caso 1: y = 3 + 2x + ruido constante
   R² = 0.973
   Homocedasticidad (Breusch-Pagan) p = 0.6511 -&gt; OK
   Independencia (Durbin-Watson) = 1.954  (≈2 sin autocorrelación)
@@ -201,7 +204,7 @@ for h in [1, 3, 5]:
 
 print(&quot;predict_proba(3 h) de sklearn:&quot;, modelo.predict_proba([[3]]).round(3))
 print(f&quot;Frontera de decisión (p = 0.5) en horas = {-b0 / b1:.2f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>ln(p/(1-p)) = -4.632 + 1.425·horas
+  <div class="output"><div class="out-label">Salida del programa</div><pre>ln(p/(1-p)) = -4.632 + 1.425·horas
 Por cada hora extra, los momios se multiplican por e^1.425 = 4.16
   1 h -&gt; logit = -3.207, momios =  0.040, P(aprobar) = 0.039 -&gt; clase 0
   3 h -&gt; logit = -0.357, momios =  0.700, P(aprobar) = 0.412 -&gt; clase 0
@@ -209,7 +212,7 @@ Por cada hora extra, los momios se multiplican por e^1.425 = 4.16
 predict_proba(3 h) de sklearn: [[0.588 0.412]]
 Frontera de decisión (p = 0.5) en horas = 3.25</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Interpretar coeficientes</div><p>En la logística \(e^{\beta}\) es el <strong>factor de momios</strong>: cada hora extra multiplica los momios de aprobar por \(e^{1.425} = 4.16\). Los coeficientes NO se leen como cambios en la probabilidad directamente.</p></div>
+<div class="callout tip"><div class="callout-title">Interpretar coeficientes</div><p>En la logística \(e^{\beta}\) es el <strong>factor de momios</strong>: cada hora extra multiplica los momios de aprobar por \(e^{1.425} = 4.16\). Los coeficientes NO se leen como cambios en la probabilidad directamente.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="regularizacion">4. Regresiones penalizadas: LASSO, LARS, Ridge, Red Elástica y Bayesiana</h2>
@@ -263,7 +266,7 @@ print(&quot;\nCamino de LASSO: coeficientes en cero conforme sube alpha&quot;)
 for a in [0.1, 1, 5, 10, 20, 40]:
     c = Lasso(alpha=a).fit(X, y).coef_
     print(f&quot;  alpha = {a:&gt;4}: variables que sobreviven = {int(np.sum(~np.isclose(c, 0)))}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>variable                 Lineal              LASSO a=5             Ridge a=50  ElasticNet a=5,l1=0.5          LassoLars a=5
+  <div class="output"><div class="out-label">Salida del programa</div><pre>variable                 Lineal              LASSO a=5             Ridge a=50  ElasticNet a=5,l1=0.5          LassoLars a=5
 age                       -0.48                   0.00                   0.11                   1.04                   0.00
 sex                      -11.41                  -2.15                  -9.69                  -0.52                  -2.16
 bmi                       24.73                  24.22                  23.08                   8.97                  24.22
@@ -355,7 +358,7 @@ for nombre, lote in [(&quot;Batch (todos)&quot;, 1000), (&quot;Mini-batch (32)&q
     b0, b1 = entrenar(lote, lr=0.01 if lote &gt; 1 else 0.001)
     print(f&quot;{nombre:&lt;16}: β0 = {b0:.3f}, β1 = {b1:.3f}  (reales: 4, 3) &quot;
           f&quot;| {entrenar.actualizaciones:,} actualizaciones en 50 épocas&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>lr = 0.1
+  <div class="output"><div class="out-label">Salida del programa</div><pre>lr = 0.1
   iter 1: x = 2.60000, y = -1.44000, gradiente = 3.20000
   iter 2: x = 2.28000, y = -2.36160, gradiente = 2.56000
   iter 3: x = 2.02400, y = -2.95142, gradiente = 2.04800
@@ -379,7 +382,7 @@ Batch (todos)   : β0 = 1.234, β1 = 3.411  (reales: 4, 3) | 50 actualizaciones 
 Mini-batch (32) : β0 = 4.001, β1 = 2.999  (reales: 4, 3) | 1,600 actualizaciones en 50 épocas
 SGD (1)         : β0 = 3.999, β1 = 3.015  (reales: 4, 3) | 50,000 actualizaciones en 50 épocas</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Por qué el batch "pierde" aquí</div><p>Con 50 épocas, el GD por lote completo hace solo <strong>50 actualizaciones</strong> (una por época), mientras que mini-batch hace 1,600 y SGD 50,000. Con el mismo número de pasadas por los datos, las versiones estocásticas avanzan mucho más. (Puedes ver el efecto del learning rate de forma interactiva en el <a href="modulo4.html#optimizadores">Módulo 4</a>.)</p></div>
+<div class="callout tip"><div class="callout-title">Por qué el batch "pierde" aquí</div><p>Con 50 épocas, el GD por lote completo hace solo <strong>50 actualizaciones</strong> (una por época), mientras que mini-batch hace 1,600 y SGD 50,000. Con el mismo número de pasadas por los datos, las versiones estocásticas avanzan mucho más. (Puedes ver el efecto del learning rate de forma interactiva en el <a href="modulo4.html#optimizadores">Módulo 4</a>.)</p></div>
 
 <!-- ===================================================== -->
 <h2 id="lda">6. Análisis discriminante (LDA y QDA)</h2>
@@ -453,7 +456,7 @@ print(f&quot;Kernel Ridge (rbf) accuracy = {np.mean((kr.predict(Xv) &gt; 0.5) ==
 # --- Pérdida de bisagra (hinge): max(0, 1 − y·f(x)), con y ∈ {−1, 1} ---
 for y_real, fx in [(1, 2.0), (1, 0.5), (1, -1.0), (-1, -3.0)]:
     print(f&quot;y = {y_real:&gt;2}, f(x) = {fx:&gt;4} -&gt; hinge = {max(0, 1 - y_real * fx):.1f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>LinearDiscriminantAnalysis       accuracy = 1.000
+  <div class="output"><div class="out-label">Salida del programa</div><pre>LinearDiscriminantAnalysis       accuracy = 1.000
 QuadraticDiscriminantAnalysis    accuracy = 1.000
 
 φ(x)·φ(z) en 9 dimensiones = 1024
@@ -467,7 +470,7 @@ y =  1, f(x) =  0.5 -&gt; hinge = 0.5
 y =  1, f(x) = -1.0 -&gt; hinge = 2.0
 y = -1, f(x) = -3.0 -&gt; hinge = 0.0</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Lectura</div><p>Con círculos concéntricos (no linealmente separables) la SVM lineal apenas supera el azar (0.542) y usa 274 vectores soporte; con kernel polinómico o RBF llega a 1.000 con solo 15–30 vectores soporte. Eso es el truco del kernel en acción.</p></div>
+<div class="callout tip"><div class="callout-title">Lectura</div><p>Con círculos concéntricos (no linealmente separables) la SVM lineal apenas supera el azar (0.542) y usa 274 vectores soporte; con kernel polinómico o RBF llega a 1.000 con solo 15–30 vectores soporte. Eso es el truco del kernel en acción.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="knn">9. K vecinos más cercanos (KNN)</h2>
@@ -553,7 +556,7 @@ for caso in [{&quot;Color&quot;: &quot;Rojo&quot;, &quot;Tipo&quot;: &quot;Depor
 
 print(&quot;\nFrecuencia cero: P(Verde|Sí) sin suavizar = 0/5 = 0  -&gt; anula todo el producto&quot;)
 print(&quot;Con suavizado de Laplace (+1):&quot;, round((0 + 1) / (5 + 1 * 3), 3), &quot;(suponiendo 3 colores posibles)&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Manhattan  : 7
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Manhattan  : 7
 Euclidiana : 5.0
 Minkowski p=3: 4.4979
 
@@ -642,7 +645,7 @@ X = pd.get_dummies(df.drop(columns=&quot;Diabetico&quot;), dtype=int)
 arbol = DecisionTreeClassifier(criterion=&quot;gini&quot;, max_depth=2, random_state=0)
 arbol.fit(X, df[&quot;Diabetico&quot;])
 print(export_text(arbol, feature_names=list(X.columns)))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Nodo raíz: Gini = 0.500, Entropía = 1.000
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Nodo raíz: Gini = 0.500, Entropía = 1.000
 
 Corte por Calorias:
    High      n=5  {&#x27;Yes&#x27;: 4, &#x27;No&#x27;: 1}  Gini=0.320
@@ -670,7 +673,7 @@ Corte por Actividad:
 |--- Azucar_High &gt;  0.50
 |   |--- class: Yes</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Lectura</div><p><strong>Azúcar</strong> es el mejor primer corte: deja dos hojas puras (High → todos diabéticos; Low → ninguno) y su Gini ponderado es el más bajo (0.150, ganancia 0.350). El árbol de sklearn elige exactamente ese corte en la raíz.</p></div>
+<div class="callout tip"><div class="callout-title">Lectura</div><p><strong>Azúcar</strong> es el mejor primer corte: deja dos hojas puras (High → todos diabéticos; Low → ninguno) y su Gini ponderado es el más bajo (0.150, ganancia 0.350). El árbol de sklearn elige exactamente ese corte en la raíz.</p></div>
 <h3 id="poda">11.2 ¿Cuándo detenerse? y poda</h3>
 <p>Buscar pureza total es costoso y <strong>sobreajusta</strong>. Criterios de paro: <strong>mínimo de observaciones</strong> por hoja, <strong>profundidad máxima</strong>, <strong>pureza</strong>. La <strong>poda</strong> recorre el árbol de las hojas a la raíz y elimina los nodos no significativos según el costo (poda de reducción de costo), reduciendo complejidad y sobreajuste.</p>
 
@@ -679,7 +682,7 @@ Corte por Actividad:
 <p>Inspiradas en el cerebro, con tres componentes: <strong>la neurona</strong> (cada una es un modelo simple, una función lineal), <strong>la función de activación</strong> (transforma la salida, incorpora no linealidad y decide si la neurona "se activa") y <strong>las capas</strong> (entrada, ocultas, salida). "Si podíamos crear una regresión lineal con gran efectividad, ¿qué pasaría si creamos varias?". Sin activaciones, una red de una capa equivale a una regresión lineal.</p>
 <div class="formula">$$Z_k = \sum_{i=1}^{j} x_i w_{ik} + w_{0k} \;\to\; f(Z_k) \;\to\; Z = \sum_{t=1}^{m} f(Z_t)\,v_t + v_0 \qquad J(\theta) = \frac1n\sum_{i=1}^{n}\text{Loss}\big(y^{(i)}F(x^{(i)};\theta)\big)$$
 <div class="where">Activaciones vistas: escalón (indicadora), sigmoide (salida de clasificadores), tanh (−1 a 1, preferida en ocultas), ReLU (0 a ∞, barata). Pérdidas: bisagra, log loss, MSE (+ penalización \(\tfrac12\lVert\theta\rVert^2\)). Optimizadores: GD y variantes, momentum, Adagrad, AdaDelta, Adam. Entrenamiento: forward → costo → backward → repetir (con GPU/TPU).</div></div>
-<div class="callout note"><div class="callout-title">➡️ Continúa en el Módulo 4</div><p>Todo esto se profundiza (con simuladores y Keras) en <a href="modulo4.html#ann">Módulo 4 · Redes neuronales</a>. El ejemplo XOR ("no es linealmente separable, pero… la unión hace la fuerza") está en <a href="modulo4.html#perceptron">el perceptrón</a>.</p></div>
+<div class="callout note"><div class="callout-title">Continúa en el Módulo 4</div><p>Todo esto se profundiza (con simuladores y Keras) en <a href="modulo4.html#ann">Módulo 4 · Redes neuronales</a>. El ejemplo XOR ("no es linealmente separable, pero… la unión hace la fuerza") está en <a href="modulo4.html#perceptron">el perceptrón</a>.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="ensambles">13. Ensambles</h2>
@@ -771,7 +774,7 @@ for nombre, m in modelos.items():
     else:
         auc_txt = f&quot;{roc_auc_score(yv, m.predict_proba(Xv)[:, 1]):.3f}&quot;
     print(f&quot;{nombre:&lt;24}{acc:&gt;10.3f}{auc_txt:&gt;8}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Modelo                    Accuracy     AUC
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Modelo                    Accuracy     AUC
 Árbol individual             0.924   0.925
 Votación dura                0.959     n/a
 Votación suave               0.959   0.992
@@ -882,7 +885,7 @@ actual = np.array([0.08, 0.18, 0.28, 0.28, 0.18])     # % por bin en el mes actu
 psi = np.sum((actual - esperado) * np.log(actual / esperado))
 estado = &quot;estable&quot; if psi &lt; 0.1 else &quot;cambio menor&quot; if psi &lt;= 0.25 else &quot;cambio MAYOR: recalibrar&quot;
 print(f&quot;\nPSI = {psi:.4f} -&gt; {estado}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>REGRESIÓN
+  <div class="output"><div class="out-label">Salida del programa</div><pre>REGRESIÓN
   Max Error = 1.000
   MAE       = 0.500
   MSE       = 0.350
@@ -925,13 +928,13 @@ PSI = 0.0168 -&gt; estable</pre></div>
 
 </main>
 </div>
-<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM, FES Acatlán). Los programas se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/js/data.js?v=180c6754" defer></script>
-<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/main.js?v=neo1" defer></script>
 <script src="assets/js/m2.js?v=e50a4702" defer></script>
 </body>
 </html>

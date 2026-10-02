@@ -8,7 +8,10 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=neo1">
 </head>
 <body>
 <header class="topbar">
@@ -30,7 +33,7 @@
     <span class="chip">6 presentaciones</span>
     <span class="chip">3 notebooks (sesiones 8, 9 y 10)</span>
     <span class="chip">18 programas verificados</span>
-    <a class="chip" href="examen-m1.html" style="text-decoration:none">📝 Guía, tarjetas y examen del M1 →</a>
+    <a class="chip" href="examen-m1.html" style="text-decoration:none">Guía, tarjetas y examen del Módulo 1 →</a>
   </div>
 </section>
 
@@ -222,7 +225,7 @@
 
 <h3 id="ventanas">2.2 Ventanas de tiempo</h3>
 <p>Se elige un <strong>ancla</strong> (un momento \(t\)). Todo lo anterior al ancla es la <strong>ventana de observación</strong> (de ahí salen las variables \(X\)); lo posterior es la <strong>ventana de desempeño</strong> (de ahí sale \(y\)). Preguntas clave: ¿cuánto tiempo debo analizar? ¿para predecir cuánto tiempo hacia adelante?</p>
-<div class="callout warn"><div class="callout-title">⚠️ Ojo con las variables futuras</div><p>Ninguna variable de \(X\) puede usar información posterior al ancla. Si se cuela (data leakage), el modelo se ve espectacular en entrenamiento y falla en producción.</p></div>
+<div class="callout warn"><div class="callout-title">Ojo con las variables futuras</div><p>Ninguna variable de \(X\) puede usar información posterior al ancla. Si se cuela (data leakage), el modelo se ve espectacular en entrenamiento y falla en producción.</p></div>
 
 <div class="widget" id="w-ventanas">
   <div class="widget-title"><span class="tag">Simulador</span> Ventanas de observación y desempeño</div>
@@ -278,7 +281,7 @@ y = pd.concat(lst_y, ignore_index=True)
 tad = X.merge(y, on=um + [&quot;ancla&quot;], how=&quot;inner&quot;)
 tad[&quot;y2&quot;] = (tad[&quot;y&quot;] &gt; 30).astype(int)       # versión clasificación: ¿alta afluencia?
 print(tad.to_string(index=False))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Anclas posibles: de 3 a 7
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Anclas posibles: de 3 a 7
 id_estacion  ancla  v_sum_afluencia  v_min_afluencia  v_max_afluencia  v_mean_afluencia  v_sum_inc_afluencia  y  y2
          E1      3               37               10               15         12.333333                    2 11   0
          E2      3              145               47               50         48.333333                    0 52   1
@@ -291,7 +294,7 @@ id_estacion  ancla  v_sum_afluencia  v_min_afluencia  v_max_afluencia  v_mean_af
          E1      7               57               18               20         19.000000                    1 25   0
          E2      7              119               38               41         39.666667                    1 37   1</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Los números reales de la sesión 8</div><p>El archivo tiene 272,877 registros de 390 estaciones en 700 periodos. Con <code>vobs = 20</code> y <code>vdes = 1</code> las anclas van de 20 a 699: 680 anclas × 390 estaciones = <strong>265,200</strong> renglones. Al pegar \(y\) quedan 123 sin valor futuro (la estación no tuvo registro en \(t+1\)) y se eliminan: la TAD preliminar queda con <strong>265,077</strong> renglones y 21 variables. Para la clasificación, <code>y2 = 1</code> si \(y &gt; 200{,}000\): el 20.5 % de los renglones.</p></div>
+<div class="callout tip"><div class="callout-title">Los números reales de la sesión 8</div><p>El archivo tiene 272,877 registros de 390 estaciones en 700 periodos. Con <code>vobs = 20</code> y <code>vdes = 1</code> las anclas van de 20 a 699: 680 anclas × 390 estaciones = <strong>265,200</strong> renglones. Al pegar \(y\) quedan 123 sin valor futuro (la estación no tuvo registro en \(t+1\)) y se eliminan: la TAD preliminar queda con <strong>265,077</strong> renglones y 21 variables. Para la clasificación, <code>y2 = 1</code> si \(y &gt; 200{,}000\): el 20.5 % de los renglones.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="algoritmos">3. Algoritmos de ML y casos de uso</h2>
@@ -354,7 +357,7 @@ print(&quot;\n7) pivot_table (formato ancho):\n&quot;, ancho.to_string(), sep=&q
 # La estación E03 siempre vale 405: en Ecobici ese valor mínimo se repite en estaciones sin movimiento
 print(&quot;\n8) Desviación estándar por estación (0 = serie constante):&quot;)
 print(df.groupby(&quot;id_estacion&quot;)[&quot;afluencia&quot;].std(ddof=0).round(2).to_string())</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>1) Dimensión (filas, columnas): (9, 3)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>1) Dimensión (filas, columnas): (9, 3)
 
 2) Tipos de dato:
 afluencia      int64
@@ -401,7 +404,7 @@ E01    12.25
 E02     4.08
 E03     0.00</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Cómo leerlo</div><p>El 75 % de la afluencia vale 405 porque una de cada tres filas es de E03, que nunca cambia. En el Ecobici real pasa lo mismo: el mínimo es 405 y hay estaciones con ese valor en todos los periodos (desviación 0). Esas series casi constantes son las que después elimina <code>VarianceThreshold</code>.</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leerlo</div><p>El 75 % de la afluencia vale 405 porque una de cada tres filas es de E03, que nunca cambia. En el Ecobici real pasa lo mismo: el mínimo es 405 y hay estaciones con ese valor en todos los periodos (desviación 0). Esas series casi constantes son las que después elimina <code>VarianceThreshold</code>.</p></div>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo1/m1_00b_frecuencias_groupby.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_00b_frecuencias_groupby.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 1 · Tablas de frecuencias, groupby, merge, concat y np.where
@@ -452,7 +455,7 @@ print(f&quot;\nmerge inner: {inner.shape} | merge left: {left.shape} | &quot;
 a = pd.DataFrame({&quot;id&quot;: [&quot;E1&quot;, &quot;E2&quot;], &quot;ancla&quot;: [20, 20]})
 b = pd.DataFrame({&quot;id&quot;: [&quot;E1&quot;, &quot;E2&quot;], &quot;ancla&quot;: [21, 21]})
 print(&quot;\nconcat:\n&quot;, pd.concat([a, b], ignore_index=True).to_string(index=False), sep=&quot;&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Tabla de frecuencias de Contract:
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Tabla de frecuencias de Contract:
                 FA     FR  FAA    FRA
 Contract                             
 Month-to-Month   4  0.500    4  0.500
@@ -479,7 +482,7 @@ E2     20
 E1     21
 E2     21</pre></div>
 </div>
-<div class="callout exam"><div class="callout-title">📝 Para el examen</div><ul style="margin:0"><li><strong>FR</strong> = FA / total; <strong>FAA</strong> y <strong>FRA</strong> son las acumuladas (la última FRA siempre es 1).</li><li>La media de una variable 0/1 es una proporción: <code>groupby(...)["Churn_Value"].mean()</code> es la <strong>tasa de fuga</strong>.</li><li><code>how="inner"</code> se queda solo con las llaves que están en ambas tablas; <code>how="left"</code> conserva todas las de la izquierda y rellena con NaN.</li></ul></div>
+<div class="callout exam"><div class="callout-title">Para el examen</div><ul style="margin:0"><li><strong>FR</strong> = FA / total; <strong>FAA</strong> y <strong>FRA</strong> son las acumuladas (la última FRA siempre es 1).</li><li>La media de una variable 0/1 es una proporción: <code>groupby(...)["Churn_Value"].mean()</code> es la <strong>tasa de fuga</strong>.</li><li><code>how="inner"</code> se queda solo con las llaves que están en ambas tablas; <code>how="left"</code> conserva todas las de la izquierda y rellena con NaN.</li></ul></div>
 
 <!-- ===================================================== -->
 <h2 id="integracion">5. Integración de datos</h2>
@@ -536,7 +539,7 @@ var_fuera = [&quot;Churn_Label&quot;, &quot;Churn_Score&quot;, &quot;Churn_Reaso
 predictoras = [c for c in df.columns if c not in um + tgt + var_fuera]
 print(&quot;\nPredictoras candidatas:&quot;, predictoras)
 print(&quot;Ojo: Customer_Status sigue en la lista y contiene &#x27;Churned&#x27; -&gt; también da la respuesta.&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>servicios     filas=4  llaves únicas=4  duplicadas=0
+  <div class="output"><div class="out-label">Salida del programa</div><pre>servicios     filas=4  llaves únicas=4  duplicadas=0
 demograficos  filas=4  llaves únicas=4  duplicadas=0
 estatus       filas=4  llaves únicas=4  duplicadas=0
 
@@ -552,7 +555,7 @@ Columnas con merge ingenuo: [&#x27;Count_x&#x27;, &#x27;Quarter_x&#x27;, &#x27;C
 Predictoras candidatas: [&#x27;Count&#x27;, &#x27;Quarter&#x27;, &#x27;Tenure_in_Months&#x27;, &#x27;Contract&#x27;, &#x27;Age&#x27;, &#x27;Married&#x27;, &#x27;Customer_Status&#x27;]
 Ojo: Customer_Status sigue en la lista y contiene &#x27;Churned&#x27; -&gt; también da la respuesta.</pre></div>
 </div>
-<div class="callout warn"><div class="callout-title">⚠️ Tres errores típicos de integración</div><ul style="margin:0"><li><strong>Llave duplicada:</strong> si un cliente aparece dos veces en una tabla, el <code>merge</code> multiplica filas en silencio. <code>validate="one_to_one"</code> lo detecta y lanza un error.</li><li><strong>Columnas repetidas:</strong> el merge ingenuo crea <code>_x</code>/<code>_y</code>. Aun quitándolas pueden sobrevivir duplicados con otro nombre: en churn, <code>Tenure_in_Months</code> y <code>Tenure_Months</code> son la misma variable (VarClus les da exactamente el mismo RS_Own = 0.851376).</li><li><strong>Columnas que dan la respuesta:</strong> además de las <code>Churn_*</code>, <code>Customer_Status</code> incluye "Churned". El notebook lo descubre más tarde porque su IV sale infinito (sección 11).</li></ul></div>
+<div class="callout warn"><div class="callout-title">Tres errores típicos de integración</div><ul style="margin:0"><li><strong>Llave duplicada:</strong> si un cliente aparece dos veces en una tabla, el <code>merge</code> multiplica filas en silencio. <code>validate="one_to_one"</code> lo detecta y lanza un error.</li><li><strong>Columnas repetidas:</strong> el merge ingenuo crea <code>_x</code>/<code>_y</code>. Aun quitándolas pueden sobrevivir duplicados con otro nombre: en churn, <code>Tenure_in_Months</code> y <code>Tenure_Months</code> son la misma variable (VarClus les da exactamente el mismo RS_Own = 0.851376).</li><li><strong>Columnas que dan la respuesta:</strong> además de las <code>Churn_*</code>, <code>Customer_Status</code> incluye "Churned". El notebook lo descubre más tarde porque su IV sale infinito (sección 11).</li></ul></div>
 
 <!-- ===================================================== -->
 <h2 id="variables-series">6. Ingeniería de variables</h2>
@@ -590,7 +593,7 @@ print(&quot;max_racha_inc  :&quot;, max(rachas(lst, lambda x, y: y &gt; x)))
 print(&quot;max_racha_dec  :&quot;, max(rachas(lst, lambda x, y: y &lt; x)))
 print(&quot;media_racha_inc:&quot;, np.mean(rachas(lst, lambda x, y: y &gt; x)))
 print(&quot;media_racha_dec:&quot;, np.mean(rachas(lst, lambda x, y: y &lt; x)))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>sum_inc        : 5
+  <div class="output"><div class="out-label">Salida del programa</div><pre>sum_inc        : 5
 sum_dec        : 2
 media_inc      : 0.7142857142857143
 media_dec      : 0.2857142857142857
@@ -608,7 +611,7 @@ media_racha_inc: 1.6666666666666667
 media_racha_dec: 0.3333333333333333</pre></div>
   <div class="code-note">Es exactamente la salida de la celda 28 del notebook de la sesión 8.</div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Cómo leerlo</div><p>Hay 7 cambios entre 8 valores: 5 subidas y 2 bajadas (media_inc = 5/7 = 0.714). La mayor caída fue de 1492 a 1051 (−441, −29.6 %). La racha más larga de subidas fue de 3 (1065→1068→1266→1492). Las rachas se calculan escribiendo 1 si sube y 0 si no ("1110011") y partiendo por los ceros.</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leerlo</div><p>Hay 7 cambios entre 8 valores: 5 subidas y 2 bajadas (media_inc = 5/7 = 0.714). La mayor caída fue de 1492 a 1051 (−441, −29.6 %). La racha más larga de subidas fue de 3 (1065→1068→1266→1492). Las rachas se calculan escribiendo 1 si sube y 0 si no ("1110011") y partiendo por los ceros.</p></div>
 
 <h3 id="ratios">6.2 Razones y diferencias</h3>
 <p>En churn se crean 9 variables nuevas a partir de las existentes: razones como <code>ratio_m_charge_age</code> (cargo mensual / edad) o <code>ratio_ref_tenure</code> (referidos / meses de antigüedad), y diferencias como <code>dif_tot_month</code> (cargos totales − cargo mensual). Toda razón se protege contra la división entre cero con <code>np.where(denominador != 0, razón, np.nan)</code>:</p>
@@ -642,7 +645,7 @@ df[&quot;dif_tot_month&quot;] = df[&quot;Total_Charges&quot;] - df[&quot;Monthly
 print(&quot;\n&quot;, df.round(3).to_string(index=False), sep=&quot;&quot;)
 print(&quot;\n¿Quedó algún inf?&quot;, bool(np.isinf(df.select_dtypes(&quot;number&quot;)).any().any()))
 print(&quot;Nulos creados (se imputan después, en la limpieza):&quot;, int(df[&quot;ratio_ref_tenure&quot;].isna().sum()))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Sin protección : [0.0, 0.08333333333333333, 0.05, inf]
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Sin protección : [0.0, 0.08333333333333333, 0.05, inf]
 
  Monthly_Charge  Total_Charges  Age  Number_of_Referrals  Tenure_in_Months  ratio_ref_tenure  ratio_m_charge_age  dif_tot_month
            70.0           70.0   25                    0                 1             0.000               2.800            0.0
@@ -727,7 +730,7 @@ print(&quot;Dimensión final:&quot;, X.shape, &quot;\n&quot;)
 
 # 6) Análisis bivariado: correlación (multicolinealidad)
 print(X.corr().round(2))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>% de ausentes:
+  <div class="output"><div class="out-label">Salida del programa</div><pre>% de ausentes:
  ingreso       0.0
 edad         10.0
 saldo        45.0
@@ -751,7 +754,7 @@ ingreso     1.00  0.06   0.99
 edad        0.06  1.00   0.06
 gasto       0.99  0.06   1.00</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Lectura</div><p><code>saldo</code> tenía 45 % de nulos: al imputar con la mediana se forma un "pico" artificial y la distribución cambia (KS = 0.225 &gt; 0.1) → variable rota. <code>edad</code> (10 % nulos) se conserva (KS = 0.049). <code>gasto</code> e <code>ingreso</code> tienen correlación 0.99: son redundantes (multicolinealidad), por eso se usa VarClus.</p></div>
+<div class="callout tip"><div class="callout-title">Lectura</div><p><code>saldo</code> tenía 45 % de nulos: al imputar con la mediana se forma un "pico" artificial y la distribución cambia (KS = 0.225 &gt; 0.1) → variable rota. <code>edad</code> (10 % nulos) se conserva (KS = 0.049). <code>gasto</code> e <code>ingreso</code> tienen correlación 0.99: son redundantes (multicolinealidad), por eso se usa VarClus.</p></div>
 
 <p><strong>Lo que pasó en los notebooks reales.</strong> Los mismos pasos, con resultados muy distintos según los datos:</p>
 <div class="table-wrap"><table class="compare">
@@ -764,7 +767,7 @@ gasto       0.99  0.06   1.00</pre></div>
 <tr><td>Extremos (p1–p99)</td><td>6.8 % de registros → quedan 247,084</td><td>14.6 % → quedan 6,018</td></tr>
 <tr><td>VarClus (id == 1)</td><td>18 → 4 variables</td><td>20 → 6 variables</td></tr>
 </tbody></table></div>
-<div class="callout warn"><div class="callout-title">⚠️ Detalles técnicos que conviene notar</div><ul style="margin:0"><li><strong>El umbral de varianza depende de la escala.</strong> <code>VarianceThreshold</code> se aplica antes de estandarizar, así que 0.1 no significa lo mismo para una proporción (entre 0 y 1, su varianza nunca pasa de 0.25) que para un cargo en dólares. Por eso las variables "media de subidas" de Ecobici caen con 0.1 y en churn se usó 1.0.</li><li><strong>Eliminar extremos por variable se acumula.</strong> Con 20 variables y 2 % por variable fuera de p1–p99, el porcentaje de filas con <em>algún</em> extremo crece rápido (14.6 % en churn).</li><li><strong>Antes de borrar filas, pega la unidad muestral</strong> (<code>X[um] = tad[um]</code>) o ya no podrás unir \(X\) con \(y\).</li></ul></div>
+<div class="callout warn"><div class="callout-title">Detalles técnicos que conviene notar</div><ul style="margin:0"><li><strong>El umbral de varianza depende de la escala.</strong> <code>VarianceThreshold</code> se aplica antes de estandarizar, así que 0.1 no significa lo mismo para una proporción (entre 0 y 1, su varianza nunca pasa de 0.25) que para un cargo en dólares. Por eso las variables "media de subidas" de Ecobici caen con 0.1 y en churn se usó 1.0.</li><li><strong>Eliminar extremos por variable se acumula.</strong> Con 20 variables y 2 % por variable fuera de p1–p99, el porcentaje de filas con <em>algún</em> extremo crece rápido (14.6 % en churn).</li><li><strong>Antes de borrar filas, pega la unidad muestral</strong> (<code>X[um] = tad[um]</code>) o ya no podrás unir \(X\) con \(y\).</li></ul></div>
 
 <h3 id="varclus">7.1 Multicolinealidad con VarClusHi</h3>
 <p>VarClus agrupa las variables en clusters de variables correlacionadas (con componentes principales). Para cada variable reporta:</p>
@@ -818,7 +821,7 @@ print(&quot;\nVariables seleccionadas (id == 1 de cada cluster):&quot;, seleccio
 # Comprobación manual con la primera fila de la tabla del notebook de la sesión 8
 rs_own, rs_nc = 0.978437, 0.082052
 print(f&quot;\nNotebook: v_max_afluencia -&gt; (1-{rs_own})/(1-{rs_nc}) = {(1 - rs_own) / (1 - rs_nc):.6f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> Cluster Variable  RS_Own  RS_NC  RS_Ratio  id
+  <div class="output"><div class="out-label">Salida del programa</div><pre> Cluster Variable  RS_Own  RS_NC  RS_Ratio  id
        0    v_sum  0.9884 0.0000    0.0116   1
        0   v_mean  0.9883 0.0000    0.0117   2
        0    v_max  0.9727 0.0001    0.0273   3
@@ -863,7 +866,7 @@ print(&quot;Desv. aprendidas  :&quot;, ss.scale_.round(2))
 print(&quot;Media z  :&quot;, z.mean().round(6).tolist(), &quot;| Desv z:&quot;, z.std(ddof=0).round(6).tolist())
 print(&quot;Min-Max  : min =&quot;, m.min().tolist(), &quot;max =&quot;, m.max().tolist())
 # Min-Max conserva proporciones: 40,000 es el doble de 20,000 (respecto al mínimo)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> edad  ingreso  z_edad  z_ingreso  mm_edad  mm_ingreso
+  <div class="output"><div class="out-label">Salida del programa</div><pre> edad  ingreso  z_edad  z_ingreso  mm_edad  mm_ingreso
    20    10000  -1.414     -0.949     0.00       0.000
    30    20000  -0.707     -0.632     0.25       0.111
    40    30000   0.000     -0.316     0.50       0.222
@@ -921,7 +924,7 @@ pipe.fit(Xt, yt)
 print(f&quot;\nPipeline -&gt; AUC train {roc_auc_score(yt, pipe.predict_proba(Xt)[:, 1]):.3f} | &quot;
       f&quot;AUC valid {roc_auc_score(yv, pipe.predict_proba(Xv)[:, 1]):.3f}&quot;)
 print(&quot;Coeficientes (escala estandarizada):&quot;, pipe[-1].coef_.round(3), &quot;| intercepto:&quot;, pipe[-1].intercept_.round(3))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Entrenamiento: (700, 2) | Validación: (300, 2)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Entrenamiento: (700, 2) | Validación: (300, 2)
 Tasa de evento -&gt; train 0.311 | valid 0.310  (stratify la conserva)
 
 Mediana aprendida (train): [62.841 36.   ]
@@ -980,7 +983,7 @@ tsne = TSNE(n_components=2, perplexity=30, random_state=0)
 X_tsne = tsne.fit_transform(X_ss)
 print(&quot;\nt-SNE -&gt; forma:&quot;, X_tsne.shape, &quot;| divergencia KL final:&quot;, round(tsne.kl_divergence_, 3))
 print(&quot;t-SNE NO tiene .transform() para datos nuevos:&quot;, hasattr(tsne, &quot;transform&quot;))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Varianza explicada por componente: [36.2 19.2 11.1  7.1  6.6  4.9  4.2  2.7  2.2  1.9  1.7  1.3  0.8]
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Varianza explicada por componente: [36.2 19.2 11.1  7.1  6.6  4.9  4.2  2.7  2.2  1.9  1.7  1.3  0.8]
 Varianza acumulada               : [ 36.2  55.4  66.5  73.6  80.2  85.1  89.3  92.   94.2  96.2  97.9  99.2
  100. ]
 Componentes necesarios para &gt;= 80% de la varianza: 5 (de 13)
@@ -1036,7 +1039,7 @@ tabla = pd.DataFrame({&quot;antes&quot;: ciudad.value_counts(normalize=True),
                       &quot;después&quot;: normalizar(ciudad).value_counts(normalize=True)})
 tabla = tabla.sort_values(&quot;antes&quot;, ascending=False)
 print(&quot;\nFrecuencias relativas:\n&quot;, tabla.round(2).fillna(&quot;-&quot;).to_string())</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> id  data_apple  data_banana
+  <div class="output"><div class="out-label">Salida del programa</div><pre> id  data_apple  data_banana
   1           0            1
   2           1            0
   3           0            1
@@ -1101,7 +1104,7 @@ $$\text{WoE}_i = \ln\!\left(\frac{\%\,\text{no evento}_i}{\%\,\text{evento}_i}\r
 <tr><td>0.3 – 0.5</td><td>Fuerte</td></tr>
 <tr><td>≥ 0.5</td><td>Sobrepredictiva (sospechosa)</td></tr>
 </tbody></table></div>
-<div class="callout exam"><div class="callout-title">📝 "No son regla dura"</div><p>En la sesión 9 se seleccionaron variables con <code>0.1 &lt; IV &lt; 0.8</code>. <code>Customer_Status</code> tuvo IV = ∞ porque <strong>"da la respuesta"</strong> (incluye "Churned"): es sobrepredictiva y no puede entrar al modelo (data leakage).</p></div>
+<div class="callout exam"><div class="callout-title">"No son regla dura"</div><p>En la sesión 9 se seleccionaron variables con <code>0.1 &lt; IV &lt; 0.8</code>. <code>Customer_Status</code> tuvo IV = ∞ porque <strong>"da la respuesta"</strong> (incluye "Churned"): es sobrepredictiva y no puede entrar al modelo (data leakage).</p></div>
 </div>
 <div class="chart-card">
   <h4>WoE por rango de edad (datos simulados del programa)</h4>
@@ -1146,7 +1149,7 @@ for var in [&quot;edad&quot;, &quot;ingreso&quot;]:
     print(f&quot;Variable: {var}&quot;)
     print(t[[&quot;total&quot;, &quot;eventos&quot;, &quot;%evento&quot;, &quot;%no_evento&quot;, &quot;WoE&quot;, &quot;IV_i&quot;]].round(4).to_string())
     print(f&quot;IV = {iv:.4f} -&gt; poder predictivo: {poder(iv)}\n&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Tasa de evento (malos): 0.200
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Tasa de evento (malos): 0.200
 
 Variable: edad
                 total  eventos  %evento  %no_evento     WoE    IV_i
@@ -1206,7 +1209,7 @@ IV = 0.1532 -&gt; poder predictivo: Regular</pre></div>
 <tr><td><code>n_Payment_Method</code></td><td class="num">0.302</td><td>sí</td></tr>
 <tr><td><code>d_Longitude_6</code></td><td class="num">0.042</td><td>no: IV ≤ 0.1</td></tr>
 </tbody></table></div>
-<div class="callout exam"><div class="callout-title">📝 Observaciones para el examen</div><ul style="margin:0"><li>El filtro 0.1–0.8 dejó fuera a <code>Contract</code>, la variable más predictiva después de la que da la respuesta. La tabla de IV es una guía ("no son regla dura"): un IV alto obliga a revisar si hay fuga de información, no a descartar automáticamente.</li><li>El IV tiende a crecer con más cortes, porque más bines separan mejor <em>en entrenamiento</em>. Por eso se limita el rango (2 a 6). En el notebook casi todas eligieron 6, pero <code>Monthly_Charge</code> eligió 5 y <code>Total_Refunds</code> 2.</li><li>El WoE se calcula con entrenamiento. Calcularlo con todo filtraría la respuesta de validación.</li></ul></div>
+<div class="callout exam"><div class="callout-title">Observaciones para el examen</div><ul style="margin:0"><li>El filtro 0.1–0.8 dejó fuera a <code>Contract</code>, la variable más predictiva después de la que da la respuesta. La tabla de IV es una guía ("no son regla dura"): un IV alto obliga a revisar si hay fuga de información, no a descartar automáticamente.</li><li>El IV tiende a crecer con más cortes, porque más bines separan mejor <em>en entrenamiento</em>. Por eso se limita el rango (2 a 6). En el notebook casi todas eligieron 6, pero <code>Monthly_Charge</code> eligió 5 y <code>Total_Refunds</code> 2.</li><li>El WoE se calcula con entrenamiento. Calcularlo con todo filtraría la respuesta de validación.</li></ul></div>
 </div>
 <p>El programa reproduce ese flujo con datos simulados (tres variables, una de ellas categórica):</p>
 <div class="code-card">
@@ -1273,7 +1276,7 @@ p = m.predict_proba(valid[cols_woe])[:, 1]
 print(&quot;\nCoeficientes:&quot;, m.coef_.round(3), &quot;| intercepto:&quot;, m.intercept_.round(3))
 print(f&quot;Validación -&gt; AUC = {roc_auc_score(valid[tgt], p):.3f} | ACC = {accuracy_score(valid[tgt], m.predict(valid[cols_woe])):.3f}&quot;)
 print(&quot;Matriz de confusión:\n&quot;, confusion_matrix(valid[tgt], m.predict(valid[cols_woe])))</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>train (2800, 4) | valid (1200, 4) | tasa de fuga train = 0.311
+  <div class="output"><div class="out-label">Salida del programa</div><pre>train (2800, 4) | valid (1200, 4) | tasa de fuga train = 0.311
 
 Monthly_Charge  k=2: IV=0.1445  k=3: IV=0.1614  k=4: IV=0.1679  k=5: IV=0.1651  k=6: IV=0.1705
                 -&gt; se elige k = 6 (IV = 0.1705)
@@ -1310,7 +1313,7 @@ Matriz de confusión:
  [[747  80]
  [173 200]]</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Lectura</div><p>Los coeficientes salen <strong>todos negativos</strong>, como en el notebook real (16 de 20 negativos). No es casualidad: con WoE = ln(%no evento / %evento), un WoE alto significa "más buenos", así que a más WoE menos probabilidad de evento. Por eso la fórmula de puntos lleva \(-\text{WoE}\cdot\beta\): con β negativo, cada atributo con WoE positivo <em>suma</em> puntos.</p></div>
+<div class="callout tip"><div class="callout-title">Lectura</div><p>Los coeficientes salen <strong>todos negativos</strong>, como en el notebook real (16 de 20 negativos). No es casualidad: con WoE = ln(%no evento / %evento), un WoE alto significa "más buenos", así que a más WoE menos probabilidad de evento. Por eso la fórmula de puntos lleva \(-\text{WoE}\cdot\beta\): con β negativo, cada atributo con WoE positivo <em>suma</em> puntos.</p></div>
 
 <h3 id="scorecard">11.5 Scorecard y puntuaciones</h3>
 <p>Ventajas de la tarjeta de puntos: fácil interpretación, explicable al usuario final, consistencia, reconocimiento de patrones, ajustable a las necesidades y útil para la toma de decisiones. Ejemplo de la clase: "Pablito, 28 años, gana $26,500, …, vive en Monterrey" suma 15 (edad) + 42 (ingreso) + … + 33 (ciudad) = <strong>350 puntos</strong>.</p>
@@ -1319,7 +1322,7 @@ Matriz de confusión:
 $$\text{Factor} = \frac{\text{PDO}}{\ln 2} \qquad \text{Offset} = \text{Score} - \text{Factor}\cdot\ln(\text{odds}) \qquad \text{Puntos}_{\text{atributo}} = \Big(-\text{WoE}\cdot\beta + \frac{\alpha}{n}\Big)\cdot\text{Factor} + \frac{\text{Offset}}{n}$$
 <div class="where"><strong>PDO</strong> (<em>Points to Double the Odds</em>): cuántos puntos hacen que los momios bueno:malo se dupliquen; afecta la escala. <strong>Score</strong>: punto para fijar los odds de referencia. \(n\) = número de variables. El <strong>Offset</strong> desplaza la distribución de scores y el <strong>Factor</strong> la estira o encoge.</div>
 </div>
-<div class="callout warn"><div class="callout-title">⚠️ Signo del intercepto</div><p>La diapositiva escribe \(+\alpha/n\). Si tu logística modela <strong>P(malo)</strong> (evento = 1, como en sklearn) y el score debe crecer con los momios bueno:malo, el término correcto es \(-\alpha/n\): ambos sumandos llevan el signo invertido porque \(\ln(\text{bueno}/\text{malo}) = -(\alpha + \sum\beta\,\text{WoE})\). El programa usa esa versión y comprueba que el score total = Offset + Factor·ln(momios).</p></div>
+<div class="callout warn"><div class="callout-title">Signo del intercepto</div><p>La diapositiva escribe \(+\alpha/n\). Si tu logística modela <strong>P(malo)</strong> (evento = 1, como en sklearn) y el score debe crecer con los momios bueno:malo, el término correcto es \(-\alpha/n\): ambos sumandos llevan el signo invertido porque \(\ln(\text{bueno}/\text{malo}) = -(\alpha + \sum\beta\,\text{WoE})\). El programa usa esa versión y comprueba que el score total = Offset + Factor·ln(momios).</p></div>
 <figure class="figure">
   <svg viewBox="0 0 720 190" role="img" aria-label="Efecto de offset y factor sobre la distribución del score">
     <text x="180" y="20" text-anchor="middle" class="d-text" font-weight="700">Offset: desplaza</text>
@@ -1380,7 +1383,7 @@ p_malo = 1 / (1 + np.exp(-logit_malo))
 print(f&quot;P(malo) = {p_malo:.4f} | momios bueno:malo = {np.exp(-logit_malo):.2f}&quot;
       f&quot; | Offset + Factor*ln(momios) = {offset + factor * (-logit_malo):.1f}&quot;)
 print(f&quot;+{PDO} puntos (PDO) =&gt; momios x2: {np.exp((score + PDO - offset) / factor):.2f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Factor = 20/ln(2) = 28.8539
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Factor = 20/ln(2) = 28.8539
 Offset = 600 - 28.8539*ln(50) = 487.1229
 
 SCORECARD
@@ -1459,7 +1462,7 @@ for nombre, cm in matrices.items():
     print(f&quot;  TN={tn}  FP={fp}  FN={fn}  TP={tp}&quot;)
     print(f&quot;  Accuracy={acc:.3f}  Precision={prec:.3f}  Recall={rec:.3f}  &quot;
           f&quot;Especificidad={esp:.3f}  F1={f1:.3f}  BalancedAcc={(rec + esp) / 2:.3f}\n&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Sesión 8 · Ecobici (alta afluencia)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Sesión 8 · Ecobici (alta afluencia)
   TN=58359  FP=2093  FN=4592  TP=8521
   Accuracy=0.909  Precision=0.803  Recall=0.650  Especificidad=0.965  F1=0.718  BalancedAcc=0.808
 
@@ -1467,7 +1470,7 @@ Sesión 9 · Churn (fuga)
   TN=1186  FP=128  FN=223  TP=269
   Accuracy=0.806  Precision=0.678  Recall=0.547  Especificidad=0.903  F1=0.605  BalancedAcc=0.725</pre></div>
 </div>
-<div class="callout exam"><div class="callout-title">📝 Interpretación</div><p>En churn, el accuracy (0.806) parece bueno, pero el <strong>recall es 0.547</strong>: el modelo solo detecta 55 % de los clientes que realmente se van. Como la clase positiva es minoritaria (27 %), un modelo que dijera "nadie se va" ya tendría 73 % de accuracy. Por eso se usan AUC, precisión, recall y F1 (más en el <a href="modulo2.html#metricas">Módulo 2</a>).</p></div>
+<div class="callout exam"><div class="callout-title">Interpretación</div><p>En churn, el accuracy (0.806) parece bueno, pero el <strong>recall es 0.547</strong>: el modelo solo detecta 55 % de los clientes que realmente se van. Como la clase positiva es minoritaria (27 %), un modelo que dijera "nadie se va" ya tendría 73 % de accuracy. Por eso se usan AUC, precisión, recall y F1 (más en el <a href="modulo2.html#metricas">Módulo 2</a>).</p></div>
 
 <h3 id="interpretar-logistica">12.1 Cómo leer los coeficientes de la logística</h3>
 <p>En la logística los coeficientes no se leen como en la regresión lineal. Como el modelo es lineal en el <strong>logaritmo de los momios</strong>, subir una unidad en \(x_i\) suma \(\beta_i\) al logit y, por lo tanto, <strong>multiplica los momios por \(e^{\beta_i}\)</strong>. Con variables estandarizadas, "una unidad" es una desviación estándar. El notebook de Ecobici imprimió <code>coef_ = [3.244, −0.122, 0.474, 0.480]</code> e <code>intercept_ = −3.229</code>:</p>
@@ -1505,7 +1508,7 @@ print(f&quot;\nEst00000, ancla 20     -&gt; P(alta) = {p_alta(z):.4f} -&gt; clas
 
 # 5) El corte 0.5 es una decisión: ¿qué valor de v_max (en z) hace P = 0.5 con las demás en 0?
 print(f&quot;Con las demás z = 0, P(alta) = 0.5 cuando z_max = -alpha/beta = {-alpha / beta[0]:.3f} desviaciones&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Variable                         beta    e^beta
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Variable                         beta    e^beta
 ss_v_max_afluencia               3.244   25.643
 ss_v_pct_delta_desv_afluencia   -0.122    0.885
 ss_v_sum_inc_afluencia           0.474    1.606
@@ -1518,7 +1521,7 @@ Momios: 0.0396 -&gt; 1.0155  (x25.64)
 Est00000, ancla 20     -&gt; P(alta) = 0.5239 -&gt; clase 1 (real y2 = 1, y = 308,424)
 Con las demás z = 0, P(alta) = 0.5 cuando z_max = -alpha/beta = 0.995 desviaciones</pre></div>
 </div>
-<div class="callout exam"><div class="callout-title">📝 Interpretación</div><p>Para una estación promedio (todas las z = 0) la probabilidad de alta afluencia es solo 3.8 %: refleja que la clase positiva es minoritaria. El máximo reciente domina: una desviación estándar más multiplica los momios por 25.6. El corte 0.5 de <code>predict</code> es una decisión; bajarlo aumenta el recall a costa de la precisión (se profundiza en el <a href="modulo2.html#roc">Módulo 2</a>).</p></div>
+<div class="callout exam"><div class="callout-title">Interpretación</div><p>Para una estación promedio (todas las z = 0) la probabilidad de alta afluencia es solo 3.8 %: refleja que la clase positiva es minoritaria. El máximo reciente domina: una desviación estándar más multiplica los momios por 25.6. El corte 0.5 de <code>predict</code> es una decisión; bajarlo aumenta el recall a costa de la precisión (se profundiza en el <a href="modulo2.html#roc">Módulo 2</a>).</p></div>
 
 <!-- ===================================================== -->
 <h2 id="oltp-olap">13. OLTP vs OLAP y cubos de información</h2>
@@ -1600,7 +1603,7 @@ slice_q1 = oltp[oltp[&quot;trimestre&quot;] == &quot;Q1&quot;]
 dice = oltp[(oltp[&quot;trimestre&quot;].isin([&quot;Q2&quot;, &quot;Q3&quot;])) &amp; (oltp[&quot;hrs&quot;].between(12, 16))]
 print(f&quot;\nSlice Q1: {len(slice_q1)} filas | Dice (Q2-Q3, 12-16 h): {len(dice)} filas, &quot;
       f&quot;O3 medio = {dice[&#x27;O3&#x27;].mean():.2f}&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>OLTP (registros): (26280, 3)
+  <div class="output"><div class="out-label">Salida del programa</div><pre>OLTP (registros): (26280, 3)
 id_station                date   O3
        ACO 2021-01-01 00:00:00 24.8
        ACO 2021-01-01 01:00:00  1.8
@@ -1628,7 +1631,7 @@ Zona 3 MER         30.76  37.43  28.60  27.44
 
 Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">💡 Los números reales de la sesión 10</div><ul style="margin:0"><li>Después de pivotear (una columna por contaminante) la tabla tiene <strong>1,074,321</strong> registros estación-hora de 34 estaciones, 2018 a 2022, con 9 contaminantes: CO, NO, NO₂, NOx, O₃, PM10, PM2.5, PMCO y SO₂.</li><li>El centro para las zonas es la media de las estaciones: longitud −99.1359, latitud 19.4092. Cada estación cae en uno de 4 cuadrantes ("Zona 1" a "Zona 4").</li><li>En el cubo de tiempo, el O₃ promedio del trimestre Q2 (39.27) es el más alto, contra 30.09 en Q1: la misma temporada que imita el programa de arriba.</li><li>Cada cubo se guarda con <code>to_csv</code> y <code>to_excel</code> para consultarlo sin repetir los cálculos: esa es la idea de OLAP.</li></ul></div>
+<div class="callout tip"><div class="callout-title">Los números reales de la sesión 10</div><ul style="margin:0"><li>Después de pivotear (una columna por contaminante) la tabla tiene <strong>1,074,321</strong> registros estación-hora de 34 estaciones, 2018 a 2022, con 9 contaminantes: CO, NO, NO₂, NOx, O₃, PM10, PM2.5, PMCO y SO₂.</li><li>El centro para las zonas es la media de las estaciones: longitud −99.1359, latitud 19.4092. Cada estación cae en uno de 4 cuadrantes ("Zona 1" a "Zona 4").</li><li>En el cubo de tiempo, el O₃ promedio del trimestre Q2 (39.27) es el más alto, contra 30.09 en Q1: la misma temporada que imita el programa de arriba.</li><li>Cada cubo se guarda con <code>to_csv</code> y <code>to_excel</code> para consultarlo sin repetir los cálculos: esa es la idea de OLAP.</li></ul></div>
 
 <!-- ===================================================== -->
 <h2 id="siguientes">14. Lo que te llevas al resto del diplomado</h2>
@@ -1646,7 +1649,7 @@ Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre>
 <tr><td>Ventanas de tiempo y series</td><td><a href="modulo4.html#secuencial">Módulo 4 · modelado secuencial y RNN</a></td></tr>
 <tr><td>Recalibrar el modelo en producción</td><td><a href="modulo2.html#estabilidad">Módulo 2 · reportes de estabilidad (PSI)</a></td></tr>
 </tbody></table></div>
-<div class="callout exam"><div class="callout-title">📝 ¿Listo para practicar?</div><p>La página <a href="examen-m1.html"><strong>Examen M1</strong></a> tiene la guía de conceptos clave, ejercicios resueltos, un cuestionario con explicaciones y tarjetas de repaso de todo este módulo.</p></div>
+<div class="callout exam"><div class="callout-title">¿Listo para practicar?</div><p>La página <a href="examen-m1.html"><strong>Examen M1</strong></a> tiene la guía de conceptos clave, ejercicios resueltos, un cuestionario con explicaciones y tarjetas de repaso de todo este módulo.</p></div>
 
 <nav class="pager" aria-label="Navegación entre páginas">
   <a href="index.html"><small>← Inicio</small>Todos los módulos</a>
@@ -1655,13 +1658,13 @@ Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre>
 
 </main>
 </div>
-<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM, FES Acatlán). Los programas se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/js/data.js?v=180c6754" defer></script>
-<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/main.js?v=neo1" defer></script>
 <script src="assets/js/m1.js?v=m1v2" defer></script>
 </body>
 </html>

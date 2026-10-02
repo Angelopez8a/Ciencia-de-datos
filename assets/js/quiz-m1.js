@@ -178,7 +178,7 @@
     const box = $("quiz"); if (!box) return;
     const tema = $("qz-filter").value;
     const ids = order.filter((i) => (!tema || Q[i][0] === tema) && (!onlyWrong || (answers[i] != null && answers[i] !== Q[i][3])));
-    if (!ids.length) { box.innerHTML = `<p class="callout tip">${onlyWrong ? "¡No tienes preguntas falladas con este filtro! 🎉" : "No hay preguntas con este filtro."}</p>`; updateScore(); return; }
+    if (!ids.length) { box.innerHTML = `<p class="callout tip">${onlyWrong ? "No hay preguntas falladas con este filtro." : "No hay preguntas con este filtro."}</p>`; updateScore(); return; }
     box.innerHTML = ids.map((i, n) => {
       const [t, q, opts, ok, ex] = Q[i], a = answers[i], done = a != null;
       return `<div class="q${done ? " answered" : ""}" data-i="${i}">

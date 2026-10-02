@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examen M1 · Guía y práctica de preparación de datos | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Guía de conceptos clave, ejercicios resueltos, cuestionario con explicaciones y tarjetas de repaso del Módulo 1: TAD, ventanas, pandas, limpieza, VarClus, estandarización, PCA, WoE, IV, scorecard, métricas y OLAP.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m1.html" aria-current="page">Examen M1</a><a href="examen-m4.html">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 1 · Guía de estudio y práctica</div>
+  <h1>Examen M1: de la TAD al primer modelo, sin dudas</h1>
+  <p class="lead">Una <strong>guía de conceptos clave</strong> con fórmulas y el código que corresponde a cada una, <strong>ejercicios resueltos</strong> a mano y con pandas, un <strong>cuestionario de <span data-quiz-count>78</span> preguntas</strong> (muchas son "¿qué imprime este código?") y <strong><span data-card-count>39</span> tarjetas de repaso</strong>. Todo sale de las presentaciones y notebooks del módulo; los resultados numéricos se verificaron ejecutándolos.</p>
+  <div class="callout tip">
+    <div class="callout-title">🗓️ Plan de estudio sugerido</div>
+    <ol>
+      <li><strong>Sesión 1:</strong> lee el <a href="modulo1.html">Módulo 1</a> secciones 1–6 (conceptos, TAD, ventanas, pandas, integración, variables). Responde aquí las preguntas de <em>Conceptos</em>, <em>TAD y ventanas</em>, <em>pandas</em> e <em>Integración</em>.</li>
+      <li><strong>Sesión 2:</strong> secciones 7–11 (limpieza, VarClus, estandarización, PCA, categóricas, WoE, scorecard) y sus preguntas.</li>
+      <li><strong>Sesión 3:</strong> secciones 12–13 (métricas, logística, OLAP) → guía de conceptos → ejercicios (tapa la solución) → cuestionario en modo aleatorio → solo falladas → tarjetas.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<h2 id="guia">1. Guía de conceptos clave</h2>
+<h3 id="formulas">1.1 Fórmulas</h3>
+<div class="two-col">
+<div class="formula"><strong>Anclas válidas</strong>
+$$\text{ancla} \in [\,t_{min}+v_{obs}-1,\ t_{max}-v_{des}\,]$$
+<div class="where">Renglones de la TAD = nº de anclas × nº de unidades muestrales.</div></div>
+<div class="formula"><strong>Ventanas para un ancla</strong>
+$$X:\ t \in (\text{ancla}-v_{obs},\ \text{ancla}],\qquad y:\ t = \text{ancla}+v_{des}$$</div>
+<div class="formula"><strong>Porcentaje de ausentes</strong>
+$$\%\text{nulos} = 1 - \frac{\text{count}}{n}$$</div>
+<div class="formula"><strong>Estadístico KS</strong>
+$$D = \max_x \lvert F_{orig}(x) - F_{imp}(x)\rvert,\quad D>0.1 \Rightarrow \text{rota}$$
+<div class="where">Máxima distancia entre las dos distribuciones acumuladas.</div></div>
+<div class="formula"><strong>RS_Ratio (VarClus)</strong>
+$$\text{RS\_Ratio} = \frac{1-\text{RS\_Own}}{1-\text{RS\_NC}}\quad(\text{bajo es mejor})$$</div>
+<div class="formula"><strong>Z-score y Min-Max</strong>
+$$z = \frac{x-\bar x}{s},\qquad x' = \frac{x-\min}{\max-\min}$$
+<div class="where"><code>StandardScaler</code> usa la desviación poblacional (ddof = 0).</div></div>
+<div class="formula"><strong>WoE e IV</strong>
+$$\text{WoE}_i = \ln\frac{\%\text{no evento}_i}{\%\text{evento}_i},\quad \text{IV} = \sum_i(\%\text{ne}_i-\%\text{e}_i)\,\text{WoE}_i$$</div>
+<div class="formula"><strong>Momios y logística</strong>
+$$\ln\frac{p}{1-p} = \beta_0+\sum\beta_i x_i,\qquad p = \frac{1}{1+e^{-(\beta_0+\sum\beta_i x_i)}}$$
+<div class="where">Subir 1 en \(x_i\) multiplica los momios por \(e^{\beta_i}\).</div></div>
+<div class="formula"><strong>Escala del score</strong>
+$$\text{Factor} = \frac{\text{PDO}}{\ln 2},\quad \text{Offset} = \text{Score}-\text{Factor}\ln(\text{odds}),\quad \text{Score} = \text{Offset}+\text{Factor}\ln(\text{momios})$$</div>
+<div class="formula"><strong>Puntos por atributo (diapositiva)</strong>
+$$\text{Puntos} = \Big(-\text{WoE}\cdot\beta+\frac{\alpha}{n}\Big)\text{Factor}+\frac{\text{Offset}}{n}$$
+<div class="where">Si la logística modela P(malo), el término del intercepto lleva \(-\alpha/n\) (ver Módulo 1, 11.5).</div></div>
+<div class="formula"><strong>Métricas de clasificación</strong>
+$$\text{Acc}=\frac{TP+TN}{N},\ \text{Prec}=\frac{TP}{TP+FP},\ \text{Rec}=\frac{TP}{TP+FN},\ \text{Esp}=\frac{TN}{TN+FP}$$
+$$F_1 = \frac{2\,\text{Prec}\cdot\text{Rec}}{\text{Prec}+\text{Rec}}$$</div>
+<div class="formula"><strong>Regresión: MAE</strong>
+$$\text{MAE} = \frac{1}{n}\sum_i \lvert y_i-\hat y_i\rvert$$
+<div class="where">Ecobici: MAE = 27,006 afluencias.</div></div>
+</div>
+
+<h3 id="recordar">1.2 Lo que debes recordar (decisiones y umbrales)</h3>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Tema</th><th>Lo que debes saber hacer o decidir</th></tr></thead>
+<tbody>
+<tr><td>Antes de programar</td><td>¿Qué información se tiene? ¿Qué representan los datos? ¿Qué problema se resuelve? → unidad muestral y variable objetivo.</td></tr>
+<tr><td>Tipo de problema</td><td>y continua → regresión (afluencia en t+1). y binaria → clasificación (alta afluencia, fuga, incumplimiento). Sin y → no supervisado.</td></tr>
+<tr><td>Ventanas</td><td>X solo con el pasado del ancla; y con el futuro. Ecobici: vobs = 20, vdes = 1, anclas 20–699.</td></tr>
+<tr><td>Integración</td><td>Llave única en cada tabla; quitar columnas repetidas; apartar llave, objetivo y variables que dan la respuesta.</td></tr>
+<tr><td>Orden de limpieza</td><td>nulos → imputar (si son muchos) → KS &gt; 0.1 fuera → varianza → extremos p1–p99 (pegar antes la unidad muestral) → correlación → VarClus.</td></tr>
+<tr><td>VarClus</td><td>Ordenar por Cluster y RS_Ratio; quedarse con id == 1 (o al menos una por cluster).</td></tr>
+<tr><td>Escalamiento</td><td>Estandarizar antes de PCA y modelos de distancia/gradiente. Min-Max conserva proporciones pero es sensible a extremos. <code>fit</code> solo en entrenamiento.</td></tr>
+<tr><td>Reducción</td><td>PCA para modelar (lineal, estructura global). t-SNE solo para visualizar.</td></tr>
+<tr><td>Categóricas</td><td>Nulos → "Sin categoría"; &lt; 3 % → "Otros"; quitar unarias; dummies con <code>drop_first</code> o WoE.</td></tr>
+<tr><td>Scoring</td><td>Discretizar continuas (2–6 cortes), elegir por IV, filtrar 0.1 &lt; IV &lt; 0.8, WoE con entrenamiento, logística, puntos con PDO.</td></tr>
+<tr><td>IV ∞ o muy alto</td><td>Sospechar fuga de información (Customer_Status). "No son regla dura".</td></tr>
+<tr><td>Evaluación</td><td>Partición 70/30. Regresión: MAE. Clasificación: AUC (probabilidades), accuracy y matriz (clase con corte 0.5). Con desbalance, mirar recall y precisión.</td></tr>
+<tr><td>OLAP</td><td>Hechos (medidas) + dimensiones (tiempo, ubicación). Roll-up, drill-down, slice, dice, pivot = <code>groupby</code> / <code>pivot_table</code>.</td></tr>
+</tbody></table></div>
+
+<h3 id="codigo-concepto">1.3 Del concepto al código</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Concepto</th><th>Código (como en los notebooks)</th></tr></thead>
+<tbody>
+<tr><td>% de nulos</td><td><code>1 - X.describe().T["count"] / len(X)</code></td></tr>
+<tr><td>Imputar</td><td><code>im = SimpleImputer(strategy="median"); im.fit(X); X[cols] = im.transform(X[cols])</code></td></tr>
+<tr><td>Distribución alterada</td><td><code>ks_2samp(tad[v].dropna(), X[v]).statistic</code></td></tr>
+<tr><td>Varianza</td><td><code>VarianceThreshold(threshold=.1).fit(X).get_support()</code></td></tr>
+<tr><td>Extremos</td><td><code>X.describe(percentiles=[.01, .99]).T[["1%", "99%"]]</code></td></tr>
+<tr><td>Multicolinealidad</td><td><code>VarClusHi(df=X, feat_list=cols).varclus()</code> → <code>.rsquare</code></td></tr>
+<tr><td>Z-score</td><td><code>StandardScaler().fit_transform(X)</code></td></tr>
+<tr><td>Nulos categóricos / dummies</td><td><code>s.fillna("Sin categoría")</code> · <code>pd.get_dummies(df, columns=[c], drop_first=True)</code></td></tr>
+<tr><td>Discretizar</td><td><code>pd.qcut(x, q=k)</code> o <code>KBinsDiscretizer</code></td></tr>
+<tr><td>Aplicar WoE</td><td><code>Xt[f"w_{v}"] = Xt[v].replace(mapa); Xv[f"w_{v}"] = Xv[v].replace(mapa)</code></td></tr>
+<tr><td>Partición</td><td><code>train_test_split(X, y, test_size=.3, random_state=42)</code></td></tr>
+<tr><td>Modelos</td><td><code>LinearRegression().fit(Xt, yt)</code> · <code>LogisticRegression().fit(Xt, yt)</code> → <code>coef_</code>, <code>intercept_</code></td></tr>
+<tr><td>Evaluar</td><td><code>mean_absolute_error</code> · <code>roc_auc_score(yv, m.predict_proba(Xv)[:, 1])</code> · <code>confusion_matrix(yv, m.predict(Xv))</code></td></tr>
+<tr><td>Cubo</td><td><code>df.groupby([d])[contaminantes].mean()</code> por cada dimensión, apilado con <code>concat</code></td></tr>
+</tbody></table></div>
+
+<!-- ===================================================== -->
+<h2 id="ejercicios">2. Ejercicios resueltos</h2>
+<p>Intenta cada uno antes de abrir la solución. Los resultados se comprobaron ejecutándolos con Python.</p>
+
+<details class="qa"><summary>E1. Un archivo tiene 390 estaciones observadas en t = 1…700. Con vobs = 20 y vdes = 1, ¿cuántos renglones tendrá la TAD antes de limpiar? ¿Y con 36 periodos, vobs = 12, vdes = 3, por unidad muestral?</summary>
+<div class="ans"><p>Anclas: de \(1+20-1 = 20\) a \(700-1 = 699\) → <strong>680</strong> anclas. Renglones: \(680\times390 = \mathbf{265{,}200}\) (lo mismo que en el notebook; después se quitan 123 con \(y\) vacía). Segundo caso: de \(12\) a \(36-3 = 33\) → <strong>22</strong> renglones por unidad muestral.</p></div></details>
+
+<details class="qa"><summary>E2. Para la serie [5, 7, 7, 6, 9, 10] calcula sum_inc, sum_dec, media_inc, delta_mean, max_racha_inc y media_racha_dec con las funciones de la sesión 8.</summary>
+<div class="ans"><p>Cambios: +2, 0, −1, +3, +1. Cadena de subidas "10011", de bajadas "00100".</p><ul><li>sum_inc = <strong>3</strong>, sum_dec = <strong>1</strong> (el empate 7→7 no cuenta en ninguna).</li><li>media_inc = 3/5 = <strong>0.6</strong>; delta_mean = (2+0−1+3+1)/5 = <strong>1.0</strong>.</li><li>"10011".split("0") = ["1", "", "11"] → longitudes [1, 0, 2] → max_racha_inc = <strong>2</strong>.</li><li>"00100".split("0") = ["", "", "1", "", ""] → [0, 0, 1, 0, 0] → media_racha_dec = <strong>0.2</strong>. Las cadenas vacías bajan el promedio: por eso en el ejemplo de la clase media_racha_dec = 0.33.</li></ul></div></details>
+
+<details class="qa"><summary>E3. Estandariza [2, 4, 6, 8, 10] con z-score y con Min-Max. ¿Qué desviación usa StandardScaler?</summary>
+<div class="ans"><p>Media = 6. StandardScaler usa la desviación poblacional: \(\sqrt{(16+4+0+4+16)/5} = \sqrt8 = 2.828\) (con ddof = 1 sería 3.162). z = <strong>[−1.414, −0.707, 0, 0.707, 1.414]</strong>. Min-Max: (x − 2)/8 = <strong>[0, 0.25, 0.5, 0.75, 1]</strong>.</p></div></details>
+
+<details class="qa"><summary>E4. Calcula a mano el WoE de cada bin y el IV. Bin A: 30 eventos, 170 no eventos. Bin B: 70 eventos, 730 no eventos.</summary>
+<div class="ans"><p>Totales: 100 eventos y 900 no eventos.</p><ul><li>A: %e = 0.30, %ne = 170/900 = 0.1889 → WoE = ln(0.1889/0.30) = <strong>−0.4626</strong>; IV<sub>A</sub> = (0.1889 − 0.30)(−0.4626) = 0.0514.</li><li>B: %e = 0.70, %ne = 730/900 = 0.8111 → WoE = ln(0.8111/0.70) = <strong>0.1473</strong>; IV<sub>B</sub> = (0.8111 − 0.70)(0.1473) = 0.0164.</li><li>IV = <strong>0.0678</strong> → poder predictivo <strong>bajo</strong>. El bin A es más riesgoso (WoE negativo).</li></ul></div></details>
+
+<details class="qa"><summary>E5. VarClus dio para un mismo cluster: A (RS_Own 0.90, RS_NC 0.20), B (0.95, 0.50), C (0.80, 0.10). ¿Qué variable se queda?</summary>
+<div class="ans"><p>RS_Ratio: A = 0.10/0.80 = 0.125; B = 0.05/0.50 = <strong>0.100</strong>; C = 0.20/0.90 = 0.222. Se queda <strong>B</strong> (id == 1). C tiene el RS_NC más bajo, pero su RS_Own también es el más bajo: lo que decide es el cociente.</p></div></details>
+
+<details class="qa"><summary>E6. Dos muestras: original [1, 2, 3, 4] e imputada [3, 4, 5, 6]. ¿Cuánto vale el estadístico KS y la variable está "rota"?</summary>
+<div class="ans"><p>Distribuciones acumuladas: en x = 2, F<sub>orig</sub> = 0.50 y F<sub>imp</sub> = 0 → diferencia 0.5; en x = 3: 0.75 vs 0.25; en x = 4: 1.0 vs 0.5. Máximo = <strong>0.5</strong> (<code>ks_2samp</code> da lo mismo). 0.5 &gt; 0.1 → <strong>rota</strong>.</p></div></details>
+
+<details class="qa"><summary>E7. Una logística da logit = −2 + 0.8·x. Para x = 1.5, ¿cuáles son los momios y la probabilidad del evento? ¿Por cuánto se multiplican los momios si x sube 1?</summary>
+<div class="ans"><p>logit = −2 + 1.2 = −0.8. Momios = e<sup>−0.8</sup> = <strong>0.449</strong>. p = 1/(1 + e<sup>0.8</sup>) = <strong>0.310</strong> (o momios/(1 + momios) = 0.449/1.449). Si x sube 1, los momios se multiplican por e<sup>0.8</sup> = <strong>2.23</strong>.</p></div></details>
+
+<details class="qa"><summary>E8. Escala de score con PDO = 20, Score = 600 para momios 50:1. Calcula Factor, Offset y los scores para momios 100:1, 25:1 y 1:1.</summary>
+<div class="ans"><p>Factor = 20/ln 2 = <strong>28.854</strong>. Offset = 600 − 28.854·ln 50 = 600 − 112.88 = <strong>487.12</strong>. Score = Offset + Factor·ln(momios): 100:1 → <strong>620</strong>; 25:1 → <strong>580</strong>; 1:1 → ln 1 = 0 → <strong>487.12</strong> (el Offset es el score de momios 1:1). Cada vez que los momios se duplican el score sube 20.</p></div></details>
+
+<details class="qa"><summary>E9. Matriz de confusión [[80, 20], [10, 40]] (formato de sklearn). Calcula accuracy, precisión, recall, especificidad y F1.</summary>
+<div class="ans"><p>TN = 80, FP = 20, FN = 10, TP = 40 (N = 150). Accuracy = 120/150 = <strong>0.80</strong>. Precisión = 40/60 = <strong>0.667</strong>. Recall = 40/50 = <strong>0.80</strong>. Especificidad = 80/100 = <strong>0.80</strong>. F1 = 2(0.667·0.8)/(1.467) = <strong>0.727</strong>.</p></div></details>
+
+<details class="qa"><summary>E10. En la validación de churn hay 1,806 clientes, 492 de ellos con fuga. El modelo tuvo accuracy 0.806. ¿Qué accuracy tendría un modelo que dice "nadie se va"?</summary>
+<div class="ans"><p>Acierta los 1,806 − 492 = 1,314 que se quedan: 1,314/1,806 = <strong>0.728</strong>. El modelo real solo gana 8 puntos de accuracy, pero su recall de 0.547 dice lo importante: detecta a poco más de la mitad de quienes se van.</p></div></details>
+
+<details class="qa"><summary>E11. Una TAD tiene tres categóricas con 3, 4 y 10 categorías. ¿Cuántas columnas dummy se crean con y sin drop_first? ¿Cuántas columnas WoE?</summary>
+<div class="ans"><p>Sin drop_first: 3 + 4 + 10 = <strong>17</strong>. Con drop_first: 2 + 3 + 9 = <strong>14</strong>. Con WoE: <strong>3</strong> (una por variable). Esa es la "reducción de dimensionalidad" que la diapositiva atribuye al WoE.</p></div></details>
+
+<details class="qa"><summary>E12. Frecuencias de una variable: A 48 %, B 30 %, C 16 %, D 4 %, E 2 %, y además 1 % de nulos. Aplica el tratamiento del curso (umbral 3 %).</summary>
+<div class="ans"><p>1) Nulos → "Sin categoría" (1 %). 2) Categorías con menos de 3 %: E (2 %) y "Sin categoría" (1 %) → se juntan en <strong>"Otros" (3 %)</strong>. Resultado: A, B, C, D, Otros. Si después de normalizar quedara una sola categoría, la variable sería unaria y se eliminaría.</p></div></details>
+
+<details class="qa"><summary>E13. ¿Qué imprime este código?<pre>d = pd.DataFrame({"a": [1, None, 3], "b": ["p", None, "q"]})
+print((1 - d.describe().T["count"] / len(d)).to_dict())
+print(d.isna().mean().round(3).to_dict())</pre></summary>
+<div class="ans"><p>Primera línea: <code>{'a': 0.333}</code> (aprox.). <code>describe()</code> solo resume las numéricas, así que <code>b</code> no aparece. Segunda línea: <code>{'a': 0.333, 'b': 0.333}</code>. Para un diagnóstico completo usa <code>isna().mean()</code>.</p></div></details>
+
+<details class="qa"><summary>E14. Clasifica cada columna de la tabla integrada de churn: Customer_ID, Churn_Value, Churn_Score, Customer_Status, Contract, Monthly_Charge, Quarter (todo Q3).</summary>
+<div class="ans"><ul><li><strong>Customer_ID</strong>: llave / unidad muestral (no entra al modelo).</li><li><strong>Churn_Value</strong>: variable objetivo.</li><li><strong>Churn_Score</strong> y <strong>Customer_Status</strong>: fuera, dan la respuesta (Customer_Status tiene "Churned"; su IV es ∞).</li><li><strong>Contract</strong>: categórica → normalizar, IV/WoE (en el notebook su IV = 1.506 quedó fuera del filtro 0.1–0.8).</li><li><strong>Monthly_Charge</strong>: continua → limpieza y discretización.</li><li><strong>Quarter</strong>: unaria → se elimina.</li></ul></div></details>
+
+<details class="qa"><summary>E15. La logística de Ecobici tiene β<sub>max</sub> = 3.244 e intercepto −3.229 (variables estandarizadas). ¿Qué probabilidad de alta afluencia tiene una estación promedio y cuál si su máximo reciente está 1 desviación arriba?</summary>
+<div class="ans"><p>Promedio (z = 0): p = 1/(1 + e<sup>3.229</sup>) = <strong>0.038</strong>. Con z<sub>max</sub> = 1: logit = 0.015 → p = <strong>0.504</strong>. Los momios pasan de 0.0396 a 1.0155: se multiplican por e<sup>3.244</sup> = <strong>25.6</strong>.</p></div></details>
+
+<!-- ===================================================== -->
+<h2 id="cuestionario">3. Cuestionario (<span data-quiz-count>78</span> preguntas)</h2>
+<p>Las respuestas se guardan en tu navegador. Usa el filtro por tema para estudiar por bloques y "Solo falladas" para repasar.</p>
+<div class="quiz-bar no-toc">
+  <div><span class="score" id="qz-score">0 / 0</span> <small style="color:var(--ink-3)">correctas</small></div>
+  <div class="meter" aria-hidden="true"><div id="qz-meter"></div></div>
+  <label style="font-size:.88rem">Tema
+    <select id="qz-filter" class="inp" style="width:auto">
+      <option value="">Todos</option>
+    </select>
+  </label>
+  <button class="btn" id="qz-shuffle" type="button">Aleatorio</button>
+  <button class="btn" id="qz-wrong" type="button">Solo falladas</button>
+  <button class="btn" id="qz-reset" type="button">Reiniciar</button>
+</div>
+<div id="quiz"></div>
+
+<!-- ===================================================== -->
+<h2 id="tarjetas">4. Tarjetas de repaso</h2>
+<p>Toca una tarjeta para voltearla. Di la definición (o la fórmula) en voz alta antes de voltear.</p>
+<div class="flash-wrap" id="flash"></div>
+
+<!-- ===================================================== -->
+<h2 id="abiertas">5. Preguntas abiertas tipo examen</h2>
+<details class="qa"><summary>Explica qué es la TAD, cómo se construye con ventanas de tiempo y qué es la unidad muestral, usando el ejemplo de Ecobici.</summary><div class="ans"><p>La TAD es la tabla con la que aprende el modelo: matriz de predictoras \(X\) y vector solución \(y\), un renglón por unidad muestral. En Ecobici los datos vienen por estación y periodo, y la pregunta es la afluencia futura de cada estación, así que la unidad muestral es estación + ancla. Para cada ancla se toman los 20 periodos anteriores (ventana de observación) y se calculan 21 variables (suma, mínimo, máximo, media, desviación, subidas, bajadas, deltas, rachas); \(y\) es la afluencia en ancla + 1 (ventana de desempeño). Se repite para las anclas 20 a 699 y se apilan: 265,200 renglones. Ninguna variable puede usar información posterior al ancla.</p></div></details>
+<details class="qa"><summary>Describe en orden los pasos de limpieza de la TAD y qué decide cada uno.</summary><div class="ans"><p>1) % de nulos por variable. 2) Si son pocos se eliminan registros; si no, se imputa (media/mediana; <code>fit</code> calcula, <code>transform</code> rellena). 3) KS entre la variable original y la imputada: KS &gt; 0.1 → rota, fuera. 4) <code>VarianceThreshold</code> quita variables casi constantes (umbral según escala). 5) Extremos: registros fuera de p1–p99 en alguna variable se eliminan, después de pegar la unidad muestral. 6) Análisis bivariado (correlación, pairplot). 7) VarClus para multicolinealidad: una variable por cluster (id == 1 por RS_Ratio).</p></div></details>
+<details class="qa"><summary>¿Qué son WoE e IV, cómo se calculan para una variable continua y cómo se usan para seleccionar variables?</summary><div class="ans"><p>WoE<sub>i</sub> = ln(%no evento<sub>i</sub>/%evento<sub>i</sub>) mide si un bin tiene más o menos riesgo que el promedio. Para continuas: discretizar (en la sesión 9, 2 a 6 cortes por cuantiles), contar eventos y no eventos por bin y sacar el logaritmo del cociente de proporciones. IV = Σ(%ne − %e)·WoE resume el poder predictivo: &lt;0.02 no ayuda, 0.02–0.1 bajo, 0.1–0.3 regular, 0.3–0.5 fuerte, ≥0.5 sobrepredictiva. Se elige el número de cortes de mayor IV por variable, se filtra (0.1 &lt; IV &lt; 0.8 en el notebook) y las seleccionadas se transforman a WoE con el mapa aprendido en entrenamiento. Un IV infinito o enorme indica que la variable puede estar dando la respuesta.</p></div></details>
+<details class="qa"><summary>Compara PCA y t-SNE, y WoE y variables dummy: ¿cuándo usarías cada uno?</summary><div class="ans"><p>PCA: lineal, combinaciones de máxima varianza, conserva la estructura global y puede transformar datos nuevos → para reducir variables antes de un modelo (estandarizando antes). t-SNE: no lineal, excelente para ver clústeres en 2D/3D, pero costoso, depende del perplexity y no conserva la estructura global → solo para explorar. WoE: una columna por variable, captura la relación con el objetivo, ideal para logística y scoring, pero menos interpretable y requiere discretizar. Dummies: simples e interpretables, pero explotan la dimensión con muchas categorías y causan multicolinealidad si no se quita una columna.</p></div></details>
+<details class="qa"><summary>¿Qué es data leakage? Da tres ejemplos del material del módulo.</summary><div class="ans"><p>Es usar en el entrenamiento información que no estaría disponible al momento de predecir; el modelo se ve excelente en validación y falla en producción. Ejemplos: 1) variables calculadas con datos posteriores al ancla ("ojo con variables futuras"); 2) <code>Churn_Label</code>, <code>Churn_Score</code>, <code>Churn_Reason</code> y <code>Churn_Category</code>, que se derivan de la fuga; 3) <code>Customer_Status</code>, que incluye "Churned" y tiene IV infinito. Una forma más sutil es calcular el WoE (o el escalamiento) con los datos de validación, por eso se aprende solo con el 70 %.</p></div></details>
+<details class="qa"><summary>Explica cómo pasar de una regresión logística a una scorecard y qué papel juegan PDO, Factor y Offset.</summary><div class="ans"><p>La logística (con variables WoE) da un logit lineal: ln(momios) = α + Σβ·WoE. El score se define como una transformación lineal de ln(momios bueno:malo): Score = Offset + Factor·ln(momios). El analista fija la escala con PDO (puntos para duplicar los momios) → Factor = PDO/ln 2, y con un punto de referencia (score para unos momios) → Offset = Score − Factor·ln(odds). El logit se reparte entre las n variables para dar puntos a cada atributo: (−WoE·β + α/n)·Factor + Offset/n. El score del cliente es la suma de los puntos de sus atributos. El Offset desplaza la distribución de scores y el Factor la estira.</p></div></details>
+<details class="qa"><summary>¿Por qué el accuracy no basta para evaluar el modelo de churn? ¿Qué métricas usarías?</summary><div class="ans"><p>La clase positiva es 27 %, así que decir "nadie se va" ya da 72.8 % de accuracy; el 0.806 del modelo no dice cuántos de los que se van detecta. La matriz [[1186, 128], [223, 269]] da recall = 0.547 (detecta 55 % de las fugas) y precisión = 0.678. Se usan AUC (con probabilidades: 0.854), recall, precisión, F1 y la matriz de confusión; además, el corte 0.5 se puede mover según el costo de cada error.</p></div></details>
+<details class="qa"><summary>Diferencia entre OLTP y OLAP y cómo se construyó un cubo en la sesión 10.</summary><div class="ans"><p>OLTP registra transacciones del día a día con detalle (cada medición por estación y hora), con muchas inserciones pequeñas y un modelo normalizado. OLAP sirve para analizar: datos agregados e históricos organizados en hechos (medidas: los contaminantes) y dimensiones (tiempo, ubicación), con operaciones roll-up, drill-down, slice, dice y pivot. En la sesión 10 se derivaron 13 dimensiones de tiempo de la fecha y la zona por cuadrantes respecto a la latitud/longitud promedio; cada cubo es un <code>groupby</code> por dimensión con agregados (media, etc.), apilados con <code>concat</code> y guardados en CSV/Excel.</p></div></details>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="modulo1.html"><small>← Volver a</small>Módulo 1 · Fundamentos y preparación de datos</a>
+  <a class="next" href="modulo2.html"><small>Siguiente →</small>Módulo 2 · Modelación supervisada</a>
+</nav>
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/quiz-m1.js?v=1" defer></script>
+</body>
+</html>

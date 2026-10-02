@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1 · Fundamentos y preparación de datos | Apuntes Ciencia de Datos</title>
-<meta name="description" content="Proceso de ciencia de datos, TAD, ventanas de tiempo, limpieza, VarClus, estandarización, PCA, t-SNE, variables dummy, credit scoring con WoE e IV, scorecards y OLAP.">
+<meta name="description" content="Conceptos base, proceso de ciencia de datos, pandas, integración, TAD, ventanas de tiempo, ingeniería de variables, limpieza, VarClus, estandarización, PCA, t-SNE, dummies, credit scoring con WoE e IV, scorecards y OLAP.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -14,7 +14,7 @@
 <header class="topbar">
   <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
-  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html" aria-current="page">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m4.html">Examen M4</a></nav>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html" aria-current="page">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m1.html">Examen M1</a><a href="examen-m4.html">Examen M4</a></nav>
   <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
 </header>
 <div class="progress" aria-hidden="true"></div>
@@ -24,44 +24,114 @@
 <section class="hero">
   <div class="eyebrow">Módulo 1 · Introducción, manipulación, exploración y visualización de datos</div>
   <h1>Del dato crudo a la Tabla Analítica de Datos (TAD) y los primeros modelos</h1>
-  <p class="lead">El módulo enseña el <strong>proceso completo</strong>: entender el problema, definir unidad muestral y variable objetivo, construir variables con ventanas de tiempo, limpiar la TAD, transformarla (estandarizar, reducir dimensiones, WoE) y ajustar los primeros modelos (regresión lineal, logística y scorecards). Cierra con OLTP vs OLAP y cubos.</p>
+  <p class="lead">El módulo enseña el <strong>proceso completo</strong>: entender el problema, definir unidad muestral y variable objetivo, integrar fuentes, construir variables con ventanas de tiempo, limpiar la TAD, transformarla (estandarizar, reducir dimensiones, WoE) y ajustar los primeros modelos (regresión lineal, logística y scorecards). Cierra con OLTP vs OLAP y cubos.</p>
   <div class="meta-row">
     <span class="chip"><span class="dot" style="background:var(--s1)"></span>Prof. Luis Gómez Aussenac</span>
     <span class="chip">6 presentaciones</span>
     <span class="chip">3 notebooks (sesiones 8, 9 y 10)</span>
-    <span class="chip">11 programas verificados</span>
+    <span class="chip">18 programas verificados</span>
+    <a class="chip" href="examen-m1.html" style="text-decoration:none">📝 Guía, tarjetas y examen del M1 →</a>
   </div>
-  <details class="sources">
-    <summary>Material del curso en el que se basa esta página</summary>
-    <ul>
-      <li><code>Sesión_02_Introducción.pdf</code> — conceptos, IA, científico de datos, proceso, equipos, retos</li>
-      <li><code>Sesión_03_Conceptos para un modelo predictivo.pdf</code> — aprendizaje, TAD, unidad muestral, ventanas de tiempo</li>
-      <li><code>Sesión_04_ Algoritmos ML_.pdf</code> — algoritmos y casos de uso (ejemplo de demanda de Ecobici)</li>
-      <li><code>DCC - Estandarización de datos y reducción de dimensiones.pdf</code> — z-score, min-max, PCA</li>
-      <li><code>DCC - Clasificación Binaria - Credit Scoring_.pdf</code> — logística, WoE, IV, scorecard, PDO</li>
-      <li><code>DCC - Más transformaciones_ TSNE y Dummy.pdf</code> — t-SNE, dummies, comparativas</li>
-      <li><code>Sesión - 8 - Regresión y Clasificación.ipynb</code> — Ecobici: ventanas, variables, limpieza, VarClus, modelos</li>
-      <li><code>Sesión - 9 - Churn.ipynb</code> — fuga de clientes: integración, normalización, discretización, IV, WoE, logística</li>
-      <li><code>Sesión - 10 - OLTP y OLAP.ipynb</code> — contaminantes CDMX: dimensiones de tiempo y ubicación, cubos</li>
-      <li><code>Screenshot…png</code> — interpretación de la salida de VarClusHi (RS_Own, RS_NC, RS_Ratio)</li>
-    </ul>
-  </details>
 </section>
 
 <!-- ===================================================== -->
+<h2 id="mapa">La historia del módulo en una imagen</h2>
+<p>Todo el módulo sigue a un mismo protagonista: <strong>la TAD</strong>. Primero se decide qué representa cada renglón y qué se quiere predecir; luego se juntan las fuentes, se construyen y limpian las variables, se transforman, y al final se entrena y evalúa un modelo. Los módulos 2, 3 y 4 asumen que ya sabes hacer esto.</p>
+<figure class="figure">
+  <svg viewBox="0 0 760 250" role="img" aria-label="Flujo del módulo 1: de los datos crudos a la TAD y el modelo">
+    <defs><marker id="ma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <rect x="10" y="20" width="135" height="56" rx="10" class="d-fill-1"/><text x="77" y="44" text-anchor="middle" class="d-text" font-weight="700">Problema</text><text x="77" y="62" text-anchor="middle" class="d-text-3">unidad muestral, y</text>
+    <rect x="160" y="20" width="135" height="56" rx="10" class="d-fill-1"/><text x="227" y="44" text-anchor="middle" class="d-text" font-weight="700">Integración</text><text x="227" y="62" text-anchor="middle" class="d-text-3">fuentes → 1 tabla</text>
+    <rect x="310" y="20" width="135" height="56" rx="10" class="d-fill-3"/><text x="377" y="44" text-anchor="middle" class="d-text" font-weight="700">Variables</text><text x="377" y="62" text-anchor="middle" class="d-text-3">ventanas, ratios</text>
+    <rect x="460" y="20" width="135" height="56" rx="10" class="d-fill-3"/><text x="527" y="44" text-anchor="middle" class="d-text" font-weight="700">Limpieza</text><text x="527" y="62" text-anchor="middle" class="d-text-3">nulos, KS, VarClus</text>
+    <rect x="610" y="20" width="140" height="56" rx="10" class="d-fill-4"/><text x="680" y="44" text-anchor="middle" class="d-text" font-weight="700">Transformación</text><text x="680" y="62" text-anchor="middle" class="d-text-3">z-score, PCA, WoE</text>
+    <rect x="460" y="140" width="135" height="56" rx="10" class="d-fill-7"/><text x="527" y="164" text-anchor="middle" class="d-text" font-weight="700">Modelo</text><text x="527" y="182" text-anchor="middle" class="d-text-3">lineal, logística</text>
+    <rect x="310" y="140" width="135" height="56" rx="10" class="d-fill-7"/><text x="377" y="164" text-anchor="middle" class="d-text" font-weight="700">Evaluación</text><text x="377" y="182" text-anchor="middle" class="d-text-3">MAE, AUC, matriz</text>
+    <rect x="160" y="140" width="135" height="56" rx="10" class="d-fill-2"/><text x="227" y="164" text-anchor="middle" class="d-text" font-weight="700">Scorecard</text><text x="227" y="182" text-anchor="middle" class="d-text-3">puntos, PDO</text>
+    <rect x="10" y="140" width="135" height="56" rx="10" class="d-fill-2"/><text x="77" y="164" text-anchor="middle" class="d-text" font-weight="700">OLAP</text><text x="77" y="182" text-anchor="middle" class="d-text-3">cubos para análisis</text>
+    <g class="d-arrow"><path d="M145 48 H157" marker-end="url(#ma)"/><path d="M295 48 H307" marker-end="url(#ma)"/><path d="M445 48 H457" marker-end="url(#ma)"/><path d="M595 48 H607" marker-end="url(#ma)"/><path d="M680 78 V168 H598" marker-end="url(#ma)"/><path d="M458 168 H448" marker-end="url(#ma)"/><path d="M308 168 H298" marker-end="url(#ma)"/></g>
+    <text x="380" y="232" text-anchor="middle" class="d-text-3">Ecobici (sesión 8) · Churn (sesión 9) · Contaminantes CDMX (sesión 10)</text>
+  </svg>
+  <figcaption>Cada caja es una sección de esta página. Las de arriba construyen la TAD; las de abajo la usan.</figcaption>
+</figure>
+
+<!-- ===================================================== -->
 <h2 id="conceptos">1. Conceptos base</h2>
-<div class="glossary">
-  <div class="gterm"><b>Inteligencia Artificial</b><span>Sistemas computacionales que simulan comportamientos cognitivos humanos.</span></div>
-  <div class="gterm"><b>Científico de datos</b><span>Profesional que obtiene conocimiento del manejo, análisis e interpretación de datos digitales complejos para asistir la toma de decisiones del negocio.</span></div>
-  <div class="gterm"><b>Business Intelligence</b><span>Reportes y tableros sobre lo que ya pasó (descriptivo).</span></div>
-  <div class="gterm"><b>Data Mining</b><span>Descubrir patrones ocultos en grandes volúmenes de datos.</span></div>
-  <div class="gterm"><b>Analytics</b><span>Análisis cuantitativo para responder preguntas de negocio.</span></div>
-  <div class="gterm"><b>Machine Learning</b><span>Algoritmos que aprenden patrones de los datos y mejoran con más datos.</span></div>
-  <div class="gterm"><b>Big Data</b><span>Datos con volumen, velocidad y variedad que exceden las herramientas tradicionales.</span></div>
-  <div class="gterm"><b>Data Science</b><span>Une estadística, programación y negocio para extraer valor de los datos.</span></div>
+<p>La sesión 2 abre con seis términos que en la práctica se usan como sinónimos pero no lo son. La diapositiva solo los nombra; aquí está la definición estándar de cada uno y, sobre todo, <strong>la pregunta que responde</strong>, que es la forma más fácil de distinguirlos.</p>
+
+<h3 id="panorama">1.1 Los seis términos del panorama</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Término</th><th>Qué es</th><th>Pregunta que responde</th><th>Ejemplo con el material del curso</th></tr></thead>
+<tbody>
+<tr><td><strong>Business Intelligence (BI)</strong></td><td>Reportes, tableros e indicadores sobre datos históricos consolidados.</td><td>¿Qué pasó?</td><td>Promedio de O₃ por trimestre y zona: los cubos OLAP de la sesión 10.</td></tr>
+<tr><td><strong>Data Mining</strong></td><td>Descubrir patrones no evidentes en grandes volúmenes de datos (asociaciones, grupos, anomalías).</td><td>¿Qué patrones hay escondidos?</td><td>Estaciones de Ecobici con series parecidas; variables que se mueven juntas (VarClus).</td></tr>
+<tr><td><strong>Analytics</strong></td><td>Análisis cuantitativo para responder preguntas de negocio. Suele dividirse en descriptiva, diagnóstica, predictiva y prescriptiva.</td><td>¿Por qué pasó? ¿Qué pasará? ¿Qué hago?</td><td>¿Qué tipo de contrato tiene más fuga? (tasa de fuga por categoría).</td></tr>
+<tr><td><strong>Data Science</strong></td><td>Disciplina que combina estadística, programación y conocimiento del negocio para extraer valor de los datos de punta a punta.</td><td>¿Cómo convierto los datos en una decisión que funcione en producción?</td><td>Los 9 pasos del proceso (sección 1.4).</td></tr>
+<tr><td><strong>Machine Learning</strong></td><td>Algoritmos que aprenden una función a partir de ejemplos, sin programar las reglas a mano; mejoran con más y mejores datos.</td><td>¿Qué pasará con este caso nuevo?</td><td>Regresión logística que predice si un cliente se va.</td></tr>
+<tr><td><strong>Big Data</strong></td><td>Datos cuyo <strong>volumen, velocidad y variedad</strong> (las "3 V") rebasan las herramientas tradicionales y exigen cómputo distribuido.</td><td>¿Cómo proceso y guardo esto a escala?</td><td>Herramientas de la diapositiva: Hadoop, Spark, Hive, HBase, Cassandra.</td></tr>
+</tbody></table></div>
+
+<div class="two-col">
+<figure class="figure" style="margin:0">
+  <svg viewBox="0 0 360 230" role="img" aria-label="Inteligencia artificial contiene a machine learning, que contiene a deep learning">
+    <ellipse cx="180" cy="118" rx="170" ry="105" class="d-fill-1"/>
+    <ellipse cx="200" cy="135" rx="118" ry="74" class="d-fill-3"/>
+    <ellipse cx="222" cy="150" rx="62" ry="40" class="d-fill-7"/>
+    <text x="70" y="70" class="d-text" font-weight="700">IA</text>
+    <text x="118" y="105" class="d-text" font-weight="700">Machine Learning</text>
+    <text x="222" y="146" text-anchor="middle" class="d-text" font-weight="700">Deep</text><text x="222" y="163" text-anchor="middle" class="d-text" font-weight="700">Learning</text>
+  </svg>
+  <figcaption>Diapositiva 2 de la sesión 3: IA ⊃ ML ⊃ DL.</figcaption>
+</figure>
+<div>
+  <div class="gterm" style="margin-bottom:10px"><b>Inteligencia Artificial (definición de la clase)</b><span>Sistemas computacionales que simulan comportamientos cognitivos humanos.</span></div>
+  <div class="gterm" style="margin-bottom:10px"><b>Machine Learning</b><span>La rama de la IA que aprende de datos. Se divide en supervisado, no supervisado y reforzado (sección 2).</span></div>
+  <div class="gterm" style="margin-bottom:10px"><b>Deep Learning</b><span>ML con redes neuronales de muchas capas. En el <a href="modulo4.html#profunda">Módulo 4</a> se considera profunda una red a partir de 5 capas ocultas.</span></div>
+  <div class="gterm"><b>Científico de datos (definición de la clase)</b><span>Profesional que obtiene conocimiento a través del manejo, análisis e interpretación de datos digitales complejos para asistir la toma de decisiones en los negocios.</span></div>
+</div>
 </div>
 
-<h3 id="proceso">1.1 Proceso de ciencia de datos aplicada</h3>
+<h3 id="vocabulario-datos">1.2 Vocabulario de los datos</h3>
+<p>Estos términos aparecen en todas las sesiones. Cada uno viene con su ejemplo real para que lo reconozcas en el código.</p>
+<div class="glossary">
+  <div class="gterm"><b>Observación / registro</b><span>Un renglón de los datos crudos: un viaje, una medición horaria, un cliente. La diapositiva las llama "historia, eventos, registros".</span></div>
+  <div class="gterm"><b>Unidad muestral</b><span>"Representación numérica de un objeto": lo que es cada renglón <em>de la TAD</em>. Ecobici: estación + ancla. Churn: <code>Customer_ID</code>.</span></div>
+  <div class="gterm"><b>Característica (feature)</b><span>Una columna que describe a la unidad muestral, p. ej. <code>SEXO</code> o <code>v_max_afluencia</code>. También: variable, predictora.</span></div>
+  <div class="gterm"><b>Atributo</b><span>Cada valor posible de una característica: para <code>SEXO</code>, "Hombre" y "Mujer" (diapositiva de credit scoring). En la scorecard cada atributo recibe puntos.</span></div>
+  <div class="gterm"><b>Variable objetivo (target, y)</b><span>"Resultado de una observación": lo que se quiere predecir. <code>Churn_Value</code> (0/1) o la afluencia en t+1.</span></div>
+  <div class="gterm"><b>TAD</b><span>Tabla Analítica de Datos: matriz de predictoras \(X\) + vector solución \(y\), un renglón por unidad muestral. "El modelo aprende de X".</span></div>
+  <div class="gterm"><b>Llave (id)</b><span>Columna que identifica la unidad muestral y sirve para unir tablas (<code>merge</code>). <strong>No es predictora.</strong></span></div>
+  <div class="gterm"><b>Granularidad</b><span>Nivel de detalle de una tabla. Ecobici viene a nivel viaje, pero la pregunta es a nivel estación-periodo: hay que agregar.</span></div>
+  <div class="gterm"><b>Formato largo vs ancho</b><span>Largo: una fila por estación y periodo (<code>estaciones.csv</code>). Ancho: una fila por estación y una columna por periodo (<code>pivot_table</code>).</span></div>
+  <div class="gterm"><b>Evento / no evento</b><span>Las dos clases de un problema binario. En crédito el evento es incumplir ("malo"); en churn, irse. Base del WoE.</span></div>
+</div>
+
+<p><strong>Tipos de variables y cómo las trata el curso.</strong> Antes de limpiar hay que separar las columnas por tipo, porque cada tipo tiene su propio tratamiento (el notebook de churn lo hace con <code>select_dtypes</code>):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Tipo</th><th>Ejemplo real</th><th>Tratamiento en el módulo</th></tr></thead>
+<tbody>
+<tr><td>Continua</td><td><code>Monthly_Charge</code>, <code>v_mean_afluencia</code></td><td>imputar, KS, varianza, extremos, VarClus; luego estandarizar o discretizar en bines (scoring)</td></tr>
+<tr><td>Discreta (conteo)</td><td><code>Number_of_Referrals</code>, <code>v_sum_inc_afluencia</code></td><td>igual que las continuas</td></tr>
+<tr><td>Categórica nominal</td><td><code>Contract</code>, <code>City</code>, <code>Payment_Method</code></td><td>nulos → "Sin categoría", normalización (&lt; 3 % → "Otros"), dummies o WoE</td></tr>
+<tr><td>Categórica ordinal</td><td><code>Satisfaction_Score</code> (1 a 5)</td><td>tiene orden; puede tratarse como número o como categoría</td></tr>
+<tr><td>Binaria</td><td><code>Churn_Value</code>, <code>y2</code></td><td>suele ser la variable objetivo</td></tr>
+<tr><td>Fecha / hora</td><td><code>date</code> de los contaminantes</td><td>se derivan dimensiones: hora, día, semana, mes, trimestre, año-mes</td></tr>
+<tr><td>Identificador</td><td><code>Customer_ID</code>, <code>id_estacion</code></td><td>llave para unir y para no perder la unidad muestral; nunca entra al modelo</td></tr>
+</tbody></table></div>
+
+<h3 id="vocabulario-modelado">1.3 Vocabulario del modelado</h3>
+<div class="glossary">
+  <div class="gterm"><b>Entrenamiento / validación</b><span>Los datos se parten (70 % / 30 % en los notebooks, <code>train_test_split</code>). El modelo aprende con uno y se mide con el otro, que nunca vio.</span></div>
+  <div class="gterm"><b>Parámetro</b><span>Lo que el modelo aprende: <code>coef_</code> e <code>intercept_</code>. Ecobici: intercepto 121,493 en la regresión.</span></div>
+  <div class="gterm"><b>Hiperparámetro / decisión del analista</b><span>Lo que tú fijas: tamaño de ventana (20), umbral KS (0.1), número de bines (2 a 6), <em>perplexity</em> de t-SNE.</span></div>
+  <div class="gterm"><b><code>fit</code> / <code>transform</code> / <code>predict</code></b><span>La interfaz de scikit-learn: <code>fit</code> aprende (la mediana, la media, los β), <code>transform</code> aplica, <code>predict</code> da la clase y <code>predict_proba</code> la probabilidad.</span></div>
+  <div class="gterm"><b>Sobreajuste (overfitting)</b><span>El modelo memoriza el entrenamiento y falla con datos nuevos. Muchas variables lo favorecen (diapositiva de PCA).</span></div>
+  <div class="gterm"><b>Generalización</b><span>Qué tan bien funciona con datos que no vio. Por eso se reporta la métrica en validación.</span></div>
+  <div class="gterm"><b>Data leakage (fuga de información)</b><span>Usar en \(X\) algo que no se conocería al momento de predecir: variables futuras ("ojo con variables futuras") o que "dan la respuesta" (<code>Customer_Status</code>).</span></div>
+  <div class="gterm"><b>Desbalance de clases</b><span>Una clase domina: churn 27 % de fugas, Ecobici 17.6 % de alta afluencia. El accuracy engaña; se usan AUC, recall, etc.</span></div>
+</div>
+
+<h3 id="proceso">1.4 Proceso de ciencia de datos aplicada</h3>
 <figure class="figure">
   <svg viewBox="0 0 760 220" role="img" aria-label="Nueve pasos del proceso de ciencia de datos">
     <defs><marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
@@ -81,10 +151,38 @@
   </svg>
   <figcaption>Los 9 pasos de la sesión 2. Es un ciclo: tras producción, el modelo se calibra y se vuelve a empezar.</figcaption>
 </figure>
+<p>Los 9 pasos no son teoría suelta: cada uno corresponde a algo concreto que se hace en los notebooks y a una sección de esta página.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Paso</th><th>Qué se hace en los notebooks</th><th>Sección</th></tr></thead>
+<tbody>
+<tr><td>1 · Recolección</td><td>leer <code>estaciones.csv</code>, 6 archivos de Excel de churn, CSV de contaminantes</td><td><a href="#pandas">4</a></td></tr>
+<tr><td>2 · Integración</td><td>unir las fuentes por la llave (<code>reduce</code> + <code>merge</code>)</td><td><a href="#integracion">5</a></td></tr>
+<tr><td>3 · Limpieza</td><td>nulos, imputación, KS, varianza, extremos</td><td><a href="#limpieza">7</a></td></tr>
+<tr><td>4 · Exploración</td><td><code>describe</code>, histogramas, frecuencias, correlación, pairplot</td><td><a href="#pandas">4</a> y <a href="#limpieza">7</a></td></tr>
+<tr><td>5 · Transformación</td><td>variables por ventana, estandarizar, PCA, dummies, discretizar, WoE</td><td><a href="#variables-series">6</a>, <a href="#estandarizacion">8</a>–<a href="#credit-scoring">11</a></td></tr>
+<tr><td>6 · Modelación</td><td><code>LinearRegression</code>, <code>LogisticRegression</code></td><td><a href="#modelos-notebooks">12</a></td></tr>
+<tr><td>7 · Pruebas / validación</td><td>MAE, AUC, accuracy, matriz de confusión en el 30 %</td><td><a href="#modelos-notebooks">12</a></td></tr>
+<tr><td>8 · Producción</td><td>persistir la TAD (<code>to_parquet</code>) y el modelo para usarlos con datos nuevos</td><td>—</td></tr>
+<tr><td>9 · Calibración</td><td>monitorear y re-entrenar; se profundiza en el <a href="modulo2.html#estabilidad">Módulo 2</a></td><td>—</td></tr>
+</tbody></table></div>
 <div class="two-col">
   <div class="callout note"><div class="callout-title">Equipos involucrados</div><p>Arquitectura de datos · Ingeniería de datos · Ciencia de datos · Desarrollo de software · Inteligencia de negocio.</p></div>
   <div class="callout warn"><div class="callout-title">Retos / obstáculos</div><p>Datos dispersos o inexistentes · calidad de datos · infraestructura · costo · comunicación con la dirección · "miedo al cambio" · permitir la creatividad · normas burocráticas.</p></div>
 </div>
+
+<h3 id="herramientas">1.5 Herramientas</h3>
+<p>La diapositiva de herramientas muestra 30 logotipos. Agrupados por para qué sirven (en este módulo se usan los de la primera fila de la tabla):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Uso</th><th>Herramientas de la diapositiva</th></tr></thead>
+<tbody>
+<tr><td><strong>Análisis y modelado en Python</strong></td><td>Python, NumPy, pandas, SciPy, scikit-learn, Jupyter</td></tr>
+<tr><td>Visualización</td><td>seaborn, Bokeh, D3.js, Kibana</td></tr>
+<tr><td>Deep learning (<a href="modulo4.html">Módulo 4</a>)</td><td>TensorFlow, Keras, PyTorch</td></tr>
+<tr><td>Bases de datos</td><td>MySQL (relacional), MongoDB, Cassandra, HBase, Elasticsearch (NoSQL / búsqueda)</td></tr>
+<tr><td>Big Data y cómputo distribuido</td><td>Hadoop, Spark, Hive, Sqoop, Dask, Scala</td></tr>
+<tr><td>Infraestructura y nube</td><td>AWS, Docker, Kubernetes, Linux</td></tr>
+<tr><td>Desarrollo, documentación y trabajo en equipo</td><td>React, LaTeX, Atlassian</td></tr>
+</tbody></table></div>
 
 <!-- ===================================================== -->
 <h2 id="modelo-predictivo">2. Conceptos para un modelo predictivo</h2>
@@ -193,6 +291,7 @@ id_estacion  ancla  v_sum_afluencia  v_min_afluencia  v_max_afluencia  v_mean_af
          E1      7               57               18               20         19.000000                    1 25   0
          E2      7              119               38               41         39.666667                    1 37   1</pre></div>
 </div>
+<div class="callout tip"><div class="callout-title">💡 Los números reales de la sesión 8</div><p>El archivo tiene 272,877 registros de 390 estaciones en 700 periodos. Con <code>vobs = 20</code> y <code>vdes = 1</code> las anclas van de 20 a 699: 680 anclas × 390 estaciones = <strong>265,200</strong> renglones. Al pegar \(y\) quedan 123 sin valor futuro (la estación no tuvo registro en \(t+1\)) y se eliminan: la TAD preliminar queda con <strong>265,077</strong> renglones y 21 variables. Para la clasificación, <code>y2 = 1</code> si \(y &gt; 200{,}000\): el 20.5 % de los renglones.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="algoritmos">3. Algoritmos de ML y casos de uso</h2>
@@ -208,7 +307,257 @@ id_estacion  ancla  v_sum_afluencia  v_min_afluencia  v_max_afluencia  v_mean_af
 </tbody></table></div>
 
 <!-- ===================================================== -->
-<h2 id="variables-series">4. Ingeniería de variables sobre series</h2>
+<h2 id="pandas">4. Manos a la obra: pandas desde lo básico</h2>
+<p>Todos los notebooks empiezan igual: leer, revisar tipos y tamaños, contar categorías y resumir. Antes de las ventanas y el WoE conviene dominar estas operaciones, porque <strong>todo lo demás se construye con ellas</strong>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Operación</th><th>Para qué</th><th>Dónde aparece en el curso</th></tr></thead>
+<tbody>
+<tr><td><code>read_csv(sep='|')</code>, <code>read_excel</code></td><td>leer datos (ojo con el separador y el <code>encoding</code>)</td><td>Ecobici usa <code>sep='|'</code>; catálogos de la sesión 10 usan <code>encoding='latin-1'</code></td></tr>
+<tr><td><code>shape</code>, <code>dtypes</code>, <code>sample</code></td><td>tamaño, tipos y un vistazo aleatorio</td><td>inicio de las tres sesiones</td></tr>
+<tr><td><code>value_counts()</code>, <code>nunique()</code></td><td>frecuencias y número de categorías</td><td>registros por estación; análisis de frecuencias</td></tr>
+<tr><td><code>describe(percentiles=…)</code></td><td>resumen numérico con percentiles</td><td>afluencia y TAD; también para % de nulos y percentiles 1 y 99</td></tr>
+<tr><td><code>pivot_table</code>, <code>groupby</code></td><td>agregar y cambiar de forma</td><td>variables por ventana; cubos OLAP</td></tr>
+<tr><td><code>merge</code>, <code>concat</code></td><td>unir por llave / apilar</td><td>integración de churn; apilar anclas</td></tr>
+<tr><td><code>np.where</code>, <code>fillna</code></td><td>crear variables con condición / rellenar</td><td><code>y2</code>; ratios; "Sin categoría"</td></tr>
+</tbody></table></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_00a_pandas_basico.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_00a_pandas_basico.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Primeros pasos con pandas: lo mínimo que usan los notebooks antes de modelar
+# Es la misma &quot;inspección&quot; con la que empieza la sesión 8 (Ecobici): dtypes, value_counts, describe, pivot_table
+import numpy as np
+import pandas as pd
+
+# Formato &quot;largo&quot; (como estaciones.csv): una fila por estación y periodo
+df = pd.DataFrame({
+    &quot;afluencia&quot;: [120, 135, 150, 90, 80, 85, 405, 405, 405],
+    &quot;id_estacion&quot;: [&quot;E01&quot;, &quot;E01&quot;, &quot;E01&quot;, &quot;E02&quot;, &quot;E02&quot;, &quot;E02&quot;, &quot;E03&quot;, &quot;E03&quot;, &quot;E03&quot;],
+    &quot;t&quot;: [1, 2, 3, 1, 2, 3, 1, 2, 3],
+})
+
+print(&quot;1) Dimensión (filas, columnas):&quot;, df.shape)
+print(&quot;\n2) Tipos de dato:\n&quot;, df.dtypes.to_string(), sep=&quot;&quot;)
+print(&quot;\n3) ¿Cuántos registros tiene cada estación?\n&quot;, df[&quot;id_estacion&quot;].value_counts().to_string(), sep=&quot;&quot;)
+print(&quot;\n4) Número de estaciones distintas:&quot;, df[&quot;id_estacion&quot;].nunique())
+
+# describe() con percentiles propios (el notebook usa np.arange(0, 1.01, 0.1))
+print(&quot;\n5) Resumen de la afluencia:&quot;)
+print(df[&quot;afluencia&quot;].describe(percentiles=[0.25, 0.5, 0.75]).round(2).to_string())
+
+# Filtrar con condiciones (máscaras booleanas)
+print(&quot;\n6) Registros con afluencia &gt; 100:&quot;)
+print(df[df[&quot;afluencia&quot;] &gt; 100].to_string(index=False))
+
+# De formato largo a formato ancho: una fila por estación, una columna por periodo
+ancho = df.pivot_table(index=&quot;id_estacion&quot;, columns=&quot;t&quot;, values=&quot;afluencia&quot;, aggfunc=&quot;sum&quot;)
+print(&quot;\n7) pivot_table (formato ancho):\n&quot;, ancho.to_string(), sep=&quot;&quot;)
+
+# La estación E03 siempre vale 405: en Ecobici ese valor mínimo se repite en estaciones sin movimiento
+print(&quot;\n8) Desviación estándar por estación (0 = serie constante):&quot;)
+print(df.groupby(&quot;id_estacion&quot;)[&quot;afluencia&quot;].std(ddof=0).round(2).to_string())</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>1) Dimensión (filas, columnas): (9, 3)
+
+2) Tipos de dato:
+afluencia      int64
+id_estacion      str
+t              int64
+
+3) ¿Cuántos registros tiene cada estación?
+id_estacion
+E01    3
+E02    3
+E03    3
+
+4) Número de estaciones distintas: 3
+
+5) Resumen de la afluencia:
+count      9.00
+mean     208.33
+std      149.29
+min       80.00
+25%       90.00
+50%      135.00
+75%      405.00
+max      405.00
+
+6) Registros con afluencia &gt; 100:
+ afluencia id_estacion  t
+       120         E01  1
+       135         E01  2
+       150         E01  3
+       405         E03  1
+       405         E03  2
+       405         E03  3
+
+7) pivot_table (formato ancho):
+t              1    2    3
+id_estacion               
+E01          120  135  150
+E02           90   80   85
+E03          405  405  405
+
+8) Desviación estándar por estación (0 = serie constante):
+id_estacion
+E01    12.25
+E02     4.08
+E03     0.00</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Cómo leerlo</div><p>El 75 % de la afluencia vale 405 porque una de cada tres filas es de E03, que nunca cambia. En el Ecobici real pasa lo mismo: el mínimo es 405 y hay estaciones con ese valor en todos los periodos (desviación 0). Esas series casi constantes son las que después elimina <code>VarianceThreshold</code>.</p></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_00b_frecuencias_groupby.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_00b_frecuencias_groupby.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Tablas de frecuencias, groupby, merge, concat y np.where
+# La tabla FA / FR / FAA / FRA es la que imprime la función freq() de la sesión 9 (churn)
+import numpy as np
+import pandas as pd
+
+clientes = pd.DataFrame({
+    &quot;Customer_ID&quot;: [&quot;C1&quot;, &quot;C2&quot;, &quot;C3&quot;, &quot;C4&quot;, &quot;C5&quot;, &quot;C6&quot;, &quot;C7&quot;, &quot;C8&quot;],
+    &quot;Contract&quot;: [&quot;Month-to-Month&quot;, &quot;One Year&quot;, &quot;Month-to-Month&quot;, &quot;Two Year&quot;,
+                 &quot;Month-to-Month&quot;, np.nan, &quot;One Year&quot;, &quot;Month-to-Month&quot;],
+    &quot;Monthly_Charge&quot;: [70.0, 55.5, 99.9, 20.0, 89.0, 45.0, 60.0, 101.0],
+    &quot;Churn_Value&quot;: [1, 0, 1, 0, 1, 0, 0, 0],
+})
+
+# 1) &quot;La falta de información también es información&quot;: el nulo se vuelve una categoría
+clientes[&quot;Contract&quot;] = clientes[&quot;Contract&quot;].fillna(&quot;Sin categoría&quot;)
+
+# 2) Tabla de frecuencias: absoluta, relativa y sus acumuladas
+def freq(df, var):
+    t = df[var].value_counts().to_frame(&quot;FA&quot;)
+    t[&quot;FR&quot;] = t[&quot;FA&quot;] / t[&quot;FA&quot;].sum()
+    t[&quot;FAA&quot;] = t[&quot;FA&quot;].cumsum()
+    t[&quot;FRA&quot;] = t[&quot;FR&quot;].cumsum()
+    return t
+
+print(&quot;Tabla de frecuencias de Contract:\n&quot;, freq(clientes, &quot;Contract&quot;).round(3).to_string(), sep=&quot;&quot;)
+
+# 3) groupby: tasa de fuga (media del 0/1) y cargo promedio por tipo de contrato
+res = clientes.groupby(&quot;Contract&quot;).agg(clientes=(&quot;Customer_ID&quot;, &quot;count&quot;),
+                                       tasa_fuga=(&quot;Churn_Value&quot;, &quot;mean&quot;),
+                                       cargo_medio=(&quot;Monthly_Charge&quot;, &quot;mean&quot;))
+print(&quot;\nTasa de fuga por contrato:\n&quot;, res.round(3).to_string(), sep=&quot;&quot;)
+
+# 4) np.where: variable nueva con una condición (vectorizado, sin for)
+clientes[&quot;cargo_alto&quot;] = np.where(clientes[&quot;Monthly_Charge&quot;] &gt; 80, 1, 0)
+print(&quot;\nCargo alto (&gt; 80):&quot;, clientes[&quot;cargo_alto&quot;].tolist())
+
+# 5) merge: pegar otra tabla por la llave (unidad muestral)
+demograficos = pd.DataFrame({&quot;Customer_ID&quot;: [&quot;C1&quot;, &quot;C2&quot;, &quot;C3&quot;, &quot;C4&quot;, &quot;C5&quot;, &quot;C6&quot;, &quot;C7&quot;, &quot;C9&quot;],
+                             &quot;Age&quot;: [25, 41, 33, 67, 29, 52, 38, 45]})
+inner = clientes.merge(demograficos, on=&quot;Customer_ID&quot;, how=&quot;inner&quot;)
+left = clientes.merge(demograficos, on=&quot;Customer_ID&quot;, how=&quot;left&quot;)
+print(f&quot;\nmerge inner: {inner.shape} | merge left: {left.shape} | &quot;
+      f&quot;clientes sin edad tras el left: {left[&#x27;Age&#x27;].isna().sum()} ({left.loc[left[&#x27;Age&#x27;].isna(), &#x27;Customer_ID&#x27;].tolist()})&quot;)
+
+# 6) concat: apilar tablas con las mismas columnas (así se apilan las anclas en la sesión 8)
+a = pd.DataFrame({&quot;id&quot;: [&quot;E1&quot;, &quot;E2&quot;], &quot;ancla&quot;: [20, 20]})
+b = pd.DataFrame({&quot;id&quot;: [&quot;E1&quot;, &quot;E2&quot;], &quot;ancla&quot;: [21, 21]})
+print(&quot;\nconcat:\n&quot;, pd.concat([a, b], ignore_index=True).to_string(index=False), sep=&quot;&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Tabla de frecuencias de Contract:
+                FA     FR  FAA    FRA
+Contract                             
+Month-to-Month   4  0.500    4  0.500
+One Year         2  0.250    6  0.750
+Two Year         1  0.125    7  0.875
+Sin categoría    1  0.125    8  1.000
+
+Tasa de fuga por contrato:
+                clientes  tasa_fuga  cargo_medio
+Contract                                        
+Month-to-Month         4       0.75       89.975
+One Year               2       0.00       57.750
+Sin categoría          1       0.00       45.000
+Two Year               1       0.00       20.000
+
+Cargo alto (&gt; 80): [0, 0, 1, 0, 1, 0, 0, 1]
+
+merge inner: (7, 6) | merge left: (8, 6) | clientes sin edad tras el left: 1 ([&#x27;C8&#x27;])
+
+concat:
+id  ancla
+E1     20
+E2     20
+E1     21
+E2     21</pre></div>
+</div>
+<div class="callout exam"><div class="callout-title">📝 Para el examen</div><ul style="margin:0"><li><strong>FR</strong> = FA / total; <strong>FAA</strong> y <strong>FRA</strong> son las acumuladas (la última FRA siempre es 1).</li><li>La media de una variable 0/1 es una proporción: <code>groupby(...)["Churn_Value"].mean()</code> es la <strong>tasa de fuga</strong>.</li><li><code>how="inner"</code> se queda solo con las llaves que están en ambas tablas; <code>how="left"</code> conserva todas las de la izquierda y rellena con NaN.</li></ul></div>
+
+<!-- ===================================================== -->
+<h2 id="integracion">5. Integración de datos</h2>
+<p>Es el paso 2 del proceso y es donde nace la unidad muestral. En la sesión 9 la información de los 7,043 clientes viene repartida en <strong>seis archivos de Excel</strong>:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Archivo</th><th class="num">Dimensión</th><th>Contenido</th></tr></thead>
+<tbody>
+<tr><td><code>Telco_customer_churn_services.xlsx</code></td><td class="num">7,043 × 30</td><td>servicios contratados, cargos, antigüedad</td></tr>
+<tr><td><code>Telco_customer_churn_location.xlsx</code></td><td class="num">7,043 × 9</td><td>país, estado, ciudad, C.P., latitud y longitud</td></tr>
+<tr><td><code>Telco_customer_churn_population.xlsx</code></td><td class="num">1,671 × 3</td><td>catálogo de población por C.P. (no se integró)</td></tr>
+<tr><td><code>Telco_customer_churn_demographics.xlsx</code></td><td class="num">7,043 × 9</td><td>género, edad, estado civil, dependientes</td></tr>
+<tr><td><code>Telco_customer_churn_status.xlsx</code></td><td class="num">7,043 × 11</td><td>satisfacción, <code>Customer_Status</code>, variables <code>Churn_*</code></td></tr>
+<tr><td><code>Telco_customer_churn.xlsx</code></td><td class="num">7,043 × 33</td><td>tabla general (su llave se llama <code>CustomerID</code> y hay que renombrarla)</td></tr>
+</tbody></table></div>
+<p>Se unen cinco con <code>reduce(merge_and_remove_duplicates, …)</code>: <code>reduce</code> aplica la función de dos en dos (el notebook lo ilustra con <code>reduce(suma, [1,2,3,4,5]) = 15</code>) y el resultado es una tabla de <strong>7,043 × 57</strong>. Después se apartan la llave, la variable objetivo (<code>Churn_Value</code>) y las 4 variables que se calcularon <em>después</em> de la fuga (<code>Churn_Label</code>, <code>Churn_Score</code>, <code>Churn_Reason</code>, <code>Churn_Category</code>).</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_12_integracion.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_12_integracion.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Integración de datos (paso 2 del proceso): varias fuentes -&gt; una tabla por unidad muestral
+# Idea de la sesión 9 (churn): 5 archivos de Excel unidos por Customer_ID con reduce + merge
+from functools import reduce
+import pandas as pd
+
+um = [&quot;Customer_ID&quot;]
+
+servicios = pd.DataFrame({&quot;Customer_ID&quot;: [&quot;A1&quot;, &quot;A2&quot;, &quot;A3&quot;, &quot;A4&quot;], &quot;Count&quot;: 1, &quot;Quarter&quot;: &quot;Q3&quot;,
+                          &quot;Tenure_in_Months&quot;: [1, 8, 18, 25], &quot;Contract&quot;: [&quot;Month&quot;, &quot;Month&quot;, &quot;Year&quot;, &quot;Two&quot;]})
+demograficos = pd.DataFrame({&quot;Customer_ID&quot;: [&quot;A1&quot;, &quot;A2&quot;, &quot;A3&quot;, &quot;A4&quot;], &quot;Count&quot;: 1,
+                             &quot;Age&quot;: [78, 74, 71, 30], &quot;Married&quot;: [&quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;]})
+estatus = pd.DataFrame({&quot;Customer_ID&quot;: [&quot;A1&quot;, &quot;A2&quot;, &quot;A3&quot;, &quot;A4&quot;], &quot;Count&quot;: 1, &quot;Quarter&quot;: &quot;Q3&quot;,
+                        &quot;Customer_Status&quot;: [&quot;Churned&quot;, &quot;Churned&quot;, &quot;Stayed&quot;, &quot;Joined&quot;],
+                        &quot;Churn_Label&quot;: [&quot;Yes&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;], &quot;Churn_Score&quot;: [91, 69, 30, 25],
+                        &quot;Churn_Reason&quot;: [&quot;Competitor&quot;, &quot;Price&quot;, None, None], &quot;Churn_Value&quot;: [1, 1, 0, 0]})
+
+# 0) Antes de unir: la llave debe ser ÚNICA en cada tabla (si no, el merge duplica filas)
+for nombre, t in [(&quot;servicios&quot;, servicios), (&quot;demograficos&quot;, demograficos), (&quot;estatus&quot;, estatus)]:
+    print(f&quot;{nombre:&lt;13} filas={len(t)}  llaves únicas={t[&#x27;Customer_ID&#x27;].nunique()}  duplicadas={t[&#x27;Customer_ID&#x27;].duplicated().sum()}&quot;)
+
+# 1) merge que descarta las columnas repetidas (Count, Quarter) en lugar de crear _x / _y
+def merge_sin_duplicados(izq, der):
+    repetidas = [c for c in der.columns if c in izq.columns and c not in um]
+    return izq.merge(der.drop(columns=repetidas), on=um, how=&quot;inner&quot;, validate=&quot;one_to_one&quot;)
+
+df = reduce(merge_sin_duplicados, [servicios, demograficos, estatus])
+print(&quot;\nTabla integrada:&quot;, df.shape)
+print(df.to_string(index=False))
+
+# 2) Lo que pasa con un merge &quot;ingenuo&quot;: columnas Count_x, Count_y...
+ingenuo = servicios.merge(demograficos, on=um).merge(estatus, on=um)
+print(&quot;\nColumnas con merge ingenuo:&quot;, [c for c in ingenuo.columns if c.endswith((&quot;_x&quot;, &quot;_y&quot;))])
+
+# 3) Separar llave, objetivo y variables que &quot;dan la respuesta&quot; (data leakage)
+tgt = [&quot;Churn_Value&quot;]
+var_fuera = [&quot;Churn_Label&quot;, &quot;Churn_Score&quot;, &quot;Churn_Reason&quot;]       # se calcularon DESPUÉS de la fuga
+predictoras = [c for c in df.columns if c not in um + tgt + var_fuera]
+print(&quot;\nPredictoras candidatas:&quot;, predictoras)
+print(&quot;Ojo: Customer_Status sigue en la lista y contiene &#x27;Churned&#x27; -&gt; también da la respuesta.&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>servicios     filas=4  llaves únicas=4  duplicadas=0
+demograficos  filas=4  llaves únicas=4  duplicadas=0
+estatus       filas=4  llaves únicas=4  duplicadas=0
+
+Tabla integrada: (4, 12)
+Customer_ID  Count Quarter  Tenure_in_Months Contract  Age Married Customer_Status Churn_Label  Churn_Score Churn_Reason  Churn_Value
+         A1      1      Q3                 1    Month   78      No         Churned         Yes           91   Competitor            1
+         A2      1      Q3                 8    Month   74     Yes         Churned         Yes           69        Price            1
+         A3      1      Q3                18     Year   71      No          Stayed          No           30          NaN            0
+         A4      1      Q3                25      Two   30     Yes          Joined          No           25          NaN            0
+
+Columnas con merge ingenuo: [&#x27;Count_x&#x27;, &#x27;Quarter_x&#x27;, &#x27;Count_y&#x27;, &#x27;Quarter_y&#x27;]
+
+Predictoras candidatas: [&#x27;Count&#x27;, &#x27;Quarter&#x27;, &#x27;Tenure_in_Months&#x27;, &#x27;Contract&#x27;, &#x27;Age&#x27;, &#x27;Married&#x27;, &#x27;Customer_Status&#x27;]
+Ojo: Customer_Status sigue en la lista y contiene &#x27;Churned&#x27; -&gt; también da la respuesta.</pre></div>
+</div>
+<div class="callout warn"><div class="callout-title">⚠️ Tres errores típicos de integración</div><ul style="margin:0"><li><strong>Llave duplicada:</strong> si un cliente aparece dos veces en una tabla, el <code>merge</code> multiplica filas en silencio. <code>validate="one_to_one"</code> lo detecta y lanza un error.</li><li><strong>Columnas repetidas:</strong> el merge ingenuo crea <code>_x</code>/<code>_y</code>. Aun quitándolas pueden sobrevivir duplicados con otro nombre: en churn, <code>Tenure_in_Months</code> y <code>Tenure_Months</code> son la misma variable (VarClus les da exactamente el mismo RS_Own = 0.851376).</li><li><strong>Columnas que dan la respuesta:</strong> además de las <code>Churn_*</code>, <code>Customer_Status</code> incluye "Churned". El notebook lo descubre más tarde porque su IV sale infinito (sección 11).</li></ul></div>
+
+<!-- ===================================================== -->
+<h2 id="variables-series">6. Ingeniería de variables</h2>
+<p>Con la unidad muestral y las ventanas definidas, toca construir \(X\). El curso usa tres familias de variables: <strong>agregados de series por ventana</strong> (Ecobici), <strong>razones y diferencias</strong> entre columnas (churn) y <strong>dimensiones derivadas de la fecha</strong> (contaminantes).</p>
+<h3 id="series">6.1 Variables sobre series (ventana de observación)</h3>
 <p>En la sesión 8 cada estación tiene una serie de afluencias. Con la ventana de observación se calculan <strong>21 variables</strong> por estación y ancla: suma, mínimo, máximo, media y desviación, más funciones propias que describen <strong>la forma de la serie</strong>: cuántas veces sube o baja, cambios absolutos y relativos, y rachas de subidas/bajadas. Este es el "ejercicio del Excel" con la serie <code>[1065, 1068, 1266, 1492, 1051, 1009, 1340, 1485]</code>:</p>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo1/m1_02_ingenieria_series.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_02_ingenieria_series.py" download>Descargar .py</a></div>
@@ -261,8 +610,60 @@ media_racha_dec: 0.3333333333333333</pre></div>
 </div>
 <div class="callout tip"><div class="callout-title">💡 Cómo leerlo</div><p>Hay 7 cambios entre 8 valores: 5 subidas y 2 bajadas (media_inc = 5/7 = 0.714). La mayor caída fue de 1492 a 1051 (−441, −29.6 %). La racha más larga de subidas fue de 3 (1065→1068→1266→1492). Las rachas se calculan escribiendo 1 si sube y 0 si no ("1110011") y partiendo por los ceros.</p></div>
 
+<h3 id="ratios">6.2 Razones y diferencias</h3>
+<p>En churn se crean 9 variables nuevas a partir de las existentes: razones como <code>ratio_m_charge_age</code> (cargo mensual / edad) o <code>ratio_ref_tenure</code> (referidos / meses de antigüedad), y diferencias como <code>dif_tot_month</code> (cargos totales − cargo mensual). Toda razón se protege contra la división entre cero con <code>np.where(denominador != 0, razón, np.nan)</code>:</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_13_ratios_diferencias.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_13_ratios_diferencias.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Ingeniería de variables con razones y diferencias (sesión 9, churn)
+# El notebook crea ratio_m_charge_age, ratio_ref_tenure, dif_tot_month... protegiendo la división entre cero
+import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({
+    &quot;Monthly_Charge&quot;: [70.0, 20.0, 99.0, 55.0],
+    &quot;Total_Charges&quot;: [70.0, 480.0, 1980.0, 0.0],
+    &quot;Age&quot;: [25, 40, 33, 60],
+    &quot;Number_of_Referrals&quot;: [0, 2, 1, 3],
+    &quot;Tenure_in_Months&quot;: [1, 24, 20, 0],          # un cliente recién llegado: 0 meses
+})
+
+# Razón sin protección: la división entre 0 produce inf (no NaN) y &quot;rompe&quot; estadísticas y modelos
+sin_proteger = df[&quot;Number_of_Referrals&quot;] / df[&quot;Tenure_in_Months&quot;]
+print(&quot;Sin protección :&quot;, sin_proteger.tolist())
+
+# Patrón del notebook: np.where(denominador != 0, razón, NaN)
+# (np.where evalúa ambas ramas, por eso numpy puede avisar de la división; el resultado ya no tiene inf)
+with np.errstate(divide=&quot;ignore&quot;, invalid=&quot;ignore&quot;):
+    df[&quot;ratio_ref_tenure&quot;] = np.where(df[&quot;Tenure_in_Months&quot;] != 0,
+                                      df[&quot;Number_of_Referrals&quot;] / df[&quot;Tenure_in_Months&quot;], np.nan)
+df[&quot;ratio_m_charge_age&quot;] = np.where(df[&quot;Age&quot;] != 0, df[&quot;Monthly_Charge&quot;] / df[&quot;Age&quot;], np.nan)
+df[&quot;dif_tot_month&quot;] = df[&quot;Total_Charges&quot;] - df[&quot;Monthly_Charge&quot;]     # diferencias: no hay riesgo
+
+print(&quot;\n&quot;, df.round(3).to_string(index=False), sep=&quot;&quot;)
+print(&quot;\n¿Quedó algún inf?&quot;, bool(np.isinf(df.select_dtypes(&quot;number&quot;)).any().any()))
+print(&quot;Nulos creados (se imputan después, en la limpieza):&quot;, int(df[&quot;ratio_ref_tenure&quot;].isna().sum()))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Sin protección : [0.0, 0.08333333333333333, 0.05, inf]
+
+ Monthly_Charge  Total_Charges  Age  Number_of_Referrals  Tenure_in_Months  ratio_ref_tenure  ratio_m_charge_age  dif_tot_month
+           70.0           70.0   25                    0                 1             0.000               2.800            0.0
+           20.0          480.0   40                    2                24             0.083               0.500          460.0
+           99.0         1980.0   33                    1                20             0.050               3.000         1881.0
+           55.0            0.0   60                    3                 0               NaN               0.917          -55.0
+
+¿Quedó algún inf? False
+Nulos creados (se imputan después, en la limpieza): 1</pre></div>
+</div>
+<div class="callout note"><div class="callout-title">Qué pasó con esas 9 variables en el notebook</div><p>No todas sobrevivieron a la limpieza: <code>ratio_extra_lon</code> y <code>ratio_extra_lat</code> salieron "rotas" por KS (dependían de <code>Latitude</code>, que tenía 30 % de nulos) y <code>ratio_ref_tenure</code> y <code>ratio_extra_tot</code> por varianza baja. <code>dif_tot_long_distance_avg</code> terminó siendo la mejor representante de su cluster en VarClus. Crear variables es barato; la limpieza decide cuáles se quedan.</p></div>
+
+<h3 id="fechas">6.3 Dimensiones derivadas de la fecha</h3>
+<p>Una fecha no entra tal cual a un modelo ni a un cubo: se descompone. En la sesión 10, a partir de <code>date</code> se derivan <code>hrs</code>, <code>anio</code>, <code>mes</code>, <code>dia</code>, <code>semana</code>, <code>trimestre</code> y combinaciones como <code>anio-mes</code> o <code>anio-trimestre</code> (13 dimensiones de tiempo en total). Dos detalles prácticos del notebook:</p>
+<ul>
+  <li>El archivo registra las horas de 01:00 a 24:00, por eso se hace <code>hrs = hrs − 1</code> para que queden de 0 a 23 y la fecha se pueda convertir con <code>pd.to_datetime</code>.</li>
+  <li>Las versiones de texto con cero a la izquierda (<code>mes_str = "01"</code>) sirven para que <code>"201801"</code> ordene bien como texto.</li>
+</ul>
+
 <!-- ===================================================== -->
-<h2 id="limpieza">5. Limpieza y análisis exploratorio de la TAD</h2>
+<h2 id="limpieza">7. Limpieza y análisis exploratorio de la TAD</h2>
 <p>El orden que siguen los notebooks de las sesiones 8 y 9 (vale la pena memorizarlo):</p>
 <ol class="steps">
   <li><strong>Valores ausentes:</strong> % de nulos por variable: <code>1 − count / len</code>.</li>
@@ -352,7 +753,20 @@ gasto       0.99  0.06   1.00</pre></div>
 </div>
 <div class="callout tip"><div class="callout-title">💡 Lectura</div><p><code>saldo</code> tenía 45 % de nulos: al imputar con la mediana se forma un "pico" artificial y la distribución cambia (KS = 0.225 &gt; 0.1) → variable rota. <code>edad</code> (10 % nulos) se conserva (KS = 0.049). <code>gasto</code> e <code>ingreso</code> tienen correlación 0.99: son redundantes (multicolinealidad), por eso se usa VarClus.</p></div>
 
-<h3 id="varclus">5.1 Multicolinealidad con VarClusHi</h3>
+<p><strong>Lo que pasó en los notebooks reales.</strong> Los mismos pasos, con resultados muy distintos según los datos:</p>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Paso</th><th>Sesión 8 · Ecobici</th><th>Sesión 9 · Churn</th></tr></thead>
+<tbody>
+<tr><td>Valores ausentes</td><td>0 % en las 21 variables</td><td>nulos agregados a propósito "con fines educativos": <code>Monthly_Charges</code> 10 %, <code>Latitude</code> 30 %, <code>Total_Revenue</code> 50 %; solo 3 % de filas completas (213 de 7,043) → no se pueden eliminar, se imputa</td></tr>
+<tr><td>Imputación</td><td>mediana (no cambió nada)</td><td>media</td></tr>
+<tr><td>KS &gt; 0.1 (rotas)</td><td>ninguna (KS = 0)</td><td><code>Total_Revenue</code> (0.303), <code>Latitude</code> (0.152), <code>ratio_extra_lon</code>, <code>ratio_extra_lat</code>; <code>Monthly_Charges</code> (0.056) se conserva → 28 → 24</td></tr>
+<tr><td>Varianza</td><td>umbral 0.1: quita 3 (<code>v_media_inc</code>, <code>v_media_dec</code>, <code>v_pct_delta_min</code>) → 18</td><td>umbral 1.0: quita 4 (<code>Count</code>, <code>Number_of_Dependents</code>, <code>ratio_ref_tenure</code>, <code>ratio_extra_tot</code>) → 20</td></tr>
+<tr><td>Extremos (p1–p99)</td><td>6.8 % de registros → quedan 247,084</td><td>14.6 % → quedan 6,018</td></tr>
+<tr><td>VarClus (id == 1)</td><td>18 → 4 variables</td><td>20 → 6 variables</td></tr>
+</tbody></table></div>
+<div class="callout warn"><div class="callout-title">⚠️ Detalles técnicos que conviene notar</div><ul style="margin:0"><li><strong>El umbral de varianza depende de la escala.</strong> <code>VarianceThreshold</code> se aplica antes de estandarizar, así que 0.1 no significa lo mismo para una proporción (entre 0 y 1, su varianza nunca pasa de 0.25) que para un cargo en dólares. Por eso las variables "media de subidas" de Ecobici caen con 0.1 y en churn se usó 1.0.</li><li><strong>Eliminar extremos por variable se acumula.</strong> Con 20 variables y 2 % por variable fuera de p1–p99, el porcentaje de filas con <em>algún</em> extremo crece rápido (14.6 % en churn).</li><li><strong>Antes de borrar filas, pega la unidad muestral</strong> (<code>X[um] = tad[um]</code>) o ya no podrás unir \(X\) con \(y\).</li></ul></div>
+
+<h3 id="varclus">7.1 Multicolinealidad con VarClusHi</h3>
 <p>VarClus agrupa las variables en clusters de variables correlacionadas (con componentes principales). Para cada variable reporta:</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Columna</th><th>Significado</th><th>¿Qué valor es bueno?</th></tr></thead>
@@ -417,7 +831,7 @@ Notebook: v_max_afluencia -&gt; (1-0.978437)/(1-0.082052) = 0.023490</pre></div>
 </div>
 
 <!-- ===================================================== -->
-<h2 id="estandarizacion">6. Estandarización de datos</h2>
+<h2 id="estandarizacion">8. Estandarización de datos</h2>
 <p>Recomendación del curso: <strong>estandarizar antes de reducir dimensiones</strong> (y antes de modelos basados en distancias o gradiente).</p>
 <div class="two-col">
 <div class="formula"><strong>Estándar (z-score)</strong>
@@ -462,9 +876,69 @@ Media z  : [0.0, 0.0] | Desv z: [1.0, 1.0]
 Min-Max  : min = [0.0, 0.0] max = [1.0, 1.0]</pre></div>
 </div>
 
+<h3 id="fit-transform">8.1 <code>fit</code> en entrenamiento, <code>transform</code> en todo</h3>
+<p>El imputador, el estandarizador y el mapa WoE "aprenden" algo de los datos (una mediana, una media, un WoE por bin). Si lo aprenden usando también los datos de validación, la validación deja de ser un examen limpio. El notebook de churn lo hace bien con el WoE: <em>"se toma el 70 % para entrenar (o generar WoE) y el 30 % para validar"</em>. El mismo principio aplica al imputador y al <code>StandardScaler</code>, y <code>Pipeline</code> de scikit-learn lo garantiza automáticamente:</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_14_fit_transform.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_14_fit_transform.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · fit vs transform: &quot;aprender&quot; solo del entrenamiento y aplicarlo a validación
+# Mismo principio que la sesión 9: &quot;se toma el 70% para entrenar (o generar WoE) y el 30% para validar&quot;
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+
+rng = np.random.default_rng(7)
+n = 1000
+X = pd.DataFrame({&quot;cargo&quot;: rng.normal(65, 30, n), &quot;antiguedad&quot;: rng.integers(0, 72, n).astype(float)})
+logit = -1 + 0.03 * (X[&quot;cargo&quot;] - 65) - 0.05 * (X[&quot;antiguedad&quot;] - 36)
+y = (rng.random(n) &lt; 1 / (1 + np.exp(-logit))).astype(int)
+X.loc[rng.choice(n, 100, replace=False), &quot;cargo&quot;] = np.nan          # 10 % de nulos
+
+Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+print(&quot;Entrenamiento:&quot;, Xt.shape, &quot;| Validación:&quot;, Xv.shape)
+print(f&quot;Tasa de evento -&gt; train {yt.mean():.3f} | valid {yv.mean():.3f}  (stratify la conserva)\n&quot;)
+
+# 1) fit SOLO con entrenamiento: aquí se &quot;aprende&quot; la mediana, la media y la desviación
+im = SimpleImputer(strategy=&quot;median&quot;).fit(Xt)
+ss = StandardScaler().fit(im.transform(Xt))
+print(&quot;Mediana aprendida (train):&quot;, im.statistics_.round(3))
+print(&quot;Media aprendida   (train):&quot;, ss.mean_.round(3))
+print(&quot;Desv. aprendida   (train):&quot;, ss.scale_.round(3))
+
+# 2) transform en ambos con lo aprendido en train (validación NUNCA se usa para calcular nada)
+Zt = ss.transform(im.transform(Xt))
+Zv = ss.transform(im.transform(Xv))
+print(&quot;\nMedia de Z en train:&quot;, Zt.mean(axis=0).round(3), &quot;&lt;- exactamente 0&quot;)
+print(&quot;Media de Z en valid:&quot;, Zv.mean(axis=0).round(3), &quot;&lt;- cerca de 0, no exacta (y así debe ser)&quot;)
+
+# 3) Lo mismo en una sola pieza: Pipeline = imputar -&gt; estandarizar -&gt; modelo
+pipe = make_pipeline(SimpleImputer(strategy=&quot;median&quot;), StandardScaler(), LogisticRegression())
+pipe.fit(Xt, yt)
+print(f&quot;\nPipeline -&gt; AUC train {roc_auc_score(yt, pipe.predict_proba(Xt)[:, 1]):.3f} | &quot;
+      f&quot;AUC valid {roc_auc_score(yv, pipe.predict_proba(Xv)[:, 1]):.3f}&quot;)
+print(&quot;Coeficientes (escala estandarizada):&quot;, pipe[-1].coef_.round(3), &quot;| intercepto:&quot;, pipe[-1].intercept_.round(3))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Entrenamiento: (700, 2) | Validación: (300, 2)
+Tasa de evento -&gt; train 0.311 | valid 0.310  (stratify la conserva)
+
+Mediana aprendida (train): [62.841 36.   ]
+Media aprendida   (train): [62.625 36.194]
+Desv. aprendida   (train): [27.042 20.478]
+
+Media de Z en train: [0. 0.] &lt;- exactamente 0
+Media de Z en valid: [-0.004 -0.02 ] &lt;- cerca de 0, no exacta (y así debe ser)
+
+Pipeline -&gt; AUC train 0.789 | AUC valid 0.765
+Coeficientes (escala estandarizada): [[ 0.716 -1.018]] | intercepto: [-1.033]</pre></div>
+</div>
+<div class="callout note"><div class="callout-title">Nota técnica</div><p>En el notebook de Ecobici el <code>StandardScaler</code> se ajusta con toda la TAD antes del <code>train_test_split</code>. Con 245 mil renglones el efecto sobre las métricas es mínimo, pero el hábito correcto es el de arriba: partir primero y ajustar solo con entrenamiento. <code>stratify=y</code> mantiene la misma proporción de eventos en ambos conjuntos.</p></div>
+
 <!-- ===================================================== -->
-<h2 id="reduccion">7. Reducción de dimensiones: PCA y t-SNE</h2>
-<h3 id="pca">7.1 PCA (Análisis de Componentes Principales)</h3>
+<h2 id="reduccion">9. Reducción de dimensiones: PCA y t-SNE</h2>
+<h3 id="pca">9.1 PCA (Análisis de Componentes Principales)</h3>
 <ul>
   <li>Encuentra <strong>combinaciones lineales</strong> de las variables originales que explican la <strong>mayor variabilidad</strong>.</li>
   <li>Se basa en la <strong>covarianza</strong>: si las variables no están en la misma escala, las de valores grandes dominan la varianza total → <strong>estandarizar primero</strong>.</li>
@@ -478,7 +952,7 @@ Min-Max  : min = [0.0, 0.0] max = [1.0, 1.0]</pre></div>
   <div class="chart-foot"><span>Mismo cálculo que el programa de abajo.</span><button class="code-btn" type="button" data-table-toggle="tbl-pca">Ver tabla de datos</button></div>
   <div class="data-table-wrap" id="tbl-pca"></div>
 </div>
-<h3 id="tsne">7.2 t-SNE</h3>
+<h3 id="tsne">9.2 t-SNE</h3>
 <p>Reducción de dimensionalidad <strong>no lineal</strong>, principalmente para <strong>visualizar</strong> datos de alta dimensión en 2D o 3D (ver clústeres). No conserva la estructura global, es costosa y depende de parámetros como el <em>perplexity</em>; por eso <strong>no se usa para modelos predictivos</strong> (ni siquiera puede transformar datos nuevos).</p>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo1/m1_05_pca_tsne.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_05_pca_tsne.py" download>Descargar .py</a></div>
@@ -529,7 +1003,7 @@ t-SNE NO tiene .transform() para datos nuevos: False</pre></div>
 </tbody></table></div>
 
 <!-- ===================================================== -->
-<h2 id="categoricas">8. Variables categóricas: dummies, nulos y normalización</h2>
+<h2 id="categoricas">10. Variables categóricas: dummies, nulos y normalización</h2>
 <ul>
   <li><strong>Nulos como categoría:</strong> "la falta de información también es información" → <code>fillna("Sin categoría")</code>.</li>
   <li><strong>Normalización (sesión 9):</strong> categorías con frecuencia muy baja (p. ej. &lt; 3 %) se agrupan en "Otros" para que tengan masa suficiente.</li>
@@ -586,6 +1060,7 @@ Tijuana        0.02       -
 Mérida         0.01       -
 Otros             -    0.05</pre></div>
 </div>
+<div class="callout note"><div class="callout-title">Unarias en el notebook de churn</div><p>Después de normalizar las 32 categóricas, 5 tenían una sola categoría y se eliminaron: <code>Quarter</code> (todo Q3), <code>Country</code>, <code>State</code>, <code>Zip_Code</code> y <code>Lat_Long</code>. <code>Zip_Code</code> y <code>Lat_Long</code> tenían muchísimos valores distintos, pero cada uno con menos de 3 %: al normalizar todo se volvió "Otros". Quedaron 27.</p></div>
 <div class="table-wrap"><table class="compare">
 <thead><tr><th></th><th>WoE (Weight of Evidence)</th><th>Dummy</th></tr></thead>
 <tbody>
@@ -595,23 +1070,23 @@ Otros             -    0.05</pre></div>
 </tbody></table></div>
 
 <!-- ===================================================== -->
-<h2 id="credit-scoring">9. Clasificación binaria: Credit Scoring</h2>
+<h2 id="credit-scoring">11. Clasificación binaria: Credit Scoring</h2>
 <p>El <strong>credit scoring</strong> evalúa el riesgo crediticio con una clasificación binaria (\(f: \mathbb{R}^d \to \{+,-\}\)) y lo resume en una <strong>tarjeta de puntos (scorecard)</strong> según el riesgo que el cliente representa en ciertas características. La \(f\) que se usa es la <strong>regresión logística</strong>.</p>
 
-<h3 id="logistica-m1">9.1 Regresión logística desde los momios</h3>
+<h3 id="logistica-m1">11.1 Regresión logística desde los momios</h3>
 <p>Sea \(P(E) = p\) la probabilidad del evento (p. ej. incumplir) y \(q = 1 - p\). Los <strong>momios</strong> son \(p/q\). Las variables aportan <strong>linealmente al logaritmo de los momios</strong>:</p>
 <div class="formula">
 $$\ln\!\Big(\frac{p}{1-p}\Big) = \beta_0 + \sum_{i=1}^{n}\beta_i x_i \;\Rightarrow\; \frac{p}{1-p} = e^{\beta_0+\sum\beta_i x_i} \;\Rightarrow\; \frac{1}{p} = 1 + e^{-\beta_0-\sum\beta_i x_i} \;\Rightarrow\; P(E) = \frac{1}{1+e^{-\beta_0-\sum\beta_i x_i}}$$
 <div class="where">El último término es la <strong>sigmoide</strong>: convierte cualquier número real en una probabilidad entre 0 y 1.</div>
 </div>
 
-<h3 id="variables-scoring">9.2 Tratamiento de variables</h3>
+<h3 id="variables-scoring">11.2 Tratamiento de variables</h3>
 <div class="two-col">
   <div class="callout note"><div class="callout-title">Continuas</div><p>Se hacen <strong>bines (discretización)</strong>; los extremos se conglomeran con los bines extremos. En la sesión 9 se prueban de 2 a 6 cortes por cuantiles y se elige el número con mayor IV.</p></div>
   <div class="callout note"><div class="callout-title">Discretas</div><p>Se analizan frecuencias (<strong>normalización</strong>). Los <strong>nulos se consideran una categoría</strong>. La variable (p. ej. SEXO) es la característica; sus valores (Hombre, Mujer) son los atributos.</p></div>
 </div>
 
-<h3 id="woe-iv">9.3 WoE e IV</h3>
+<h3 id="woe-iv">11.3 WoE e IV</h3>
 <div class="formula">
 $$\text{WoE}_i = \ln\!\left(\frac{\%\,\text{no evento}_i}{\%\,\text{evento}_i}\right) \qquad\qquad \text{IV} = \sum_i \big(\%\,\text{no evento}_i - \%\,\text{evento}_i\big)\cdot \text{WoE}_i$$
 <div class="where">Continuas: 1) discretizar, 2) contar eventos y no eventos por bin, 3) logaritmo natural del cociente. Discretas: se omite el paso 1. Ventaja del WoE: <strong>mide el poder predictivo</strong>.</div>
@@ -694,7 +1169,150 @@ bin
 IV = 0.1532 -&gt; poder predictivo: Regular</pre></div>
 </div>
 
-<h3 id="scorecard">9.4 Scorecard y puntuaciones</h3>
+<div class="widget" id="w-woe">
+  <div class="widget-title"><span class="tag">Calculadora</span> WoE e IV de una variable</div>
+  <p class="hint">Escribe eventos (malos / se fue) y no eventos (buenos / se quedó) por bin. Prueba poner 0 eventos en un bin: el WoE se vuelve infinito, igual que <code>Customer_Status</code> en churn.</p>
+  <div class="table-wrap"><table id="woe-tbl">
+    <thead><tr><th>Bin</th><th class="num">Eventos</th><th class="num">No eventos</th><th class="num">% evento</th><th class="num">% no evento</th><th class="num">WoE</th><th class="num">IV<sub>i</sub></th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <div class="readout" id="woe-out"></div>
+</div>
+
+<h3 id="discretizacion">11.4 Discretización y selección por IV: el flujo completo de la sesión 9</h3>
+<p>Así se encadenan las piezas en el notebook de churn, en este orden:</p>
+<ol class="steps">
+  <li><strong>Discretizar</strong> cada continua (las 6 que dejó VarClus) con 2, 3, 4, 5 y 6 cortes por cuantiles (<code>d_Monthly_Charge_2</code> … <code>_6</code>).</li>
+  <li><strong>Partir</strong> 70 / 30 y calcular el IV <strong>solo con entrenamiento</strong>.</li>
+  <li>Para cada variable raíz quedarse con el número de cortes de <strong>mayor IV</strong> (<code>id == 1</code> por raíz).</li>
+  <li>Calcular el IV de las categóricas normalizadas y juntar todo.</li>
+  <li>Filtrar <code>0.1 &lt; IV &lt; 0.8</code> → 20 variables.</li>
+  <li><strong>Mapa WoE</strong> aprendido en entrenamiento y aplicado con <code>replace</code> a entrenamiento y validación (<code>w_…</code>).</li>
+  <li>Regresión logística con las 20 variables WoE.</li>
+</ol>
+<div class="two-col">
+<div class="table-wrap"><table>
+<thead><tr><th>Variable (notebook real)</th><th class="num">IV</th><th>¿Entra?</th></tr></thead>
+<tbody>
+<tr><td><code>n_Customer_Status</code></td><td class="num">∞</td><td>no: da la respuesta</td></tr>
+<tr><td><code>n_Contract</code></td><td class="num">1.506</td><td>no: IV ≥ 0.8</td></tr>
+<tr><td><code>n_Tech_Support</code></td><td class="num">0.726</td><td>sí</td></tr>
+<tr><td><code>n_Internet_Type</code></td><td class="num">0.664</td><td>sí</td></tr>
+<tr><td><code>n_Device_Protection</code></td><td class="num">0.559</td><td>sí</td></tr>
+<tr><td><code>n_Internet_Service</code></td><td class="num">0.452</td><td>sí</td></tr>
+<tr><td><code>n_Dependents</code></td><td class="num">0.436</td><td>sí</td></tr>
+<tr><td><code>d_Monthly_Charge_5</code></td><td class="num">0.410</td><td>sí (5 cortes)</td></tr>
+<tr><td><code>n_Offer</code></td><td class="num">0.391</td><td>sí</td></tr>
+<tr><td><code>n_Payment_Method</code></td><td class="num">0.302</td><td>sí</td></tr>
+<tr><td><code>d_Longitude_6</code></td><td class="num">0.042</td><td>no: IV ≤ 0.1</td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">📝 Observaciones para el examen</div><ul style="margin:0"><li>El filtro 0.1–0.8 dejó fuera a <code>Contract</code>, la variable más predictiva después de la que da la respuesta. La tabla de IV es una guía ("no son regla dura"): un IV alto obliga a revisar si hay fuga de información, no a descartar automáticamente.</li><li>El IV tiende a crecer con más cortes, porque más bines separan mejor <em>en entrenamiento</em>. Por eso se limita el rango (2 a 6). En el notebook casi todas eligieron 6, pero <code>Monthly_Charge</code> eligió 5 y <code>Total_Refunds</code> 2.</li><li>El WoE se calcula con entrenamiento. Calcularlo con todo filtraría la respuesta de validación.</li></ul></div>
+</div>
+<p>El programa reproduce ese flujo con datos simulados (tres variables, una de ellas categórica):</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_15_discretizacion_woe.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_15_discretizacion_woe.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Flujo completo de la sesión 9: discretizar (2 a 6 cortes) -&gt; elegir por IV -&gt; mapa WoE -&gt; logística
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix
+
+rng = np.random.default_rng(11)
+n = 4000
+df = pd.DataFrame({
+    &quot;Monthly_Charge&quot;: rng.uniform(18, 120, n).round(2),
+    &quot;Tenure&quot;: rng.integers(0, 73, n),
+    &quot;Contract&quot;: rng.choice([&quot;Month-to-Month&quot;, &quot;One Year&quot;, &quot;Two Year&quot;], n, p=[0.5, 0.25, 0.25]),
+})
+logit = (-1.2 + 0.02 * (df[&quot;Monthly_Charge&quot;] - 65) - 0.04 * (df[&quot;Tenure&quot;] - 36)
+         + df[&quot;Contract&quot;].map({&quot;Month-to-Month&quot;: 1.0, &quot;One Year&quot;: -0.6, &quot;Two Year&quot;: -1.5}))
+df[&quot;Churn_Value&quot;] = (rng.random(n) &lt; 1 / (1 + np.exp(-logit))).astype(int)
+tgt = &quot;Churn_Value&quot;
+
+# 1) Partición ANTES de calcular IV/WoE: los mapas se aprenden solo con el 70 %
+train, valid = train_test_split(df, train_size=0.7, random_state=0, stratify=df[tgt])
+print(f&quot;train {train.shape} | valid {valid.shape} | tasa de fuga train = {train[tgt].mean():.3f}\n&quot;)
+
+def iv_woe(d, var):
+    t = d.groupby(var, observed=True)[tgt].agg(total=&quot;count&quot;, eventos=&quot;sum&quot;)
+    t[&quot;no_eventos&quot;] = t[&quot;total&quot;] - t[&quot;eventos&quot;]
+    pe, pn = t[&quot;eventos&quot;] / t[&quot;eventos&quot;].sum(), t[&quot;no_eventos&quot;] / t[&quot;no_eventos&quot;].sum()
+    woe = np.log(pn / pe)                           # WoE = ln(%no evento / %evento)
+    return float(((pn - pe) * woe).sum()), woe
+
+# 2) Discretizar cada continua con 2..6 cortes por cuantiles y quedarse con el de mayor IV
+mejores = {}
+for var in [&quot;Monthly_Charge&quot;, &quot;Tenure&quot;]:
+    res = []
+    for k in range(2, 7):
+        cortes = np.unique(np.quantile(train[var], np.linspace(0, 1, k + 1)))
+        cortes[0], cortes[-1] = -np.inf, np.inf           # los extremos se &quot;conglomeran&quot; en los bines de las orillas
+        iv, _ = iv_woe(train.assign(b=pd.cut(train[var], cortes)), &quot;b&quot;)
+        res.append((k, iv, cortes))
+    print(f&quot;{var:&lt;15}&quot;, &quot;  &quot;.join(f&quot;k={k}: IV={iv:.4f}&quot; for k, iv, _ in res))
+    k, iv, cortes = max(res, key=lambda r: r[1])
+    mejores[var] = cortes
+    print(f&quot;{&#x27;&#x27;:&lt;15} -&gt; se elige k = {k} (IV = {iv:.4f})&quot;)
+
+# 3) Mapa WoE aprendido en train y aplicado a ambos conjuntos
+cols_woe = []
+for var in [&quot;Monthly_Charge&quot;, &quot;Tenure&quot;, &quot;Contract&quot;]:
+    if var in mejores:
+        bt, bv = pd.cut(train[var], mejores[var]), pd.cut(valid[var], mejores[var])
+    else:
+        bt, bv = train[var], valid[var]
+    iv, woe = iv_woe(train.assign(b=bt), &quot;b&quot;)
+    train[f&quot;w_{var}&quot;], valid[f&quot;w_{var}&quot;] = bt.map(woe).astype(float), bv.map(woe).astype(float)
+    cols_woe.append(f&quot;w_{var}&quot;)
+    print(f&quot;\nWoE de {var} (IV = {iv:.4f}):\n&quot;, woe.round(4).to_string(), sep=&quot;&quot;)
+
+# 4) Regresión logística sobre las variables WoE
+m = LogisticRegression().fit(train[cols_woe], train[tgt])
+p = m.predict_proba(valid[cols_woe])[:, 1]
+print(&quot;\nCoeficientes:&quot;, m.coef_.round(3), &quot;| intercepto:&quot;, m.intercept_.round(3))
+print(f&quot;Validación -&gt; AUC = {roc_auc_score(valid[tgt], p):.3f} | ACC = {accuracy_score(valid[tgt], m.predict(valid[cols_woe])):.3f}&quot;)
+print(&quot;Matriz de confusión:\n&quot;, confusion_matrix(valid[tgt], m.predict(valid[cols_woe])))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>train (2800, 4) | valid (1200, 4) | tasa de fuga train = 0.311
+
+Monthly_Charge  k=2: IV=0.1445  k=3: IV=0.1614  k=4: IV=0.1679  k=5: IV=0.1651  k=6: IV=0.1705
+                -&gt; se elige k = 6 (IV = 0.1705)
+Tenure          k=2: IV=0.2267  k=3: IV=0.2703  k=4: IV=0.3031  k=5: IV=0.3011  k=6: IV=0.3120
+                -&gt; se elige k = 6 (IV = 0.3120)
+
+WoE de Monthly_Charge (IV = 0.1705):
+b
+(-inf, 34.255]     0.5162
+(34.255, 50.9]     0.5551
+(50.9, 67.31]      0.1850
+(67.31, 84.85]    -0.1356
+(84.85, 101.94]   -0.4234
+(101.94, inf]     -0.4991
+
+WoE de Tenure (IV = 0.3120):
+b
+(-inf, 12.0]   -0.7317
+(12.0, 24.0]   -0.4336
+(24.0, 36.0]   -0.1005
+(36.0, 48.0]    0.2305
+(48.0, 61.0]    0.4665
+(61.0, inf]     1.0536
+
+WoE de Contract (IV = 0.7026):
+b
+Month-to-Month   -0.6810
+One Year          0.7690
+Two Year          1.3694
+
+Coeficientes: [[-1.359 -1.278 -1.174]] | intercepto: [-0.791]
+Validación -&gt; AUC = 0.824 | ACC = 0.789
+Matriz de confusión:
+ [[747  80]
+ [173 200]]</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Lectura</div><p>Los coeficientes salen <strong>todos negativos</strong>, como en el notebook real (16 de 20 negativos). No es casualidad: con WoE = ln(%no evento / %evento), un WoE alto significa "más buenos", así que a más WoE menos probabilidad de evento. Por eso la fórmula de puntos lleva \(-\text{WoE}\cdot\beta\): con β negativo, cada atributo con WoE positivo <em>suma</em> puntos.</p></div>
+
+<h3 id="scorecard">11.5 Scorecard y puntuaciones</h3>
 <p>Ventajas de la tarjeta de puntos: fácil interpretación, explicable al usuario final, consistencia, reconocimiento de patrones, ajustable a las necesidades y útil para la toma de decisiones. Ejemplo de la clase: "Pablito, 28 años, gana $26,500, …, vive en Monterrey" suma 15 (edad) + 42 (ingreso) + … + 33 (ciudad) = <strong>350 puntos</strong>.</p>
 <p>La escala es <strong>arbitraria</strong> (depende del analista y del negocio) y se fija con base en los momios del portafolio:</p>
 <div class="formula">
@@ -778,8 +1396,20 @@ P(malo) = 0.1400 | momios bueno:malo = 6.14 | Offset + Factor*ln(momios) = 539.5
 +20 puntos (PDO) =&gt; momios x2: 12.28</pre></div>
 </div>
 
+<div class="widget" id="w-pdo">
+  <div class="widget-title"><span class="tag">Calculadora</span> Factor, Offset y PDO</div>
+  <p class="hint">Fija la escala y mira qué score le toca a unos momios bueno:malo. Comprueba que cada PDO puntos los momios se duplican.</p>
+  <div class="controls">
+    <label>PDO <input type="number" id="pdo-pdo" value="20" min="1" step="1" style="width:80px"></label>
+    <label>Score de referencia <input type="number" id="pdo-score" value="600" step="10" style="width:90px"></label>
+    <label>Momios de referencia <input type="number" id="pdo-odds" value="50" min="0.01" step="1" style="width:80px"></label>
+    <label>Momios del cliente <input type="number" id="pdo-cli" value="6.14" min="0.01" step="0.5" style="width:90px"></label>
+  </div>
+  <div class="readout" id="pdo-out"></div>
+</div>
+
 <!-- ===================================================== -->
-<h2 id="modelos-notebooks">10. Los modelos de los notebooks y cómo evaluarlos</h2>
+<h2 id="modelos-notebooks">12. Los modelos de los notebooks y cómo evaluarlos</h2>
 <p>Una vez lista la TAD final (variables estandarizadas o transformadas a WoE), el flujo de modelado del curso es siempre el mismo:</p>
 <div class="code-card"><div class="code-head"><span class="fname">flujo de modelado de las sesiones 8 y 9</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button></div><pre><code class="language-python">from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -839,8 +1469,59 @@ Sesión 9 · Churn (fuga)
 </div>
 <div class="callout exam"><div class="callout-title">📝 Interpretación</div><p>En churn, el accuracy (0.806) parece bueno, pero el <strong>recall es 0.547</strong>: el modelo solo detecta 55 % de los clientes que realmente se van. Como la clase positiva es minoritaria (27 %), un modelo que dijera "nadie se va" ya tendría 73 % de accuracy. Por eso se usan AUC, precisión, recall y F1 (más en el <a href="modulo2.html#metricas">Módulo 2</a>).</p></div>
 
+<h3 id="interpretar-logistica">12.1 Cómo leer los coeficientes de la logística</h3>
+<p>En la logística los coeficientes no se leen como en la regresión lineal. Como el modelo es lineal en el <strong>logaritmo de los momios</strong>, subir una unidad en \(x_i\) suma \(\beta_i\) al logit y, por lo tanto, <strong>multiplica los momios por \(e^{\beta_i}\)</strong>. Con variables estandarizadas, "una unidad" es una desviación estándar. El notebook de Ecobici imprimió <code>coef_ = [3.244, −0.122, 0.474, 0.480]</code> e <code>intercept_ = −3.229</code>:</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_16_interpretar_logistica.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_16_interpretar_logistica.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Interpretar la regresión logística de la sesión 8 (Ecobici, ¿alta afluencia?)
+# Coeficientes e intercepto reales que imprimió el notebook (variables estandarizadas, z-score)
+import numpy as np
+
+variables = [&quot;ss_v_max_afluencia&quot;, &quot;ss_v_pct_delta_desv_afluencia&quot;,
+             &quot;ss_v_sum_inc_afluencia&quot;, &quot;ss_v_sum_dec_afluencia&quot;]
+beta = np.array([3.24427681, -0.1219525, 0.47388188, 0.48031202])
+alpha = -3.22891895
+
+def p_alta(z):
+    return 1 / (1 + np.exp(-(alpha + z @ beta)))     # sigmoide del logit
+
+# 1) Razón de momios: subir 1 desviación estándar en una variable multiplica los momios por e^beta
+print(&quot;Variable                         beta    e^beta&quot;)
+for v, b in zip(variables, beta):
+    print(f&quot;{v:&lt;31} {b:&gt;6.3f}  {np.exp(b):&gt;7.3f}&quot;)
+
+# 2) Una estación &quot;promedio&quot; (todas las z = 0): solo cuenta el intercepto
+z0 = np.zeros(4)
+print(f&quot;\nEstación promedio      -&gt; logit = {alpha:.3f} -&gt; P(alta) = {p_alta(z0):.4f}&quot;)
+
+# 3) Misma estación pero con un máximo reciente 1 desviación arriba del promedio
+z1 = np.array([1.0, 0, 0, 0])
+print(f&quot;v_max a +1 desviación  -&gt; logit = {alpha + beta[0]:.3f} -&gt; P(alta) = {p_alta(z1):.4f}&quot;)
+print(f&quot;Momios: {np.exp(alpha):.4f} -&gt; {np.exp(alpha + beta[0]):.4f}  (x{np.exp(beta[0]):.2f})&quot;)
+
+# 4) La primera estación de la TAD final del notebook (Est00000, ancla 20)
+z = np.array([1.012736, 1.409126, 0.113030, 0.327499])
+print(f&quot;\nEst00000, ancla 20     -&gt; P(alta) = {p_alta(z):.4f} -&gt; clase {int(p_alta(z) &gt;= 0.5)} (real y2 = 1, y = 308,424)&quot;)
+
+# 5) El corte 0.5 es una decisión: ¿qué valor de v_max (en z) hace P = 0.5 con las demás en 0?
+print(f&quot;Con las demás z = 0, P(alta) = 0.5 cuando z_max = -alpha/beta = {-alpha / beta[0]:.3f} desviaciones&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Variable                         beta    e^beta
+ss_v_max_afluencia               3.244   25.643
+ss_v_pct_delta_desv_afluencia   -0.122    0.885
+ss_v_sum_inc_afluencia           0.474    1.606
+ss_v_sum_dec_afluencia           0.480    1.617
+
+Estación promedio      -&gt; logit = -3.229 -&gt; P(alta) = 0.0381
+v_max a +1 desviación  -&gt; logit = 0.015 -&gt; P(alta) = 0.5038
+Momios: 0.0396 -&gt; 1.0155  (x25.64)
+
+Est00000, ancla 20     -&gt; P(alta) = 0.5239 -&gt; clase 1 (real y2 = 1, y = 308,424)
+Con las demás z = 0, P(alta) = 0.5 cuando z_max = -alpha/beta = 0.995 desviaciones</pre></div>
+</div>
+<div class="callout exam"><div class="callout-title">📝 Interpretación</div><p>Para una estación promedio (todas las z = 0) la probabilidad de alta afluencia es solo 3.8 %: refleja que la clase positiva es minoritaria. El máximo reciente domina: una desviación estándar más multiplica los momios por 25.6. El corte 0.5 de <code>predict</code> es una decisión; bajarlo aumenta el recall a costa de la precisión (se profundiza en el <a href="modulo2.html#roc">Módulo 2</a>).</p></div>
+
 <!-- ===================================================== -->
-<h2 id="oltp-olap">11. OLTP vs OLAP y cubos de información</h2>
+<h2 id="oltp-olap">13. OLTP vs OLAP y cubos de información</h2>
 <div class="table-wrap"><table class="compare">
 <thead><tr><th></th><th>OLTP (On-Line Transaction Processing)</th><th>OLAP (On-Line Analytical Processing)</th></tr></thead>
 <tbody>
@@ -947,10 +1628,29 @@ Zona 3 MER         30.76  37.43  28.60  27.44
 
 Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre></div>
 </div>
+<div class="callout tip"><div class="callout-title">💡 Los números reales de la sesión 10</div><ul style="margin:0"><li>Después de pivotear (una columna por contaminante) la tabla tiene <strong>1,074,321</strong> registros estación-hora de 34 estaciones, 2018 a 2022, con 9 contaminantes: CO, NO, NO₂, NOx, O₃, PM10, PM2.5, PMCO y SO₂.</li><li>El centro para las zonas es la media de las estaciones: longitud −99.1359, latitud 19.4092. Cada estación cae en uno de 4 cuadrantes ("Zona 1" a "Zona 4").</li><li>En el cubo de tiempo, el O₃ promedio del trimestre Q2 (39.27) es el más alto, contra 30.09 en Q1: la misma temporada que imita el programa de arriba.</li><li>Cada cubo se guarda con <code>to_csv</code> y <code>to_excel</code> para consultarlo sin repetir los cálculos: esa es la idea de OLAP.</li></ul></div>
+
+<!-- ===================================================== -->
+<h2 id="siguientes">14. Lo que te llevas al resto del diplomado</h2>
+<p>Cada pieza de este módulo reaparece más adelante. Si algo de esta tabla no te queda claro, vuelve a su sección antes de avanzar.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Del Módulo 1…</th><th>…se usa en</th></tr></thead>
+<tbody>
+<tr><td>TAD, train/validación, <code>fit</code>/<code>predict</code></td><td>todos los modelos supervisados del <a href="modulo2.html#definicion">Módulo 2</a></td></tr>
+<tr><td>Regresión lineal y logística (momios, sigmoide)</td><td><a href="modulo2.html#lineal">Módulo 2 · regresión lineal y supuestos</a>, <a href="modulo2.html#logistica">logística</a>; la sigmoide vuelve como activación en el <a href="modulo4.html#activaciones">Módulo 4</a></td></tr>
+<tr><td>Matriz de confusión, AUC, recall, desbalance</td><td><a href="modulo2.html#metricas">Módulo 2 · métricas, ROC, KS, Lift</a></td></tr>
+<tr><td>Multicolinealidad (VarClus)</td><td>supuestos de la regresión y <a href="modulo2.html#regularizacion">LASSO / Ridge</a></td></tr>
+<tr><td>Estandarizar antes de distancias</td><td><a href="modulo2.html#knn">KNN</a>, <a href="modulo2.html#svm">SVM</a>, <a href="modulo3.html#kmeans">K-means</a> y <a href="modulo3.html#dbscan">DBSCAN</a></td></tr>
+<tr><td>PCA y t-SNE</td><td><a href="modulo3.html#pca">Módulo 3 · PCA paso a paso</a></td></tr>
+<tr><td>Dummies / one-hot</td><td><a href="modulo4.html#onehot">Módulo 4 · el problema del one-hot</a> y los embeddings</td></tr>
+<tr><td>Ventanas de tiempo y series</td><td><a href="modulo4.html#secuencial">Módulo 4 · modelado secuencial y RNN</a></td></tr>
+<tr><td>Recalibrar el modelo en producción</td><td><a href="modulo2.html#estabilidad">Módulo 2 · reportes de estabilidad (PSI)</a></td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">📝 ¿Listo para practicar?</div><p>La página <a href="examen-m1.html"><strong>Examen M1</strong></a> tiene la guía de conceptos clave, ejercicios resueltos, un cuestionario con explicaciones y tarjetas de repaso de todo este módulo.</p></div>
 
 <nav class="pager" aria-label="Navegación entre páginas">
   <a href="index.html"><small>← Inicio</small>Todos los módulos</a>
-  <a class="next" href="modulo2.html"><small>Siguiente →</small>Módulo 2 · Modelación supervisada</a>
+  <a class="next" href="examen-m1.html"><small>Siguiente →</small>Examen M1 · Guía y práctica</a>
 </nav>
 
 </main>
@@ -962,6 +1662,6 @@ Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/js/data.js?v=180c6754" defer></script>
 <script src="assets/js/main.js?v=54416b98" defer></script>
-<script src="assets/js/m1.js?v=e5862c24" defer></script>
+<script src="assets/js/m1.js?v=m1v2" defer></script>
 </body>
 </html>

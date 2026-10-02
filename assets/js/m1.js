@@ -81,7 +81,58 @@
     }));
   }
 
+  /* ---------- Calculadora WoE / IV ---------- */
+  function woeCalc() {
+    const tb = document.querySelector("#woe-tbl tbody"); if (!tb) return;
+    // Valores iniciales = variable edad del programa m1_07 (IV = 0.4792)
+    const ini = [["18–29", 391, 657], ["30–40", 262, 711], ["41–51", 163, 817], ["52–63", 102, 908], ["64–74", 84, 905]];
+    tb.innerHTML = ini.map(([b, e, ne], i) =>
+      `<tr><td>${b}</td><td class="num"><input class="inp" type="number" min="0" step="1" value="${e}" data-r="${i}" data-c="e" style="width:90px" aria-label="Eventos ${b}"></td>` +
+      `<td class="num"><input class="inp" type="number" min="0" step="1" value="${ne}" data-r="${i}" data-c="n" style="width:90px" aria-label="No eventos ${b}"></td>` +
+      `<td class="num" id="woe-pe${i}"></td><td class="num" id="woe-pn${i}"></td><td class="num" id="woe-w${i}"></td><td class="num" id="woe-iv${i}"></td></tr>`).join("");
+    const fmt = (v, d) => (isFinite(v) ? v.toFixed(d) : v > 0 ? "∞" : v < 0 ? "−∞" : "—");
+    function calc() {
+      const rows = ini.map((_, i) => ({
+        e: Math.max(0, parseFloat(tb.querySelector(`[data-r="${i}"][data-c="e"]`).value) || 0),
+        n: Math.max(0, parseFloat(tb.querySelector(`[data-r="${i}"][data-c="n"]`).value) || 0),
+      }));
+      const E = rows.reduce((s, r) => s + r.e, 0), N = rows.reduce((s, r) => s + r.n, 0);
+      let iv = 0;
+      rows.forEach((r, i) => {
+        const pe = E ? r.e / E : 0, pn = N ? r.n / N : 0;
+        const w = Math.log(pn / pe), ivi = (pn - pe) * w;
+        iv += isNaN(ivi) ? 0 : ivi;
+        $("woe-pe" + i).textContent = pe.toFixed(4); $("woe-pn" + i).textContent = pn.toFixed(4);
+        $("woe-w" + i).textContent = fmt(w, 4); $("woe-iv" + i).textContent = fmt(ivi, 4);
+      });
+      const poder = !isFinite(iv) ? "infinito: algún bin no tiene eventos o no eventos (¿la variable da la respuesta?)"
+        : iv < 0.02 ? "no ayuda a la predicción" : iv < 0.1 ? "bajo" : iv < 0.3 ? "regular" : iv < 0.5 ? "fuerte" : "sobrepredictiva (revisar)";
+      $("woe-out").textContent = `Total: ${E} eventos y ${N} no eventos  (tasa de evento = ${E + N ? (E / (E + N)).toFixed(3) : "—"})\n` +
+        `IV = Σ (%no evento − %evento) · WoE = ${fmt(iv, 4)}  →  poder predictivo ${poder}`;
+    }
+    tb.addEventListener("input", calc);
+    calc();
+  }
+
+  /* ---------- Calculadora Factor / Offset / PDO ---------- */
+  function pdoCalc() {
+    if (!$("pdo-out")) return;
+    function calc() {
+      const pdo = num("pdo-pdo", 20), sref = num("pdo-score", 600), oref = num("pdo-odds", 50), ocli = num("pdo-cli", 6.14);
+      if (pdo <= 0 || oref <= 0 || ocli <= 0) { $("pdo-out").textContent = "PDO y momios deben ser positivos."; return; }
+      const factor = pdo / Math.LN2, offset = sref - factor * Math.log(oref), score = offset + factor * Math.log(ocli);
+      $("pdo-out").textContent =
+        `Factor = PDO / ln 2 = ${pdo} / 0.6931 = ${factor.toFixed(4)}\n` +
+        `Offset = Score − Factor · ln(odds) = ${sref} − ${factor.toFixed(4)} · ln(${oref}) = ${offset.toFixed(4)}\n` +
+        `Score(momios ${ocli}) = Offset + Factor · ln(${ocli}) = ${score.toFixed(1)}\n` +
+        `Score(momios ${(2 * ocli).toFixed(2)}) = ${(score + pdo).toFixed(1)}   ← +${pdo} puntos al duplicar los momios\n` +
+        `P(malo) del cliente = 1 / (1 + momios) = ${(1 / (1 + ocli)).toFixed(4)}`;
+    }
+    ["pdo-pdo", "pdo-score", "pdo-odds", "pdo-cli"].forEach((id) => $(id).addEventListener("input", calc));
+    calc();
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
-    [ventanas, pcaChart, woeChart].forEach((fn) => { try { fn(); } catch (e) { console.error(fn.name, e); } });
+    [ventanas, pcaChart, woeChart, woeCalc, pdoCalc].forEach((fn) => { try { fn(); } catch (e) { console.error(fn.name, e); } });
   });
 })();

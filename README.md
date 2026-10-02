@@ -7,7 +7,8 @@ gráficas, simuladores interactivos y código Python **con la salida real que pr
 | Página | Contenido |
 |---|---|
 | `index.html` | Portada y mapa del diplomado |
-| `modulo1.html` | Proceso de ciencia de datos, TAD, ventanas de tiempo, limpieza, VarClus, estandarización, PCA, t-SNE, dummies, credit scoring (WoE, IV, scorecard), OLTP/OLAP |
+| `modulo1.html` | Conceptos base, proceso de ciencia de datos, herramientas, TAD, ventanas de tiempo, pandas desde lo básico, integración, ingeniería de variables, limpieza, VarClus, estandarización (fit/transform), PCA, t-SNE, dummies, credit scoring (discretización, WoE, IV, scorecard), interpretación de la logística, OLTP/OLAP |
+| `examen-m1.html` | Guía de conceptos clave (fórmulas, decisiones, concepto → código), 15 ejercicios resueltos, 78 preguntas con explicación y 39 tarjetas de repaso |
 | `modulo2.html` | Regresión lineal y supuestos, logística, LASSO/Ridge/ElasticNet, gradiente, LDA, kernel, SVM, KNN, Bayes ingenuo, árboles, redes, ensambles, métricas, ROC, KS, Lift, PSI |
 | `modulo3.html` | PCA paso a paso, K-means, clustering jerárquico, DBSCAN, ciclo de clustering |
 | `modulo4.html` | Deep learning: MLP, activaciones, backprop, CNN, dropout, optimizadores, RNN, embeddings, LSTM/GRU, transfer learning |
@@ -17,13 +18,13 @@ gráficas, simuladores interactivos y código Python **con la salida real que pr
 
 ```
 sitio-web/
-├── index.html, modulo1..4.html, examen-m4.html
+├── index.html, modulo1..4.html, examen-m1.html, examen-m4.html
 ├── assets/
 │   ├── css/style.css         estilos (modo claro y oscuro)
-│   └── js/                   main.js (común), m1..m4.js (gráficas y simuladores), quiz.js, data.js
+│   └── js/                   main.js (común), m1..m4.js (gráficas y simuladores), quiz-m1.js, quiz.js (M4), data.js
 ├── codigo/
 │   ├── requirements.txt
-│   └── modulo1..4/*.py       40 programas; su salida es la que aparece en las páginas
+│   └── modulo1..4/*.py       47 programas; su salida es la que aparece en las páginas
 └── .nojekyll                 le indica a GitHub Pages que publique los archivos tal cual
 ```
 

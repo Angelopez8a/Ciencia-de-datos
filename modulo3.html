@@ -27,14 +27,14 @@
 <section class="hero">
   <div class="eyebrow">Módulo 3 · Modelación no supervisada</div>
   <h1>Encontrar estructura sin variable objetivo: reducción de dimensiones y clustering</h1>
-  <p class="lead">En el aprendizaje no supervisado solo tenemos \(X\). Los objetivos: <strong>comprimir</strong> la información (PCA), <strong>agrupar</strong> observaciones parecidas (K-means, jerárquico, DBSCAN) y <strong>describir</strong> esos grupos para el negocio (perfilamiento).</p>
+  <p class="lead">En el aprendizaje no supervisado solo se dispone de \(X\), sin una variable objetivo. Los propósitos son <strong>comprimir</strong> la información (PCA), <strong>agrupar</strong> observaciones parecidas (K-means, clustering jerárquico y DBSCAN) y <strong>describir</strong> esos grupos para el negocio (perfilamiento). Los ejemplos usan datos reales: flores de iris, erupciones del géiser Old Faithful, ciudades de México, sismos cerca de Fiyi y clientes de un distribuidor mayorista de Portugal.</p>
   <div class="meta-row">
     <span class="chip"><span class="dot" style="background:var(--s3)"></span>Prácticas: reducción de dimensiones · jerárquico · DBSCAN · ciclo de clustering</span>
     <span class="chip">5 programas verificados</span>
   </div>
   <div class="callout note">
-    <div class="callout-title">ℹ️ Sobre esta página</div>
-    <p>La carpeta <code>modulo3</code> solo contiene una captura con la lista de tareas del módulo: <em>1. Práctica reducción de dimensiones (partes 1 y 2), 2. Práctica clustering jerárquico, 3. Práctica DBSCAN, 4. Práctica ciclo clustering</em>, Quiz 2, Examen y Proyecto final. No había presentaciones, así que esta página desarrolla esos cuatro temas con el mismo estilo (teoría, diagramas, código y salidas verificadas). Si consigues las diapositivas, se pueden integrar.</p>
+    <div class="callout-title">Sobre esta página</div>
+    <p>La carpeta <code>modulo3</code> del curso solo contiene una captura con la lista de tareas del módulo: <em>1. Práctica reducción de dimensiones (partes 1 y 2), 2. Práctica clustering jerárquico, 3. Práctica DBSCAN, 4. Práctica ciclo clustering</em>, además del Quiz 2, el examen y el proyecto final. Como no había presentaciones, esta página desarrolla esos cuatro temas con el mismo formato que las demás: teoría, diagramas, código y salidas verificadas. Si se consiguen las diapositivas, pueden integrarse.</p>
   </div>
 </section>
 
@@ -48,31 +48,37 @@
 <tr><td>Evaluación</td><td>contra la verdad (accuracy, AUC, MAE)</td><td>métricas internas (silueta, inercia) + utilidad para el negocio</td></tr>
 <tr><td>Ejemplos</td><td>churn, scoring, demanda</td><td>segmentación de clientes, compresión, detección de atípicos</td></tr>
 </tbody></table></div>
-<p>Casi todos los métodos se basan en <strong>distancias</strong>, por eso la regla de oro del Módulo 1 sigue vigente: <strong>estandarizar antes</strong> (si una variable está en miles y otra en unidades, la primera domina la distancia).</p>
+<p>Casi todos los métodos se basan en <strong>distancias</strong>; por eso sigue vigente la regla del Módulo 1: <strong>estandarizar antes</strong>, porque si una variable se mide en miles y otra en unidades, la primera domina la distancia.</p>
 <div class="formula">$$d_{\text{euclidiana}}(a,b) = \sqrt{\sum_i (a_i - b_i)^2}\qquad d_{\text{manhattan}}(a,b) = \sum_i |a_i - b_i| \qquad \text{sim}_{\cos}(a,b) = \frac{a\cdot b}{\lVert a\rVert\lVert b\rVert}$$</div>
 
 <!-- ===================================================== -->
 <h2 id="pca">2. Reducción de dimensiones con PCA (paso a paso)</h2>
-<p>PCA busca nuevas variables (<strong>componentes principales</strong>) que son combinaciones lineales de las originales, ortogonales entre sí y ordenadas por la varianza que explican. El algoritmo:</p>
+<p>PCA construye nuevas variables, las <strong>componentes principales</strong>, que son combinaciones lineales de las originales, ortogonales entre sí y ordenadas según la varianza que explican. El algoritmo es el siguiente:</p>
 <ol class="steps">
   <li><strong>Estandarizar</strong> (o al menos centrar) las variables.</li>
   <li>Calcular la <strong>matriz de covarianza</strong> \(C = \frac{1}{n-1}X_c^T X_c\).</li>
-  <li>Obtener <strong>eigenvalores</strong> \(\lambda_k\) y <strong>eigenvectores</strong> \(v_k\) de \(C\): cada eigenvector es una dirección (componente) y su eigenvalor la <strong>varianza</strong> en esa dirección.</li>
-  <li>Ordenar de mayor a menor \(\lambda\) y quedarse con las \(k\) primeras.</li>
+  <li>Obtener <strong>eigenvalores</strong> \(\lambda_k\) y <strong>eigenvectores</strong> \(v_k\) de \(C\): cada eigenvector es una dirección (componente) y su eigenvalor es la <strong>varianza</strong> en esa dirección.</li>
+  <li>Ordenar los eigenvalores de mayor a menor y conservar las \(k\) primeras componentes.</li>
   <li><strong>Proyectar</strong>: \(Z = X_c V_k\).</li>
 </ol>
-<div class="formula">$$\text{Varianza explicada}_k = \frac{\lambda_k}{\sum_j \lambda_j}\qquad\qquad \text{¿Cuántas componentes? } \to \text{acumulada} \ge 80\text{–}90\%,\ \text{codo del scree plot, o } \lambda_k > 1 \text{ (Kaiser, datos estandarizados)}$$</div>
+<div class="formula">$$\text{Varianza explicada}_k = \frac{\lambda_k}{\sum_j \lambda_j}$$
+<div class="where">¿Cuántas componentes conservar? Hay tres criterios habituales: que la varianza acumulada llegue a 80 % o 90 %, el codo del <em>scree plot</em> o, con datos estandarizados, las componentes con \(\lambda_k > 1\) (criterio de Kaiser).</div></div>
+<p>El programa aplica el algoritmo paso a paso al largo y al ancho del pétalo de las 150 flores de iris y compara el resultado con scikit-learn. Al final repite el análisis con las cuatro medidas de cada flor (largo y ancho del sépalo y del pétalo), estandarizadas.</p>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo3/m3_01_pca.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_01_pca.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 3 · PCA paso a paso: covarianza -&gt; eigenvectores -&gt; proyección (y comparación con sklearn)
+# Datos reales: 150 flores de iris de tres especies (Anderson, 1935; Fisher, 1936), medidas en centímetros.
 import numpy as np
+from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 np.set_printoptions(precision=4, suppress=True)
-X = np.array([[2.5, 2.4], [0.5, 0.7], [2.2, 2.9], [1.9, 2.2], [3.1, 3.0],
-              [2.3, 2.7], [2.0, 1.6], [1.0, 1.1], [1.5, 1.6], [1.1, 0.9]])
+iris = load_iris()
+X = iris.data[:, 2:4]                        # largo y ancho del pétalo
+print(&quot;Correlación entre el largo y el ancho del pétalo:&quot;, round(float(np.corrcoef(X, rowvar=False)[0, 1]), 3))
 
-Xc = X - X.mean(axis=0)                      # 1) centrar (en la práctica: estandarizar)
+Xc = X - X.mean(axis=0)                      # 1) centrar (ambas en cm: no hace falta estandarizar)
 C = np.cov(Xc, rowvar=False)                 # 2) matriz de covarianza
 valores, vectores = np.linalg.eigh(C)        # 3) eigen-descomposición
 orden = np.argsort(valores)[::-1]
@@ -80,96 +86,123 @@ valores, vectores = valores[orden], vectores[:, orden]
 print(&quot;Matriz de covarianza:\n&quot;, C)
 print(&quot;Eigenvalores (varianza de cada componente):&quot;, valores)
 print(&quot;Proporción de varianza explicada:&quot;, valores / valores.sum())
-Z = Xc @ vectores[:, :1]                     # 4) proyectar en la 1a componente
-print(&quot;Datos proyectados en PC1:&quot;, Z.ravel())
+print(&quot;Pesos (loadings) de PC1 [largo, ancho]:&quot;, vectores[:, 0])
+Z = Xc @ vectores[:, :1]                     # 4) proyectar en la primera componente
+print(&quot;Primeras 5 flores proyectadas en PC1:&quot;, Z[:5].ravel())
 
 pca = PCA(n_components=2).fit(X)
 print(&quot;\nsklearn explained_variance_ratio_:&quot;, pca.explained_variance_ratio_)
-print(&quot;sklearn PC1 (signo puede variar):&quot;, pca.transform(X)[:, 0])</code></pre>
-  <div class="output"><div class="out-label">Salida del programa</div><pre>Matriz de covarianza:
- [[0.6166 0.6154]
- [0.6154 0.7166]]
-Eigenvalores (varianza de cada componente): [1.284  0.0491]
-Proporción de varianza explicada: [0.9632 0.0368]
-Datos proyectados en PC1: [ 0.828  -1.7776  0.9922  0.2742  1.6758  0.9129 -0.0991 -1.1446 -0.438
- -1.2238]
+print(&quot;sklearn PC1, primeras 5 flores (el signo puede variar):&quot;, pca.transform(X)[:5, 0])
 
-sklearn explained_variance_ratio_: [0.9632 0.0368]
-sklearn PC1 (signo puede variar): [ 0.828  -1.7776  0.9922  0.2742  1.6758  0.9129 -0.0991 -1.1446 -0.438
- -1.2238]</pre></div>
+# Con las cuatro medidas (sépalo y pétalo), estandarizadas
+pca4 = PCA().fit(StandardScaler().fit_transform(iris.data))
+print(&quot;\nCuatro medidas estandarizadas&quot;)
+print(&quot;  Eigenvalores:&quot;, pca4.explained_variance_)
+print(&quot;  Varianza explicada:&quot;, pca4.explained_variance_ratio_, &quot;| acumulada:&quot;, pca4.explained_variance_ratio_.cumsum())</code></pre>
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Correlación entre el largo y el ancho del pétalo: 0.963
+Matriz de covarianza:
+ [[3.1163 1.2956]
+ [1.2956 0.581 ]]
+Eigenvalores (varianza de cada componente): [3.6612 0.036 ]
+Proporción de varianza explicada: [0.9903 0.0097]
+Pesos (loadings) de PC1 [largo, ancho]: [-0.9218 -0.3877]
+Primeras 5 flores proyectadas en PC1: [2.561  2.561  2.6532 2.4688 2.561 ]
+
+sklearn explained_variance_ratio_: [0.9903 0.0097]
+sklearn PC1, primeras 5 flores (el signo puede variar): [-2.561  -2.561  -2.6532 -2.4688 -2.561 ]
+
+Cuatro medidas estandarizadas
+  Eigenvalores: [2.9381 0.9202 0.1477 0.0209]
+  Varianza explicada: [0.7296 0.2285 0.0367 0.0052] | acumulada: [0.7296 0.9581 0.9948 1.    ]</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">Lectura</div><p>Las dos variables están muy correlacionadas, así que una sola componente (PC1) conserva el 96.3 % de la información: pasamos de 2 dimensiones a 1 perdiendo solo 3.7 %. sklearn da exactamente lo mismo (el signo de un eigenvector es arbitrario). Para el caso con 13 variables (Wine) revisa la <a href="modulo1.html#pca">gráfica del Módulo 1</a>: 5 componentes explican &gt; 80 %.</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>El largo y el ancho del pétalo tienen una correlación de 0.963, así que casi toda la información está en una sola dirección: PC1 conserva el 99.0 % de la varianza y basta una dimensión en lugar de dos. Sus pesos (−0.92 y −0.39) indican que PC1 representa, en esencia, el tamaño del pétalo. El signo de un eigenvector es arbitrario; por eso scikit-learn obtiene los mismos valores con el signo contrario. Con las cuatro medidas estandarizadas, PC1 explica el 73.0 % y las dos primeras componentes, el 95.8 %. Los criterios no siempre coinciden: el de Kaiser conservaría solo PC1 (\(\lambda_1 = 2.94\), mientras que \(\lambda_2 = 0.92\) queda apenas por debajo de 1), y el de la varianza acumulada de 90 % pide dos componentes. Un caso con 13 variables (los vinos) aparece en la <a href="modulo1.html#pca">gráfica del Módulo 1</a>, donde 5 componentes explican más del 80 %.</p></div>
 <div class="callout exam"><div class="callout-title">Para la práctica</div><ul>
-<li><strong>Loadings</strong> (<code>pca.components_</code>): el peso de cada variable original en cada componente; sirven para nombrar las componentes ("PC1 = tamaño", "PC2 = gasto vs frecuencia").</li>
-<li>PCA es lineal y no supervisado: no sabe cuál variable importa para predecir, solo cuál varía más.</li>
-<li>t-SNE (y UMAP) son no lineales: excelentes para visualizar clusters en 2D, no para alimentar modelos.</li>
+<li><strong>Loadings</strong> (<code>pca.components_</code>): son los pesos de cada variable original en cada componente y sirven para nombrarlas (por ejemplo, «PC1 = tamaño del pétalo»).</li>
+<li>PCA es lineal y no supervisado: no sabe qué variable importa para predecir, solo cuál varía más.</li>
+<li>t-SNE y UMAP son métodos no lineales: muy útiles para visualizar grupos en dos dimensiones, pero no para alimentar modelos.</li>
 </ul></div>
 
 <!-- ===================================================== -->
 <h2 id="kmeans">3. K-means</h2>
-<p>Agrupa en \(k\) clusters minimizando la distancia de cada punto al <strong>centroide</strong> (media) de su grupo.</p>
+<p>Agrupa las observaciones en \(k\) clusters minimizando la distancia de cada punto al <strong>centroide</strong> (la media) de su grupo.</p>
 <ol class="steps">
-  <li>Elegir \(k\) y colocar \(k\) centroides iniciales (sklearn usa <strong>k-means++</strong>: centroides iniciales alejados entre sí).</li>
+  <li>Elegir \(k\) y colocar \(k\) centroides iniciales (scikit-learn usa <strong>k-means++</strong>, que elige centroides iniciales alejados entre sí).</li>
   <li><strong>Asignar</strong> cada punto al centroide más cercano.</li>
   <li><strong>Actualizar</strong> cada centroide como la media de sus puntos.</li>
-  <li>Repetir 2–3 hasta que las asignaciones no cambien (<code>n_init</code> repite todo con varias semillas y se queda con la mejor).</li>
+  <li>Repetir los pasos 2 y 3 hasta que las asignaciones no cambien (<code>n_init</code> repite todo el proceso con varias semillas y conserva la mejor solución).</li>
 </ol>
 <div class="formula">$$\text{Inercia (WCSS)} = \sum_{j=1}^{k}\sum_{x_i\in C_j}\lVert x_i - \mu_j\rVert^2 \qquad\qquad s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}$$
-<div class="where">\(a(i)\) = distancia promedio de \(i\) a su propio cluster; \(b(i)\) = distancia promedio al cluster vecino más cercano. Silueta cerca de 1: bien agrupado; cerca de 0: en la frontera; negativa: mal asignado. <strong>Davies-Bouldin</strong>: menor es mejor. <strong>Calinski-Harabasz</strong>: mayor es mejor.</div></div>
+<div class="where">\(a(i)\) es la distancia promedio de \(i\) a los puntos de su propio cluster, y \(b(i)\), la distancia promedio a los del cluster vecino más cercano. Una silueta cercana a 1 indica un punto bien agrupado; cercana a 0, un punto en la frontera, y negativa, un punto mal asignado. En el índice de <strong>Davies-Bouldin</strong>, un valor menor es mejor; en el de <strong>Calinski-Harabasz</strong>, uno mayor.</div></div>
+<p>El ejemplo usa las 272 erupciones del géiser Old Faithful, en el Parque Nacional de Yellowstone: de cada una se registró su duración y el tiempo de espera hasta la siguiente, ambos en minutos. Las dos variables se estandarizan antes de agrupar.</p>
 <div class="two-col">
 <div class="chart-card">
   <h4>Método del codo</h4>
-  <p class="sub">La inercia siempre baja con más k; buscamos el "codo" donde deja de bajar mucho: k = 4.</p>
-  <div class="chart-box short"><canvas id="chart-elbow" aria-label="Inercia por k"></canvas></div>
+  <p class="sub">La inercia siempre baja al aumentar k; se busca el «codo», donde deja de bajar mucho. De k = 1 a k = 2 cae de 544 a 79.6, y después baja poco a poco.</p>
+  <div class="chart-box short"><canvas id="chart-elbow" aria-label="Inercia por número de clusters, géiser Old Faithful"></canvas></div>
 </div>
 <div class="chart-card">
   <h4>Coeficiente de silueta</h4>
-  <p class="sub">Máximo en k = 4 (0.802): confirma el codo.</p>
-  <div class="chart-box short"><canvas id="chart-sil" aria-label="Silueta por k"></canvas></div>
+  <p class="sub">El máximo está en k = 2 (0.745), lo que confirma el codo.</p>
+  <div class="chart-box short"><canvas id="chart-sil" aria-label="Silueta por número de clusters, géiser Old Faithful"></canvas></div>
 </div>
 </div>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo3/m3_02_kmeans.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_02_kmeans.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 3 · K-means: método del codo (inercia) y coeficiente de silueta para elegir k
-from sklearn.datasets import make_blobs
-from sklearn.preprocessing import StandardScaler
+# Datos reales: 272 erupciones del géiser Old Faithful (Parque Nacional de Yellowstone): duración de la erupción
+# y tiempo de espera hasta la siguiente, ambos en minutos (Azzalini y Bowman, 1990).
+from pathlib import Path
+import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from sklearn.preprocessing import StandardScaler
 
-X, _ = make_blobs(n_samples=600, centers=4, cluster_std=1.0, random_state=7)
-X = StandardScaler().fit_transform(X)
+ARCHIVO = Path(__file__).resolve().parents[1] / &quot;datos&quot; / &quot;old_faithful.csv&quot;
+URL = &quot;https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/faithful.csv&quot;
+geiser = pd.read_csv(ARCHIVO if ARCHIVO.exists() else URL, index_col=0)
+escala = StandardScaler().fit(geiser)
+X = escala.transform(geiser)                  # duración y espera en la misma escala
 
 print(f&quot;{&#x27;k&#x27;:&gt;2}{&#x27;Inercia (WCSS)&#x27;:&gt;16}{&#x27;Silueta&#x27;:&gt;10}{&#x27;Davies-B&#x27;:&gt;10}{&#x27;Calinski-H&#x27;:&gt;12}&quot;)
+print(f&quot;{1:&gt;2}{KMeans(n_clusters=1, n_init=10, random_state=0).fit(X).inertia_:&gt;16.1f}&quot;
+      f&quot;{&#x27;-&#x27;:&gt;10}{&#x27;-&#x27;:&gt;10}{&#x27;-&#x27;:&gt;12}   (todas las erupciones en un solo grupo)&quot;)
 for k in range(2, 9):
     km = KMeans(n_clusters=k, n_init=10, random_state=0).fit(X)
     et = km.labels_
     print(f&quot;{k:&gt;2}{km.inertia_:&gt;16.1f}{silhouette_score(X, et):&gt;10.3f}&quot;
           f&quot;{davies_bouldin_score(X, et):&gt;10.3f}{calinski_harabasz_score(X, et):&gt;12.1f}&quot;)
 
-km = KMeans(n_clusters=4, n_init=10, random_state=0).fit(X)
-print(&quot;\nCentroides (k=4):\n&quot;, km.cluster_centers_.round(2))
-print(&quot;Tamaño de cada cluster:&quot;, [int((km.labels_ == c).sum()) for c in range(4)])</code></pre>
+km = KMeans(n_clusters=2, n_init=10, random_state=0).fit(X)
+centros = pd.DataFrame(escala.inverse_transform(km.cluster_centers_), columns=[&quot;duración (min)&quot;, &quot;espera (min)&quot;])
+centros[&quot;erupciones&quot;] = [int((km.labels_ == c).sum()) for c in range(2)]
+print(&quot;\nCentroides con k = 2, en minutos:\n&quot;, centros.round(2).to_string())</code></pre>
   <div class="output"><div class="out-label">Salida del programa</div><pre> k  Inercia (WCSS)   Silueta  Davies-B  Calinski-H
- 2           490.8     0.593     0.785       864.0
- 3           129.8     0.766     0.333      2460.6
- 4            31.1     0.802     0.283      7462.0
- 5            27.9     0.683     0.583      6240.6
- 6            25.0     0.580     0.790      5591.9
- 7            21.9     0.450     0.968      5314.6
- 8            19.0     0.355     1.079      5263.0
+ 1           544.0         -         -           -   (todas las erupciones en un solo grupo)
+ 2            79.6     0.745     0.341      1575.8
+ 3            56.3     0.485     0.818      1164.8
+ 4            43.9     0.388     0.924      1017.5
+ 5            34.3     0.365     0.931       992.3
+ 6            27.3     0.393     0.854      1006.4
+ 7            23.8     0.387     0.849       964.7
+ 8            20.8     0.361     0.871       948.3
 
-Centroides (k=4):
- [[ 1.47  0.04]
- [-1.31  0.9 ]
- [ 0.03 -1.62]
- [-0.19  0.67]]
-Tamaño de cada cluster: [150, 150, 150, 150]</pre></div>
+Centroides con k = 2, en minutos:
+    duración (min)  espera (min)  erupciones
+0            2.05         54.59          98
+1            4.30         80.08         174</pre></div>
 </div>
-<div class="callout warn"><div class="callout-title">Limitaciones de K-means</div><p>Hay que fijar \(k\); asume clusters <strong>esféricos y de tamaño parecido</strong>; es sensible a la escala, a los atípicos y a la inicialización; todo punto termina en algún cluster (no detecta ruido). Por eso existen el jerárquico y DBSCAN.</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>Las tres métricas de validación coinciden en k = 2: la silueta es máxima (0.745), el índice de Davies-Bouldin es mínimo (0.341) y el de Calinski-Harabasz, máximo (1,575.8); la inercia muestra el codo en el mismo punto. Los centroides, expresados de nuevo en minutos, describen los dos tipos de erupción del géiser: 98 erupciones cortas, de 2.05 minutos en promedio, tras las que la siguiente llega en unos 55 minutos, y 174 erupciones largas, de 4.30 minutos, seguidas de una espera de unos 80 minutos. Es decir, la duración de una erupción ayuda a anticipar cuándo ocurrirá la siguiente.</p></div>
+<div class="chart-card">
+  <h4>Old Faithful: los dos grupos de K-means (k = 2)</h4>
+  <p class="sub">Cada punto es una erupción. Los grupos se formaron con las variables estandarizadas, pero los ejes se muestran en minutos.</p>
+  <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>erupciones cortas</span><span><i class="sq" style="background:var(--s2)"></i>erupciones largas</span></div>
+  <div class="chart-box"><canvas id="chart-faithful" aria-label="Erupciones del géiser Old Faithful agrupadas con K-means"></canvas></div>
+</div>
+<div class="callout warn"><div class="callout-title">Limitaciones de K-means</div><p>Hay que fijar \(k\) de antemano; supone clusters <strong>esféricos y de tamaño parecido</strong>; es sensible a la escala, a los atípicos y a la inicialización, y todo punto termina en algún cluster, es decir, no detecta ruido. Por eso existen alternativas como el clustering jerárquico y DBSCAN.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="jerarquico">4. Clustering jerárquico</h2>
-<p>Construye una <strong>jerarquía</strong> de agrupaciones representada en un <strong>dendrograma</strong>. El más común es el <strong>aglomerativo</strong> (bottom-up): empieza con cada punto como su propio cluster y en cada paso une los dos clusters más cercanos hasta tener uno solo. (El <strong>divisivo</strong> hace lo contrario: top-down.)</p>
+<p>Construye una <strong>jerarquía</strong> de agrupaciones que se representa en un <strong>dendrograma</strong>. El más común es el <strong>aglomerativo</strong> (de abajo hacia arriba): empieza con cada punto como un cluster propio y, en cada paso, une los dos clusters más cercanos hasta que queda uno solo. El <strong>divisivo</strong> hace lo contrario: parte de un solo grupo y lo va dividiendo.</p>
 <h3 id="enlaces">4.1 Criterios de enlace (linkage)</h3>
 <div class="table-wrap"><table class="compare">
 <thead><tr><th>Enlace</th><th>Distancia entre clusters A y B</th><th>Comportamiento</th></tr></thead>
@@ -179,78 +212,96 @@ Tamaño de cada cluster: [150, 150, 150, 150]</pre></div>
 <tr><td>Average (promedio)</td><td>promedio de todas las distancias entre pares</td><td>intermedio</td></tr>
 <tr><td>Ward</td><td>aumento de la varianza (WCSS) al unirlos</td><td>clusters compactos de tamaño similar (el más usado)</td></tr>
 </tbody></table></div>
+<p>El ejemplo agrupa seis ciudades de México según su ubicación: Ciudad de México y Toluca, Monterrey y Saltillo, y Mérida y Cancún. Las coordenadas de cada ciudad se convierten a kilómetros con una proyección plana; para estas distancias, el resultado difiere en menos de 2.5 % de la distancia medida sobre la superficie terrestre.</p>
 <figure class="figure">
-  <svg viewBox="0 0 640 300" role="img" aria-label="Dendrograma con enlace ward de seis puntos">
-    <line x1="60" y1="20" x2="60" y2="260" class="d-line"/>
-    <g class="d-text-3"><text x="52" y="264" text-anchor="end">0</text><text x="52" y="174" text-anchor="end">4</text><text x="52" y="84" text-anchor="end">8</text><text x="52" y="38" text-anchor="end">10</text></g>
-    <text x="22" y="140" class="d-text-3" transform="rotate(-90 22 140)" text-anchor="middle">distancia de unión</text>
-    <!-- y = 260 - d*22.5 -->
-    <g stroke="var(--s1)" stroke-width="2.5" fill="none"><path d="M110 260 V248.75 H180 V260"/></g>
-    <g stroke="var(--s3)" stroke-width="2.5" fill="none"><path d="M280 260 V248.75 H350 V260"/></g>
-    <g stroke="var(--s7)" stroke-width="2.5" fill="none"><path d="M450 260 V242 H520 V260"/></g>
-    <g stroke="var(--ink-3)" stroke-width="2" fill="none"><path d="M315 248.75 V83.4 H485 V242"/><path d="M145 248.75 V32.1 H400 V83.4"/></g>
-    <g class="d-text" text-anchor="middle"><text x="110" y="282">A</text><text x="180" y="282">B</text><text x="280" y="282">C</text><text x="350" y="282">D</text><text x="450" y="282">E</text><text x="520" y="282">F</text></g>
-    <line x1="70" y1="150" x2="600" y2="150" stroke="var(--crit)" stroke-width="1.5"/>
-    <text x="598" y="144" text-anchor="end" class="d-text-2">corte → 3 clusters</text>
-    <text x="330" y="78" class="d-text-3">7.85</text><text x="273" y="27" class="d-text-3">10.13</text>
+  <svg viewBox="0 0 660 310" role="img" aria-label="Dendrograma con enlace ward de seis ciudades de México">
+    <line x1="70" y1="20" x2="70" y2="260" class="d-line"/>
+    <g class="d-text-3"><text x="62" y="264" text-anchor="end">0</text><text x="62" y="205.2" text-anchor="end">500</text><text x="62" y="146.5" text-anchor="end">1,000</text><text x="62" y="87.8" text-anchor="end">1,500</text><text x="62" y="29.0" text-anchor="end">2,000</text></g>
+    <text x="20" y="140" class="d-text-3" transform="rotate(-90 20 140)" text-anchor="middle">altura de unión (ward)</text>
+    <g stroke="var(--s1)" stroke-width="2.5" fill="none"><path d="M110 260 V253.4 H190 V260"/></g>
+    <g stroke="var(--s3)" stroke-width="2.5" fill="none"><path d="M290 260 V251.1 H370 V260"/></g>
+    <g stroke="var(--s7)" stroke-width="2.5" fill="none"><path d="M470 260 V226.4 H550 V260"/></g>
+    <g stroke="var(--ink-3)" stroke-width="2" fill="none"><path d="M150 253.4 V143.7 H330 V251.1"/><path d="M240 143.7 V24.9 H510 V226.4"/></g>
+    <g class="d-text" text-anchor="middle"><text x="110" y="280">Ciudad de</text><text x="110" y="296">México</text><text x="190" y="280">Toluca</text><text x="290" y="280">Monterrey</text><text x="370" y="280">Saltillo</text><text x="470" y="280">Mérida</text><text x="550" y="280">Cancún</text></g>
+    <line x1="80" y1="189.5" x2="640" y2="189.5" stroke="var(--crit)" stroke-width="1.5"/>
+    <text x="638" y="183.5" text-anchor="end" class="d-text-2">corte → 3 clusters</text>
+    <g class="d-text-3"><text x="157" y="247.4">56</text><text x="337" y="245.1">76</text><text x="517" y="220.4">286</text><text x="246" y="137.7">990</text><text x="380" y="18.9" text-anchor="middle">2,001</text></g>
   </svg>
-  <figcaption>Dendrograma real del programa (enlace ward): A-B y C-D se unen a 0.5, E-F a 0.8; luego (C,D) con (E,F) a 7.85 y todo a 10.13. Cortar entre 0.8 y 7.85 da 3 clusters.</figcaption>
+  <figcaption>Dendrograma del programa con enlace ward. Primero se unen Ciudad de México y Toluca (56), Monterrey y Saltillo (76) y Mérida y Cancún (286); después, el centro con el norte (990) y, al final, todo con la península de Yucatán (2,001). Un corte entre 286 y 990 produce tres grupos: centro, norte y península.</figcaption>
 </figure>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo3/m3_03_jerarquico.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_03_jerarquico.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 3 · Clustering jerárquico aglomerativo: matriz de enlace (linkage) y corte del dendrograma
+# Datos reales: ubicación de seis ciudades de México (latitud y longitud del centro de cada ciudad, en grados).
 import numpy as np
 from scipy.cluster.hierarchy import linkage, fcluster
 from sklearn.cluster import AgglomerativeClustering
 
-puntos = np.array([[1, 1], [1.5, 1], [5, 5], [5, 5.5], [9, 1], [9, 1.8]])
-nombres = [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;]
+ciudades = {&quot;Ciudad de México&quot;: (19.43, -99.13), &quot;Toluca&quot;: (19.29, -99.65), &quot;Monterrey&quot;: (25.67, -100.31),
+            &quot;Saltillo&quot;: (25.42, -101.00), &quot;Mérida&quot;: (20.97, -89.62), &quot;Cancún&quot;: (21.16, -86.85)}
+nombres = list(ciudades)
+lat, lon = np.radians(np.array(list(ciudades.values()))).T
+
+# Proyección plana en kilómetros (equirectangular): suficiente para distancias de unos cientos de km
+R = 6371
+puntos = np.c_[R * lon * np.cos(lat.mean()), R * lat]
+d = lambda a, b: np.linalg.norm(puntos[nombres.index(a)] - puntos[nombres.index(b)])
+print(f&quot;Distancias en línea recta: Ciudad de México-Toluca = {d(&#x27;Ciudad de México&#x27;, &#x27;Toluca&#x27;):.0f} km, &quot;
+      f&quot;Monterrey-Saltillo = {d(&#x27;Monterrey&#x27;, &#x27;Saltillo&#x27;):.0f} km, Mérida-Cancún = {d(&#x27;Mérida&#x27;, &#x27;Cancún&#x27;):.0f} km&quot;)
 
 for metodo in [&quot;single&quot;, &quot;complete&quot;, &quot;average&quot;, &quot;ward&quot;]:
     Z = linkage(puntos, method=metodo)
-    print(f&quot;Enlace &#x27;{metodo}&#x27;:&quot;)
+    print(f&quot;\nEnlace &#x27;{metodo}&#x27;:&quot;)
+    grupos = {i: [n] for i, n in enumerate(nombres)}      # scipy numera los grupos nuevos desde 6
     for i, (a, b, dist, n) in enumerate(Z):
-        print(f&quot;  paso {i + 1}: une {int(a)} y {int(b)} a distancia {dist:.3f} -&gt; nuevo grupo con {int(n)} puntos&quot;)
+        grupos[len(nombres) + i] = grupos[int(a)] + grupos[int(b)]
+        altura = f&quot;a {dist:,.0f} km&quot; if metodo != &quot;ward&quot; else f&quot;a una altura de {dist:,.0f}&quot;   # en ward no es una distancia
+        print(f&quot;  paso {i + 1}: une {&#x27; + &#x27;.join(grupos[int(a)])} con {&#x27; + &#x27;.join(grupos[int(b)])} {altura}&quot;)
 
 Z = linkage(puntos, method=&quot;ward&quot;)
 etiquetas = fcluster(Z, t=3, criterion=&quot;maxclust&quot;)          # &quot;cortar&quot; el árbol en 3 grupos
 print(&quot;\nCorte en 3 clusters (ward):&quot;, dict(zip(nombres, etiquetas.tolist())))
-
 ac = AgglomerativeClustering(n_clusters=3, linkage=&quot;ward&quot;).fit(puntos)
 print(&quot;sklearn AgglomerativeClustering:&quot;, dict(zip(nombres, ac.labels_.tolist())))</code></pre>
-  <div class="output collapsed"><div class="out-label">Salida del programa</div><pre>Enlace &#x27;single&#x27;:
-  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
-  paso 4: une 7 y 8 a distancia 5.122 -&gt; nuevo grupo con 4 puntos
-  paso 5: une 6 y 9 a distancia 5.315 -&gt; nuevo grupo con 6 puntos
-Enlace &#x27;complete&#x27;:
-  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
-  paso 4: une 6 y 7 a distancia 6.021 -&gt; nuevo grupo con 4 puntos
-  paso 5: une 8 y 9 a distancia 8.040 -&gt; nuevo grupo con 6 puntos
-Enlace &#x27;average&#x27;:
-  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
-  paso 4: une 7 y 8 a distancia 5.562 -&gt; nuevo grupo con 4 puntos
-  paso 5: une 6 y 9 a distancia 6.722 -&gt; nuevo grupo con 6 puntos
-Enlace &#x27;ward&#x27;:
-  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
-  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
-  paso 4: une 7 y 8 a distancia 7.851 -&gt; nuevo grupo con 4 puntos
-  paso 5: une 6 y 9 a distancia 10.128 -&gt; nuevo grupo con 6 puntos
+  <div class="output collapsed"><div class="out-label">Salida del programa</div><pre>Distancias en línea recta: Ciudad de México-Toluca = 56 km, Monterrey-Saltillo = 76 km, Mérida-Cancún = 286 km
 
-Corte en 3 clusters (ward): {&#x27;A&#x27;: 1, &#x27;B&#x27;: 1, &#x27;C&#x27;: 2, &#x27;D&#x27;: 2, &#x27;E&#x27;: 3, &#x27;F&#x27;: 3}
-sklearn AgglomerativeClustering: {&#x27;A&#x27;: 1, &#x27;B&#x27;: 1, &#x27;C&#x27;: 2, &#x27;D&#x27;: 2, &#x27;E&#x27;: 0, &#x27;F&#x27;: 0}</pre></div>
+Enlace &#x27;single&#x27;:
+  paso 1: une Ciudad de México con Toluca a 56 km
+  paso 2: une Monterrey con Saltillo a 76 km
+  paso 3: une Mérida con Cancún a 286 km
+  paso 4: une Ciudad de México + Toluca con Monterrey + Saltillo a 693 km
+  paso 5: une Mérida + Cancún con Ciudad de México + Toluca + Monterrey + Saltillo a 995 km
+
+Enlace &#x27;complete&#x27;:
+  paso 1: une Ciudad de México con Toluca a 56 km
+  paso 2: une Monterrey con Saltillo a 76 km
+  paso 3: une Mérida con Cancún a 286 km
+  paso 4: une Ciudad de México + Toluca con Monterrey + Saltillo a 713 km
+  paso 5: une Mérida + Cancún con Ciudad de México + Toluca + Monterrey + Saltillo a 1,534 km
+
+Enlace &#x27;average&#x27;:
+  paso 1: une Ciudad de México con Toluca a 56 km
+  paso 2: une Monterrey con Saltillo a 76 km
+  paso 3: une Mérida con Cancún a 286 km
+  paso 4: une Ciudad de México + Toluca con Monterrey + Saltillo a 702 km
+  paso 5: une Mérida + Cancún con Ciudad de México + Toluca + Monterrey + Saltillo a 1,271 km
+
+Enlace &#x27;ward&#x27;:
+  paso 1: une Ciudad de México con Toluca a una altura de 56
+  paso 2: une Monterrey con Saltillo a una altura de 76
+  paso 3: une Mérida con Cancún a una altura de 286
+  paso 4: une Ciudad de México + Toluca con Monterrey + Saltillo a una altura de 990
+  paso 5: une Mérida + Cancún con Ciudad de México + Toluca + Monterrey + Saltillo a una altura de 2,001
+
+Corte en 3 clusters (ward): {&#x27;Ciudad de México&#x27;: 2, &#x27;Toluca&#x27;: 2, &#x27;Monterrey&#x27;: 3, &#x27;Saltillo&#x27;: 3, &#x27;Mérida&#x27;: 1, &#x27;Cancún&#x27;: 1}
+sklearn AgglomerativeClustering: {&#x27;Ciudad de México&#x27;: 2, &#x27;Toluca&#x27;: 2, &#x27;Monterrey&#x27;: 1, &#x27;Saltillo&#x27;: 1, &#x27;Mérida&#x27;: 0, &#x27;Cancún&#x27;: 0}</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">Ventajas y desventajas</div><p><strong>+</strong> No hay que fijar \(k\) de antemano (se decide al cortar el dendrograma); el dendrograma es muy interpretable. <strong>−</strong> Costoso en memoria y tiempo (\(O(n^2)\) distancias), no escala a millones de registros; una unión no se deshace. Los números de etiqueta son arbitrarios (sklearn y scipy los nombran distinto pero forman los mismos grupos).</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>Con los cuatro criterios de enlace, el orden de las uniones es el mismo porque los grupos están muy bien separados; lo que cambia es la altura. En el paso 4, el enlace simple usa la distancia mínima entre los dos grupos (693 km, de Ciudad de México a Saltillo), el completo usa la máxima (713 km, de Toluca a Monterrey) y el promedio da 702 km. En el último paso las diferencias crecen: 995, 1,534 y 1,271 km. En ward, la altura no es una distancia entre ciudades, sino una medida del aumento de la varianza dentro de los grupos al unirlos. El corte en tres grupos separa el centro, el norte y la península de Yucatán.</p></div>
+<div class="callout tip"><div class="callout-title">Ventajas y desventajas</div><p><strong>+</strong> No hay que fijar \(k\) de antemano, porque se decide al cortar el dendrograma, y el dendrograma es fácil de interpretar. <strong>−</strong> Es costoso en memoria y tiempo (requiere \(O(n^2)\) distancias), por lo que no escala a millones de registros, y una unión ya no puede deshacerse. Los números de etiqueta son arbitrarios: scipy y scikit-learn nombran distinto a los grupos, pero forman los mismos.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="dbscan">5. DBSCAN (clustering por densidad)</h2>
-<p><strong>D</strong>ensity-<strong>B</strong>ased <strong>S</strong>patial <strong>C</strong>lustering of <strong>A</strong>pplications with <strong>N</strong>oise. Un cluster es una región densa de puntos separada por regiones poco densas. Dos parámetros:</p>
+<p><strong>D</strong>ensity-<strong>B</strong>ased <strong>S</strong>patial <strong>C</strong>lustering of <strong>A</strong>pplications with <strong>N</strong>oise. Un cluster es una región densa de puntos separada de otras por regiones poco densas. El método tiene dos parámetros:</p>
 <ul>
   <li><strong>eps (ε):</strong> radio de vecindad.</li>
   <li><strong>min_samples:</strong> número mínimo de puntos dentro del radio para considerar una región densa.</li>
@@ -258,62 +309,96 @@ sklearn AgglomerativeClustering: {&#x27;A&#x27;: 1, &#x27;B&#x27;: 1, &#x27;C&#x
 <div class="glossary">
   <div class="gterm"><b>Punto núcleo (core)</b><span>Tiene al menos <code>min_samples</code> vecinos dentro de ε.</span></div>
   <div class="gterm"><b>Punto frontera (border)</b><span>No es núcleo, pero está dentro del ε de un núcleo.</span></div>
-  <div class="gterm"><b>Ruido (noise)</b><span>Ni núcleo ni frontera: etiqueta <strong>−1</strong>. ¡DBSCAN detecta atípicos!</span></div>
+  <div class="gterm"><b>Ruido (noise)</b><span>No es núcleo ni frontera, y recibe la etiqueta <strong>−1</strong>. Así, DBSCAN detecta atípicos.</span></div>
 </div>
-<p>El algoritmo toma un núcleo no visitado, crea un cluster y lo expande con todos los puntos alcanzables por densidad; repite hasta visitar todo. <strong>No hay que fijar \(k\)</strong> y encuentra <strong>formas arbitrarias</strong>.</p>
+<p>El algoritmo toma un punto núcleo no visitado, crea un cluster y lo expande con todos los puntos alcanzables por densidad; repite el proceso hasta visitar todos los puntos. <strong>No hay que fijar \(k\)</strong> y puede encontrar clusters de <strong>forma arbitraria</strong>.</p>
+<p>El ejemplo principal usa 1,000 sismos de magnitud mayor a 4.0 registrados cerca de Fiyi desde 1964 (conjunto <code>quakes</code> de R, del proyecto PRIM-H de la Universidad de Harvard). Los sismos se agrupan según su longitud y su latitud, en grados; un grado equivale a unos 100 km.</p>
 <div class="chart-card">
-  <h4>K-means vs DBSCAN en datos con forma de "lunas" (+3 atípicos)</h4>
-  <p class="sub">K-means corta las lunas con una recta (ARI = 0.475). DBSCAN (ε = 0.25, min_samples = 5) las recupera perfectamente (ARI = 1.000) y marca los 3 atípicos como ruido (gris).</p>
+  <h4>Sismos cerca de Fiyi agrupados con DBSCAN (ε = 2°, min_samples = 10)</h4>
+  <p class="sub">DBSCAN encuentra dos zonas sísmicas sin que se le indique cuántos grupos buscar, y marca como ruido 10 sismos aislados (en gris).</p>
+  <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>zona oriental</span><span><i class="sq" style="background:var(--s2)"></i>zona occidental</span><span><i class="sq" style="background:var(--muted-series)"></i>ruido (−1)</span></div>
+  <div class="chart-box tall"><canvas id="chart-fiji" aria-label="Mapa de los sismos cerca de Fiyi agrupados con DBSCAN"></canvas></div>
+</div>
+<div class="chart-card">
+  <h4>Formas no esféricas: K-means contra DBSCAN en dos «lunas» (datos sintéticos)</h4>
+  <p class="sub">En los sismos, los dos grupos están tan separados que K-means también los encuentra. Para ver la diferencia se usan dos «lunas» entrelazadas, generadas con <code>make_moons</code>, más tres atípicos: K-means las corta con una recta (ARI = 0.475), mientras que DBSCAN (ε = 0.25, min_samples = 5) las recupera por completo (ARI = 1.000) y marca los tres atípicos como ruido (en gris).</p>
   <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>cluster 0</span><span><i class="sq" style="background:var(--s2)"></i>cluster 1</span><span><i class="sq" style="background:var(--muted-series)"></i>ruido (−1)</span></div>
   <div class="small-multiples">
-    <div class="chart-box short"><canvas id="chart-moons-km" aria-label="K-means sobre lunas"></canvas></div>
-    <div class="chart-box short"><canvas id="chart-moons-db" aria-label="DBSCAN sobre lunas"></canvas></div>
+    <div class="chart-box short"><canvas id="chart-moons-km" aria-label="K-means sobre dos lunas sintéticas"></canvas></div>
+    <div class="chart-box short"><canvas id="chart-moons-db" aria-label="DBSCAN sobre dos lunas sintéticas"></canvas></div>
   </div>
 </div>
 <h3 id="eps">5.1 ¿Cómo elegir ε? La gráfica de k-distancias</h3>
-<p>Para cada punto se calcula la distancia a su k-ésimo vecino (k = min_samples), se ordenan de menor a mayor y se grafican. El <strong>codo</strong> (donde la curva sube bruscamente) sugiere ε: por debajo, los puntos están en zonas densas; por encima, son ruido.</p>
+<p>Para cada punto se calcula la distancia a su \(k\)-ésimo vecino (con \(k\) = min_samples); después, las distancias se ordenan de menor a mayor y se grafican. El <strong>codo</strong>, donde la curva sube bruscamente, sugiere el valor de ε: por debajo, los puntos están en zonas densas; por encima, son ruido.</p>
 <div class="chart-card">
-  <h4>Distancia al 5.º vecino (ordenada)</h4>
-  <p class="sub">El codo aparece alrededor de 0.2–0.3; con ε = 0.25 se obtienen los 2 clusters correctos.</p>
-  <div class="chart-box short"><canvas id="chart-kdist" aria-label="Gráfica de k-distancias"></canvas></div>
+  <h4>Sismos de Fiyi: distancia al 10.º vecino, ordenada</h4>
+  <p class="sub">La curva es casi plana hasta el 90 % de los sismos (1.03°) y se dispara en el último 2 % (más de 2.17°). Con ε = 2° quedan dos grupos y 10 sismos de ruido. El eje llega a 3.5° para no aplastar la curva; siete valores lo rebasan, hasta 5.2°.</p>
+  <div class="chart-box short"><canvas id="chart-kdist" aria-label="Gráfica de k-distancias de los sismos de Fiyi"></canvas></div>
 </div>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo3/m3_04_dbscan.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_04_dbscan.py" download>Descargar .py</a></div>
-  <pre><code class="language-python"># Módulo 3 · DBSCAN vs K-means en formas no esféricas (lunas) + elección de eps con k-distancias
+  <pre><code class="language-python"># Módulo 3 · DBSCAN: sismos reales cerca de Fiyi y, para comparar formas, dos &quot;lunas&quot; sintéticas
+from pathlib import Path
 import numpy as np
-from sklearn.datasets import make_moons
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.neighbors import NearestNeighbors
+from sklearn.datasets import make_moons
 from sklearn.metrics import adjusted_rand_score
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import StandardScaler
 
-X, y = make_moons(n_samples=400, noise=0.07, random_state=0)
-X = np.vstack([X, [[2.5, 1.5], [-1.5, -0.8], [0.5, 1.6]]])      # 3 puntos atípicos
-y = np.r_[y, [-1, -1, -1]]
-X = StandardScaler().fit_transform(X)
+# 1) Datos reales: 1,000 sismos de magnitud mayor a 4.0 registrados cerca de Fiyi desde 1964 (Universidad de Harvard)
+ARCHIVO = Path(__file__).resolve().parents[1] / &quot;datos&quot; / &quot;sismos_fiji.csv&quot;
+URL = &quot;https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/quakes.csv&quot;
+q = pd.read_csv(ARCHIVO if ARCHIVO.exists() else URL, index_col=0)
+X = q[[&quot;long&quot;, &quot;lat&quot;]].to_numpy()                 # longitud y latitud en grados (1 grado ≈ 100 km)
 
-# Gráfica de k-distancias: distancia al 5º vecino de cada punto (min_samples = 5)
-dist, _ = NearestNeighbors(n_neighbors=5).fit(X).kneighbors(X)
+# Gráfica de k-distancias: distancia al 10.º vecino (kneighbors cuenta al propio punto, igual que min_samples)
+dist, _ = NearestNeighbors(n_neighbors=10).fit(X).kneighbors(X)
 k_dist = np.sort(dist[:, -1])
-print(&quot;Percentiles de la 5-distancia (el &#x27;codo&#x27; sugiere eps):&quot;,
-      np.percentile(k_dist, [50, 90, 95, 99]).round(3))
+print(&quot;Distancia al 10.º vecino, percentiles 50/90/95/98/99 (grados):&quot;, np.percentile(k_dist, [50, 90, 95, 98, 99]).round(2))
 
-for eps in [0.1, 0.25, 0.5]:
-    db = DBSCAN(eps=eps, min_samples=5).fit(X)
-    et = db.labels_
-    n_cl = len(set(et)) - (1 if -1 in et else 0)
-    print(f&quot;eps={eps:&lt;5} clusters={n_cl}  ruido={int((et == -1).sum()):&gt;3}  &quot;
-          f&quot;núcleo={len(db.core_sample_indices_):&gt;3}  ARI vs real={adjusted_rand_score(y, et):.3f}&quot;)
+for eps in [0.75, 1.5, 2.0]:
+    et = DBSCAN(eps=eps, min_samples=10).fit_predict(X)
+    tam = sorted(np.bincount(et[et &gt;= 0]).tolist(), reverse=True)
+    print(f&quot;eps = {eps:&lt;4} -&gt; clusters = {len(tam)}, ruido = {int((et == -1).sum()):&gt;3}, tamaños = {tam}&quot;)
 
-km = KMeans(n_clusters=2, n_init=10, random_state=0).fit(X)
-print(f&quot;K-means k=2           ARI vs real={adjusted_rand_score(y, km.labels_):.3f}  (no sabe de ruido)&quot;)</code></pre>
-  <div class="output"><div class="out-label">Salida del programa</div><pre>Percentiles de la 5-distancia (el &#x27;codo&#x27; sugiere eps): [0.103 0.173 0.203 0.308]
-eps=0.1   clusters=28  ruido=114  núcleo=190  ARI vs real=0.043
-eps=0.25  clusters=2  ruido=  3  núcleo=392  ARI vs real=1.000
-eps=0.5   clusters=1  ruido=  3  núcleo=400  ARI vs real=0.029
-K-means k=2           ARI vs real=0.475  (no sabe de ruido)</pre></div>
+q[&quot;dbscan&quot;] = DBSCAN(eps=2.0, min_samples=10).fit_predict(X)
+q[&quot;kmeans&quot;] = KMeans(n_clusters=2, n_init=10, random_state=0).fit_predict(X)
+print(&quot;\nPerfil de los grupos de DBSCAN (eps = 2.0):&quot;)
+print(q.groupby(&quot;dbscan&quot;).agg(sismos=(&quot;mag&quot;, &quot;size&quot;), longitud=(&quot;long&quot;, &quot;mean&quot;), latitud=(&quot;lat&quot;, &quot;mean&quot;),
+                              profundidad_km=(&quot;depth&quot;, &quot;mean&quot;), magnitud=(&quot;mag&quot;, &quot;mean&quot;)).round(1).to_string())
+sin_ruido = q[&quot;dbscan&quot;] &gt;= 0
+print(f&quot;Coincidencia con K-means (k = 2) sin contar el ruido: ARI = &quot;
+      f&quot;{adjusted_rand_score(q.loc[sin_ruido, &#x27;dbscan&#x27;], q.loc[sin_ruido, &#x27;kmeans&#x27;]):.3f}&quot;)
+
+# 2) Datos sintéticos: dos &quot;lunas&quot; entrelazadas más 3 atípicos, para ver qué pasa con formas no esféricas
+Xs, ys = make_moons(n_samples=400, noise=0.07, random_state=0)
+Xs = StandardScaler().fit_transform(np.vstack([Xs, [[2.5, 1.5], [-1.5, -0.8], [0.5, 1.6]]]))
+ys = np.r_[ys, [-1, -1, -1]]
+print()
+for nombre, et in [(&quot;K-means (k = 2)&quot;, KMeans(n_clusters=2, n_init=10, random_state=0).fit_predict(Xs)),
+                   (&quot;DBSCAN (eps = 0.25)&quot;, DBSCAN(eps=0.25, min_samples=5).fit_predict(Xs))]:
+    print(f&quot;Lunas · {nombre:&lt;20} ARI contra la forma real = {adjusted_rand_score(ys, et):.3f} | &quot;
+          f&quot;ruido = {int((et == -1).sum())}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Distancia al 10.º vecino, percentiles 50/90/95/98/99 (grados): [0.46 1.03 1.32 2.17 2.87]
+eps = 0.75 -&gt; clusters = 8, ruido = 113, tamaños = [612, 120, 58, 36, 24, 15, 12, 10]
+eps = 1.5  -&gt; clusters = 2, ruido =  28, tamaños = [785, 187]
+eps = 2.0  -&gt; clusters = 2, ruido =  10, tamaños = [786, 204]
+
+Perfil de los grupos de DBSCAN (eps = 2.0):
+        sismos  longitud  latitud  profundidad_km  magnitud
+dbscan
+-1          10     176.8    -31.9           226.6       5.1
+ 0         786     182.4    -21.7           349.7       4.6
+ 1         204     168.2    -15.9           167.8       4.8
+Coincidencia con K-means (k = 2) sin contar el ruido: ARI = 1.000
+
+Lunas · K-means (k = 2)      ARI contra la forma real = 0.475 | ruido = 0
+Lunas · DBSCAN (eps = 0.25)  ARI contra la forma real = 1.000 | ruido = 3</pre></div>
 </div>
-<div class="callout warn"><div class="callout-title">Sensibilidad a ε</div><p>ε = 0.1 (muy chico) fragmenta todo en 28 clusters y 114 puntos de ruido; ε = 0.5 (muy grande) une las dos lunas en una. DBSCAN también sufre si los clusters tienen <strong>densidades muy distintas</strong> o con muchas dimensiones (las distancias pierden sentido).</p></div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>Con ε = 2°, DBSCAN separa una zona oriental de 786 sismos y una occidental de 204. La documentación del conjunto de datos menciona dos planos claros de actividad sísmica, uno de ellos asociado a la fosa de Tonga; el grupo oriental se ubica en esa región y sus sismos son más profundos (350 km en promedio, contra 168 km en el occidental). K-means con k = 2 forma exactamente los mismos dos grupos (ARI = 1.000 sin contar el ruido) porque aquí los grupos son compactos y están muy separados; la diferencia es que K-means también asigna a los 10 sismos aislados, que DBSCAN deja como ruido. En las lunas sintéticas, en cambio, solo DBSCAN recupera la forma.</p></div>
+<div class="callout warn"><div class="callout-title">Sensibilidad a ε</div><p>Con ε = 0.75° (demasiado pequeño), los sismos se fragmentan en 8 grupos y 113 quedan como ruido; con ε = 1.5° ya aparecen las dos zonas, con 28 sismos de ruido, y con ε = 2° quedan solo 10. DBSCAN también tiene dificultades cuando los clusters tienen <strong>densidades muy distintas</strong> o cuando hay muchas dimensiones, porque las distancias pierden sentido.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="ciclo">6. El ciclo completo de clustering</h2>
@@ -331,54 +416,65 @@ K-means k=2           ARI vs real=0.475  (no sabe de ruido)</pre></div>
       <path d="M692 88 V108 H60 V90" class="d-arrow" marker-end="url(#ca)"/><text x="380" y="104" text-anchor="middle" class="d-text-3">iterar: si los segmentos no tienen sentido de negocio, se ajustan variables o k</text>
     </g>
   </svg>
-  <figcaption>El "ciclo de clustering" de la práctica 4.</figcaption>
+  <figcaption>El «ciclo de clustering» de la práctica 4.</figcaption>
 </figure>
+<p>El programa recorre el ciclo con datos reales: el gasto anual de 440 clientes de un distribuidor mayorista de Portugal en seis categorías (frescos, lácteos, abarrotes, congelados, productos de limpieza y papel, y delicatessen). Cada cliente es un hotel, restaurante o café, o bien un comercio minorista; ese dato no se usa para agrupar, sino para comprobar al final si los segmentos tienen sentido.</p>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo3/m3_05_ciclo_clustering.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_05_ciclo_clustering.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 3 · Ciclo completo de clustering: preparar -&gt; estandarizar -&gt; reducir -&gt; agrupar -&gt; evaluar -&gt; perfilar
+# Datos reales: gasto anual de 440 clientes de un distribuidor mayorista de Portugal en seis categorías de producto
+# (UCI, Cardoso, 2014). El canal de cada cliente (hotel/restaurante/café o minorista) NO se usa para agrupar:
+# se guarda para comprobar al final si los segmentos tienen sentido.
+from pathlib import Path
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
 
-rng = np.random.default_rng(5)
-def grupo(n, gasto, visitas, antig, desc):
-    return pd.DataFrame({&quot;gasto_mensual&quot;: rng.normal(gasto, gasto * 0.15, n),
-                         &quot;visitas_mes&quot;: rng.poisson(visitas, n),
-                         &quot;antiguedad_meses&quot;: rng.normal(antig, 6, n).clip(1),
-                         &quot;uso_descuentos&quot;: rng.beta(*desc, n)})
-clientes = pd.concat([grupo(300, 800, 2, 40, (2, 8)), grupo(200, 3500, 8, 60, (2, 5)),
-                      grupo(250, 1200, 12, 10, (8, 2))], ignore_index=True)
-print(&quot;1) Datos:&quot;, clientes.shape)
+ARCHIVO = Path(__file__).resolve().parents[1] / &quot;datos&quot; / &quot;mayorista_lisboa.csv&quot;
+URL = &quot;https://raw.githubusercontent.com/udacity/machine-learning/master/projects/customer_segments/customers.csv&quot;
+clientes = pd.read_csv(ARCHIVO if ARCHIVO.exists() else URL)
+canal = clientes.pop(&quot;Channel&quot;).map({1: &quot;Hotel/Rest./Café&quot;, 2: &quot;Minorista&quot;}).rename(&quot;canal&quot;)
+clientes = clientes.drop(columns=&quot;Region&quot;)
+print(&quot;1) Datos:&quot;, clientes.shape, &quot;| gasto medio vs mediano en frescos:&quot;,
+      f&quot;{clientes[&#x27;Fresh&#x27;].mean():,.0f} vs {clientes[&#x27;Fresh&#x27;].median():,.0f} (distribución sesgada)&quot;)
 
-X = StandardScaler().fit_transform(clientes)               # 2) misma escala
-pca = PCA(n_components=0.9).fit(X)                          # 3) quedarnos con 90% de varianza
+X = StandardScaler().fit_transform(np.log(clientes))    # 2) logaritmo (reduce el sesgo) y misma escala
+print(&quot;2) Logaritmo del gasto y estandarización: cada categoría con media 0 y desviación 1&quot;)
+pca = PCA(n_components=0.9).fit(X)                       # 3) conservar al menos 90 % de la varianza
 Xp = pca.transform(X)
 print(f&quot;3) PCA: {Xp.shape[1]} componentes explican {pca.explained_variance_ratio_.sum():.1%}&quot;)
 
 sil = {k: silhouette_score(Xp, KMeans(k, n_init=10, random_state=0).fit_predict(Xp)) for k in range(2, 7)}
 k = max(sil, key=sil.get)
-print(&quot;4-5) Silueta por k:&quot;, {kk: round(v, 3) for kk, v in sil.items()}, &quot;-&gt; k elegido =&quot;, k)
+print(&quot;4-5) Silueta por k:&quot;, {kk: round(float(v), 3) for kk, v in sil.items()}, &quot;-&gt; k elegido =&quot;, k)
 
 clientes[&quot;segmento&quot;] = KMeans(k, n_init=10, random_state=0).fit_predict(Xp)
-perfil = clientes.groupby(&quot;segmento&quot;).agg(n=(&quot;gasto_mensual&quot;, &quot;size&quot;), gasto=(&quot;gasto_mensual&quot;, &quot;mean&quot;),
-                                          visitas=(&quot;visitas_mes&quot;, &quot;mean&quot;),
-                                          antiguedad=(&quot;antiguedad_meses&quot;, &quot;mean&quot;),
-                                          descuentos=(&quot;uso_descuentos&quot;, &quot;mean&quot;)).round(2)
-print(&quot;6) Perfilamiento de segmentos (medias):\n&quot;, perfil.to_string())</code></pre>
-  <div class="output"><div class="out-label">Salida del programa</div><pre>1) Datos: (750, 4)
-3) PCA: 2 componentes explican 92.2%
-4-5) Silueta por k: {2: 0.603, 3: 0.773, 4: 0.662, 5: 0.572, 6: 0.424} -&gt; k elegido = 3
-6) Perfilamiento de segmentos (medias):
-             n    gasto  visitas  antiguedad  descuentos
-segmento                                               
-0         200  3538.93     7.71       59.95        0.28
-1         250  1199.67    11.96       10.08        0.80
-2         300   795.18     1.87       40.32        0.21</pre></div>
+print(&quot;6) Perfil de los segmentos (mediana del gasto anual):&quot;)
+print(clientes.groupby(&quot;segmento&quot;).agg(n=(&quot;Fresh&quot;, &quot;size&quot;), frescos=(&quot;Fresh&quot;, &quot;median&quot;), lacteos=(&quot;Milk&quot;, &quot;median&quot;),
+                                       abarrotes=(&quot;Grocery&quot;, &quot;median&quot;), congelados=(&quot;Frozen&quot;, &quot;median&quot;),
+                                       limpieza_papel=(&quot;Detergents_Paper&quot;, &quot;median&quot;),
+                                       delicatessen=(&quot;Delicatessen&quot;, &quot;median&quot;)).round(0).astype(int).to_string())
+print(&quot;7) Validación con el canal real (no se usó para agrupar):&quot;)
+print(pd.crosstab(clientes[&quot;segmento&quot;], canal).to_string())</code></pre>
+  <div class="output"><div class="out-label">Salida del programa</div><pre>1) Datos: (440, 6) | gasto medio vs mediano en frescos: 12,000 vs 8,504 (distribución sesgada)
+2) Logaritmo del gasto y estandarización: cada categoría con media 0 y desviación 1
+3) PCA: 4 componentes explican 92.0%
+4-5) Silueta por k: {2: 0.316, 3: 0.288, 4: 0.208, 5: 0.218, 6: 0.223} -&gt; k elegido = 2
+6) Perfil de los segmentos (mediana del gasto anual):
+            n  frescos  lacteos  abarrotes  congelados  limpieza_papel  delicatessen
+segmento
+0         252    10348     1871       2406        2225             328           750
+1         188     5406     7690      11527        1062            4495          1388
+7) Validación con el canal real (no se usó para agrupar):
+canal     Hotel/Rest./Café  Minorista
+segmento
+0                      244          8
+1                       54        134</pre></div>
 </div>
-<div class="callout tip"><div class="callout-title">Perfilamiento: darle nombre a los segmentos</div><p>El paso más importante para el negocio. Con las medias de cada segmento: <strong>segmento 0</strong> (gasto ~3,539, 7.7 visitas, 60 meses, pocos descuentos) = <em>"clientes premium leales"</em>; <strong>segmento 1</strong> (gasto ~1,200, 12 visitas, 10 meses, 80 % descuentos) = <em>"nuevos cazadores de ofertas"</em>; <strong>segmento 2</strong> (gasto ~795, 1.9 visitas, 40 meses) = <em>"ocasionales de bajo valor"</em>. Cada uno recibe una estrategia distinta.</p></div>
+<div class="callout tip"><div class="callout-title">Perfilamiento: darle nombre a los segmentos</div><p>El perfilamiento es el paso más importante para el negocio. El gasto está muy sesgado (en frescos, la media es de 12,000 y la mediana, de 8,504), por lo que se aplica logaritmo antes de estandarizar; con 4 componentes se conserva el 92.0 % de la varianza, y la silueta elige k = 2. Las medianas describen dos segmentos claros: el <strong>segmento 0</strong> (252 clientes) compra sobre todo frescos (10,348) y congelados, y muy pocos abarrotes y productos de limpieza; el <strong>segmento 1</strong> (188 clientes) compra muchos abarrotes (11,527), lácteos y productos de limpieza y papel. Al compararlos con el canal, que no se usó para agrupar, el segmento 0 resulta formado casi solo por hoteles, restaurantes y cafés (244 de 252), y el segmento 1 reúne al 94 % de los minoristas (134 de 142). Por eso sería razonable llamarlos «hoteles y restaurantes» y «comercios minoristas», aunque el modelo nunca vio esa información. La coincidencia no es perfecta: 54 hoteles, restaurantes o cafés compran como un minorista, algo que también merece revisarse.</p></div>
 
 <!-- ===================================================== -->
 <h2 id="comparacion">7. ¿Qué algoritmo uso?</h2>
@@ -415,6 +511,6 @@ segmento
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/js/data.js?v=real2" defer></script>
 <script src="assets/js/main.js?v=neo1" defer></script>
-<script src="assets/js/m3.js?v=e4715408" defer></script>
+<script src="assets/js/m3.js?v=real2" defer></script>
 </body>
 </html>

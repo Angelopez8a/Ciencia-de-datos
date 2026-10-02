@@ -1,19 +1,14 @@
-# Módulo 1 · Multicolinealidad con VarClusHi: agrupar variables y quedarse con 1 por cluster
+# Módulo 1 · Multicolinealidad con VarClusHi: agrupar variables y quedarse con una por cluster
 # RS_Ratio = (1 - RS_Own) / (1 - RS_NC)   -> entre MÁS BAJO, mejor representa a su cluster
-import numpy as np
-import pandas as pd
+# Datos reales: las 10 medidas "promedio" de 569 tumores de mama (Breast Cancer Wisconsin, en scikit-learn),
+# calculadas a partir de imágenes digitalizadas de biopsias. Radio, perímetro y área miden casi lo mismo.
+from sklearn.datasets import load_breast_cancer
 from varclushi import VarClusHi
 
-rng = np.random.default_rng(0)
-n = 500
-base_a, base_b = rng.normal(size=n), rng.normal(size=n)
-X = pd.DataFrame({
-    "v_sum":  base_a * 10 + rng.normal(0, 1, n),     # familia "volumen"
-    "v_mean": base_a * 0.5 + rng.normal(0, 0.05, n),
-    "v_max":  base_a * 12 + rng.normal(0, 3, n),
-    "v_inc":  base_b + rng.normal(0, 0.2, n),        # familia "tendencia"
-    "v_racha": base_b * 2 + rng.normal(0, 1, n),
-})
+X = load_breast_cancer(as_frame=True).data.iloc[:, :10]
+X.columns = [c.replace("mean ", "").replace(" ", "_") for c in X.columns]
+print("Variables:", X.columns.tolist())
+print("Correlaciones radio-perímetro-área:", X[["radius", "perimeter", "area"]].corr().round(3).values[0, 1:].tolist(), "\n")
 
 vc = VarClusHi(df=X, feat_list=X.columns.tolist())
 vc.varclus()
@@ -24,6 +19,6 @@ print(rs.round(4).to_string(index=False))
 seleccion = rs.loc[rs["id"] == 1, "Variable"].tolist()
 print("\nVariables seleccionadas (id == 1 de cada cluster):", seleccion)
 
-# Comprobación manual con la primera fila de la tabla del notebook de la sesión 8
+# Comprobación manual con la primera fila de la tabla del notebook de la sesión 8 (Ecobici)
 rs_own, rs_nc = 0.978437, 0.082052
 print(f"\nNotebook: v_max_afluencia -> (1-{rs_own})/(1-{rs_nc}) = {(1 - rs_own) / (1 - rs_nc):.6f}")

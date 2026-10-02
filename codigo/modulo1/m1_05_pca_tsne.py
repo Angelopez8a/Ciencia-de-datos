@@ -1,4 +1,5 @@
 # Módulo 1 · Reducción de dimensiones: PCA (para modelar) vs t-SNE (para visualizar)
+# Datos reales: análisis químico de 178 vinos de tres cultivares de una misma región de Italia (UCI, en scikit-learn).
 import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
@@ -20,5 +21,5 @@ print("\nPrimeras 3 filas en 2 componentes principales:\n", X_pca[:3].round(3))
 
 tsne = TSNE(n_components=2, perplexity=30, random_state=0)
 X_tsne = tsne.fit_transform(X_ss)
-print("\nt-SNE -> forma:", X_tsne.shape, "| divergencia KL final:", round(tsne.kl_divergence_, 3))
-print("t-SNE NO tiene .transform() para datos nuevos:", hasattr(tsne, "transform"))
+print("\nt-SNE -> forma:", X_tsne.shape, "(las coordenadas cambian con la semilla y la computadora)")
+print("¿t-SNE tiene .transform() para datos nuevos?", hasattr(tsne, "transform"))

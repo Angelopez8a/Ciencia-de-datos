@@ -1,24 +1,21 @@
 # Módulo 1 · Flujo completo de la sesión 9: discretizar (2 a 6 cortes) -> elegir por IV -> mapa WoE -> logística
+# Datos reales: IBM Telco Customer Churn (7,043 clientes). Evento = el cliente abandona la compañía.
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix
 
-rng = np.random.default_rng(11)
-n = 4000
-df = pd.DataFrame({
-    "Monthly_Charge": rng.uniform(18, 120, n).round(2),
-    "Tenure": rng.integers(0, 73, n),
-    "Contract": rng.choice(["Month-to-Month", "One Year", "Two Year"], n, p=[0.5, 0.25, 0.25]),
-})
-logit = (-1.2 + 0.02 * (df["Monthly_Charge"] - 65) - 0.04 * (df["Tenure"] - 36)
-         + df["Contract"].map({"Month-to-Month": 1.0, "One Year": -0.6, "Two Year": -1.5}))
-df["Churn_Value"] = (rng.random(n) < 1 / (1 + np.exp(-logit))).astype(int)
+ARCHIVO = Path(__file__).resolve().parents[1] / "datos" / "telco_churn_ibm.csv"
+URL = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
+df = pd.read_csv(ARCHIVO if ARCHIVO.exists() else URL)
+df["Churn_Value"] = (df["Churn"] == "Yes").astype(int)
 tgt = "Churn_Value"
 
 # 1) Partición ANTES de calcular IV/WoE: los mapas se aprenden solo con el 70 %
 train, valid = train_test_split(df, train_size=0.7, random_state=0, stratify=df[tgt])
+train, valid = train.copy(), valid.copy()
 print(f"train {train.shape} | valid {valid.shape} | tasa de fuga train = {train[tgt].mean():.3f}\n")
 
 def iv_woe(d, var):
@@ -28,9 +25,9 @@ def iv_woe(d, var):
     woe = np.log(pn / pe)                           # WoE = ln(%no evento / %evento)
     return float(((pn - pe) * woe).sum()), woe
 
-# 2) Discretizar cada continua con 2..6 cortes por cuantiles y quedarse con el de mayor IV
+# 2) Discretizar cada continua con 2..6 cortes por cuantiles y quedarse con el número de mayor IV
 mejores = {}
-for var in ["Monthly_Charge", "Tenure"]:
+for var in ["MonthlyCharges", "tenure"]:
     res = []
     for k in range(2, 7):
         cortes = np.unique(np.quantile(train[var], np.linspace(0, 1, k + 1)))
@@ -44,7 +41,7 @@ for var in ["Monthly_Charge", "Tenure"]:
 
 # 3) Mapa WoE aprendido en train y aplicado a ambos conjuntos
 cols_woe = []
-for var in ["Monthly_Charge", "Tenure", "Contract"]:
+for var in ["MonthlyCharges", "tenure", "Contract"]:
     if var in mejores:
         bt, bv = pd.cut(train[var], mejores[var]), pd.cut(valid[var], mejores[var])
     else:

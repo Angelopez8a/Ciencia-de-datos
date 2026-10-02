@@ -69,14 +69,15 @@
   /* ---------- WoE por edad ---------- */
   function woeChart() {
     if (!$("chart-woe")) return;
-    const labels = ["18–29", "30–40", "41–51", "52–63", "64–74"], woe = [-0.8648, -0.3855, 0.2281, 0.8025, 0.9933];
+    // Salida real de codigo/modulo1/m1_07_woe_iv.py (antigüedad en el empleo, 4,454 solicitudes de crédito)
+    const labels = ["0–1 años", "2–3 años", "4–8 años", "9–14 años", "15 o más"], woe = [-0.8966, -0.2701, 0.2003, 0.5568, 1.1529];
     Viz.chart("chart-woe", (P) => ({
       type: "bar",
       data: { labels, datasets: [{ label: "WoE", data: woe, backgroundColor: woe.map((v) => (v < 0 ? P.s[7] : P.s[0])), borderRadius: 4, borderSkipped: false, maxBarThickness: 24 }] },
       options: Viz.baseOptions(P, {
         indexAxis: "y",
         plugins: { tooltip: { callbacks: { label: (c) => ` WoE = ${c.parsed.x.toFixed(4)}` } } },
-        scales: { x: { min: -1.1, max: 1.1, title: { display: true, text: "WoE = ln(% no evento / % evento)" } }, y: { grid: { display: false }, title: { display: true, text: "edad" } } },
+        scales: { x: { min: -1.3, max: 1.3, title: { display: true, text: "WoE = ln(% no evento / % evento)" } }, y: { grid: { display: false }, title: { display: true, text: "antigüedad en el empleo" } } },
       }),
     }));
   }
@@ -84,8 +85,8 @@
   /* ---------- Calculadora WoE / IV ---------- */
   function woeCalc() {
     const tb = document.querySelector("#woe-tbl tbody"); if (!tb) return;
-    // Valores iniciales = variable edad del programa m1_07 (IV = 0.4792)
-    const ini = [["18–29", 391, 657], ["30–40", 262, 711], ["41–51", 163, 817], ["52–63", 102, 908], ["64–74", 84, 905]];
+    // Valores iniciales = antigüedad en el empleo del programa m1_07 (datos reales; IV = 0.4781)
+    const ini = [["0–1 años", 512, 533], ["2–3 años", 268, 522], ["4–8 años", 238, 742], ["9–14 años", 139, 619], ["15 o más", 97, 784]];
     tb.innerHTML = ini.map(([b, e, ne], i) =>
       `<tr><td>${b}</td><td class="num"><input class="inp" type="number" min="0" step="1" value="${e}" data-r="${i}" data-c="e" style="width:90px" aria-label="Eventos ${b}"></td>` +
       `<td class="num"><input class="inp" type="number" min="0" step="1" value="${ne}" data-r="${i}" data-c="n" style="width:90px" aria-label="No eventos ${b}"></td>` +

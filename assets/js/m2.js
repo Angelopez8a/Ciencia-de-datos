@@ -5,43 +5,61 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
 
-  /* ---------- Residuales: homocedasticidad vs heterocedasticidad ---------- */
+  /* ---------- Residuales reales: Galton (parejos) vs Telco (cono) ---------- */
   function residuals() {
-    const make = (id, hetero) => {
-      if (!$(id)) return;
-      const r = Viz.rng(hetero ? 7 : 3), pts = [];
-      for (let i = 0; i < 220; i++) { const x = r() * 10, fit = 3 + 2 * x; pts.push({ x: +fit.toFixed(3), y: +(r.normal() * (hetero ? 0.45 * x + 0.1 : 1.2)).toFixed(3) }); }
+    if (!window.DATA) return;
+    const make = (id, key, hetero, unidad, rango) => {
+      if (!$(id) || !window.DATA[key]) return;
+      const d = window.DATA[key], pts = d.f.map((x, i) => ({ x, y: d.r[i] }));
+      const xs = d.f.slice().sort((a, b) => a - b), x0 = xs[0], x1 = xs[xs.length - 1];
+      const fmt = (v) => (unidad === "$" ? "$" + Math.round(v).toLocaleString("es-MX") : v.toFixed(1) + " cm");
       Viz.chart(id, (P) => ({
         type: "scatter",
         data: { datasets: [
-          { label: "residual", data: pts, backgroundColor: Viz.alpha(P.s[hetero ? 1 : 0], 0.75), pointRadius: 3, pointHoverRadius: 5 },
-          { label: "cero", data: [{ x: 3, y: 0 }, { x: 23, y: 0 }], type: "line", borderColor: P.ink3, borderWidth: 1, pointRadius: 0 },
+          { label: "residual", data: pts, backgroundColor: Viz.alpha(P.s[hetero ? 1 : 0], hetero ? 0.6 : 0.5), pointRadius: 2.5, pointHoverRadius: 5 },
+          { label: "cero", data: [{ x: x0, y: 0 }, { x: x1, y: 0 }], type: "line", borderColor: P.ink3, borderWidth: 1, pointRadius: 0 },
         ] },
         options: Viz.baseOptions(P, {
-          plugins: { title: { display: true, text: hetero ? "Heterocedástico (cono)" : "Homocedástico", color: P.ink1, font: { size: 12, weight: "600" } },
-            tooltip: { filter: (i) => i.datasetIndex === 0, callbacks: { label: (c) => ` ajustado ${c.parsed.x.toFixed(2)}, residual ${c.parsed.y.toFixed(2)}` } } },
-          scales: { x: { type: "linear", min: 3, max: 23, title: { display: true, text: "valor ajustado ŷ" } }, y: { min: -10, max: 10, title: { display: true, text: "residual" } } },
+          plugins: { title: { display: true, text: hetero ? "Telco: cargos totales ~ antigüedad" : "Galton: estatura ~ padres + sexo", color: P.ink1, font: { size: 12, weight: "600" } },
+            tooltip: { filter: (i) => i.datasetIndex === 0, callbacks: { label: (c) => ` ajustado ${fmt(c.parsed.x)}, residual ${fmt(c.parsed.y)}` } } },
+          scales: { x: { type: "linear", title: { display: true, text: "valor ajustado ŷ (" + (unidad === "$" ? "dólares" : "cm") + ")" } },
+            y: { min: -rango, max: rango, title: { display: true, text: "residual (" + (unidad === "$" ? "dólares" : "cm") + ")" } } },
         }),
       }));
     };
-    make("chart-res-ok", false); make("chart-res-bad", true);
+    make("chart-res-ok", "res_galton", false, "cm", 30);
+    make("chart-res-bad", "res_telco", true, "$", 4000);
   }
 
-  /* ---------- Curva logística ---------- */
+  /* ---------- Curva logística: Challenger ---------- */
   function logit() {
     if (!$("chart-logit")) return;
-    const h = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6], y = [0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1];
-    const b0 = -4.632, b1 = 1.425, curve = [];
-    for (let x = 0; x <= 7.0001; x += 0.1) curve.push({ x: +x.toFixed(2), y: 1 / (1 + Math.exp(-(b0 + b1 * x))) });
+    // 23 vuelos previos al Challenger: temperatura al despegar (°F) y si hubo daño en alguna junta tórica
+    const vuelos = [[53, 1], [57, 1], [58, 1], [63, 1], [66, 0], [67, 0], [67, 0], [67, 0], [68, 0], [69, 0], [70, 1], [70, 0],
+      [70, 1], [70, 0], [72, 0], [73, 0], [75, 0], [75, 1], [76, 0], [76, 0], [78, 0], [79, 0], [81, 0]];
+    const b0 = 15.0429, b1 = -0.2322, prob = (t) => 1 / (1 + Math.exp(-(b0 + b1 * t)));
+    const aC = (t) => ((t - 32) / 1.8).toFixed(1).replace("-", "−") + " °C";
+    const curve = [];
+    for (let t = 30; t <= 85.0001; t += 0.5) curve.push({ x: +t.toFixed(1), y: prob(t) });
+    const visto = {}, puntos = vuelos.map(([t, f]) => {            // apila los vuelos con la misma temperatura y resultado
+      const k = t + "-" + f; visto[k] = (visto[k] || 0) + 1;
+      return { x: t, y: f ? 1 - 0.035 * (visto[k] - 1) : 0.035 * (visto[k] - 1), falla: f };
+    });
     Viz.chart("chart-logit", (P) => ({
       type: "scatter",
       data: { datasets: [
-        { label: "P(aprobar)", data: curve, type: "line", borderColor: P.s[0], backgroundColor: P.s[0], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 },
-        { label: "observación", data: h.map((x, i) => ({ x, y: y[i] })), backgroundColor: P.s[1], borderColor: P.surface, borderWidth: 2, pointRadius: 6, pointHoverRadius: 8 },
+        { label: "P(daño)", data: curve, type: "line", borderColor: P.s[0], backgroundColor: P.s[0], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 },
+        { label: "vuelo", data: puntos, backgroundColor: P.s[1], borderColor: P.surface, borderWidth: 2, pointRadius: 6, pointHoverRadius: 8 },
+        { label: "pronóstico", data: [{ x: 31, y: prob(31) }], backgroundColor: P.s[2], borderColor: P.surface, borderWidth: 2, pointRadius: 7, pointHoverRadius: 9, pointStyle: "rectRot" },
       ] },
       options: Viz.baseOptions(P, {
-        plugins: { tooltip: { callbacks: { label: (c) => c.datasetIndex === 0 ? ` ${c.parsed.x.toFixed(1)} h → P = ${c.parsed.y.toFixed(3)}` : ` ${c.parsed.x} h → ${c.parsed.y ? "aprobó" : "reprobó"}` } } },
-        scales: { x: { type: "linear", min: 0, max: 7, title: { display: true, text: "horas de estudio" } }, y: { min: -0.05, max: 1.05, title: { display: true, text: "probabilidad de aprobar" } } },
+        plugins: { tooltip: { callbacks: { label: (c) => {
+          if (c.datasetIndex === 0) return ` ${c.parsed.x} °F (${aC(c.parsed.x)}) → P = ${c.parsed.y.toFixed(3)}`;
+          if (c.datasetIndex === 2) return ` Pronóstico del 28 de enero de 1986: 31 °F (${aC(31)}) → P = ${prob(31).toFixed(4)}`;
+          return ` Vuelo a ${c.parsed.x} °F (${aC(c.parsed.x)}): ${c.raw.falla ? "con daño" : "sin daño"}`;
+        } } } },
+        scales: { x: { type: "linear", min: 30, max: 85, title: { display: true, text: "temperatura al despegar (°F)" } },
+          y: { min: -0.05, max: 1.05, ticks: { stepSize: 0.2, includeBounds: false }, title: { display: true, text: "probabilidad de daño" } } },
       }),
     }));
   }
@@ -118,7 +136,7 @@
   /* ---------- Lift ---------- */
   function lift() {
     if (!$("chart-lift")) return;
-    const L = [2.68, 1.91, 1.38, 1.12, 0.73, 0.69, 0.4, 0.45, 0.27, 0.37];
+    const L = [2.86, 2.09, 1.59, 1.41, 0.84, 0.62, 0.39, 0.12, 0.05, 0.02];   // modelo de abandono (Telco), conjunto de prueba
     Viz.chart("chart-lift", (P) => ({
       type: "bar",
       data: { labels: L.map((_, i) => "D" + (i + 1)), datasets: [
@@ -132,22 +150,25 @@
     }));
   }
 
-  /* ---------- PSI en el tiempo ---------- */
+  /* ---------- PSI en el tiempo: PIB per cápita de 142 países (Gapminder) ---------- */
   function psi() {
     if (!$("chart-psi")) return;
-    const yrs = Array.from({ length: 28 }, (_, i) => 1989 + i);
-    const v = [0, 0.425, 0.052, 0.168, 0.148, 0.125, 0.068, 0.368, 0.135, 0.11, 0.075, 0.146, 0.069, 0.188, 0.047, 0.029, 0.162, 0.034, 0.01, 0.068, 0.038, 0.09, 0.017, 0.053, 0.103, 0.308, 0.398, 0.362];
+    const yrs = [1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007];
+    const ref = [0.025, 0.11, 0.223, 0.37, 0.525, 0.575, 0.656, 0.649, 0.812, 0.884, 1.119];
+    const ant = [0.025, 0.038, 0.031, 0.041, 0.06, 0.019, 0.03, 0.023, 0.014, 0.004, 0.033];
+    const lectura = (x) => (x < 0.1 ? "estable" : x <= 0.25 ? "cambio menor" : "cambio mayor");
     Viz.chart("chart-psi", (P) => ({
       type: "line",
       data: { labels: yrs, datasets: [
-        { label: "PSI", data: v, borderColor: P.s[0], backgroundColor: P.s[0], borderWidth: 2, pointRadius: 3, pointBorderColor: P.surface, pointBorderWidth: 1.5, pointHoverRadius: 5 },
+        { label: "contra 1952", data: ref, borderColor: P.s[0], backgroundColor: P.s[0], borderWidth: 2, pointRadius: 3, pointBorderColor: P.surface, pointBorderWidth: 1.5, pointHoverRadius: 5 },
+        { label: "contra el periodo anterior", data: ant, borderColor: P.s[1], backgroundColor: P.s[1], borderWidth: 2, pointRadius: 3, pointBorderColor: P.surface, pointBorderWidth: 1.5, pointHoverRadius: 5 },
         { label: "control 0.10", data: yrs.map(() => 0.1), borderColor: P.warn, borderWidth: 1.5, pointRadius: 0 },
         { label: "control 0.25", data: yrs.map(() => 0.25), borderColor: P.crit, borderWidth: 1.5, pointRadius: 0 },
       ] },
       options: Viz.baseOptions(P, {
         interaction: { mode: "index", intersect: false },
-        plugins: { tooltip: { filter: (i) => i.datasetIndex === 0, callbacks: { label: (c) => { const x = c.parsed.y; return ` PSI = ${x.toFixed(3)} → ${x < 0.1 ? "estable" : x <= 0.25 ? "cambio menor" : "cambio MAYOR"}`; } } } },
-        scales: { x: { ticks: { maxTicksLimit: 10 } }, y: { min: 0, max: 0.45, title: { display: true, text: "PSI" } } },
+        plugins: { tooltip: { filter: (i) => i.datasetIndex < 2, callbacks: { label: (c) => ` ${c.dataset.label}: PSI = ${c.parsed.y.toFixed(3)} → ${lectura(c.parsed.y)}` } } },
+        scales: { x: { title: { display: true, text: "año" } }, y: { min: 0, max: 1.2, title: { display: true, text: "PSI" } } },
       }),
     }));
   }

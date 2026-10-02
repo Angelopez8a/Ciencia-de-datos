@@ -1,4 +1,7 @@
 # Módulo 2 · Ensambles: votación, bagging, bosque aleatorio, boosting y stacking
+# Datos reales: 569 casos de tumores de mama reunidos por W. H. Wolberg en la Universidad de Wisconsin (Wolberg,
+# Street y Mangasarian, 1995). Cada caso tiene 30 medidas de los núcleos celulares, obtenidas de la imagen
+# digitalizada de una biopsia por aspiración con aguja fina; y indica si el tumor fue maligno o benigno.
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler

@@ -1,4 +1,5 @@
-# Módulo 2 · Árboles de decisión: Gini, entropía y elección del mejor corte (tabla "Diabetic")
+# Módulo 2 · Árboles de decisión: Gini, entropía y elección del mejor corte
+# Tabla de ejemplo "Diabetic" del curso: diez pacientes (datos ilustrativos, no provienen de un estudio)
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier, export_text

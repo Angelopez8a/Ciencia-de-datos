@@ -1,4 +1,8 @@
 # Módulo 2 · Regresión lineal vs LASSO (L1) vs Ridge (L2) vs ElasticNet vs LARS
+# Datos reales: 442 pacientes con diabetes, publicados por Efron, Hastie, Johnstone y Tibshirani (2004) en el
+# artículo que presentó el método LARS. Diez variables medidas al inicio: edad (age), sexo (sex), índice de masa
+# corporal (bmi), presión arterial media (bp) y seis análisis de sangre (s1 a s6; por ejemplo, s3 es el colesterol
+# HDL). La variable y mide el avance de la enfermedad un año después.
 import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.preprocessing import StandardScaler

@@ -6,7 +6,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.svm import SVC
 from sklearn.kernel_ridge import KernelRidge
 
-# --- LDA vs QDA ---
+# --- LDA vs QDA con datos reales: 150 flores de iris de tres especies (Anderson, 1935; Fisher, 1936) ---
 X, y = load_iris(return_X_y=True)
 Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
 for m in [LinearDiscriminantAnalysis(), QuadraticDiscriminantAnalysis()]:
@@ -18,7 +18,7 @@ phi = lambda v: np.array([v[i] * v[j] for i in range(3) for j in range(3)])   # 
 print(f"\nφ(x)·φ(z) en 9 dimensiones = {phi(x) @ phi(z):.0f}")
 print(f"(x·z)² en 3 dimensiones    = {(x @ z) ** 2:.0f}   <- mismo resultado, mucho menos cómputo")
 
-# --- Datos NO linealmente separables: círculos concéntricos ---
+# --- Datos NO linealmente separables: dos círculos concéntricos (datos sintéticos, generados para ilustrar) ---
 X, y = make_circles(n_samples=400, factor=0.4, noise=0.08, random_state=0)
 Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=0)
 for kernel in ["linear", "poly", "rbf"]:

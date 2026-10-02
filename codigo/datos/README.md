@@ -16,7 +16,10 @@ que aparece en su código.
 | `sismos_fiji.csv` | Ubicación (latitud, longitud), profundidad y magnitud de 1,000 sismos de magnitud mayor a 4.0 cerca de Fiyi, desde 1964. | Proyecto PRIM-H de la Universidad de Harvard (J. Woodhouse). Conjunto `quakes` de R. | `m3_04` |
 | `mayorista_lisboa.csv` | Gasto anual de 440 clientes de un distribuidor mayorista de Portugal en seis categorías de producto, con su canal (hotel/restaurante/café o minorista). | UCI Machine Learning Repository, *Wholesale customers* (Cardoso, 2014; CC BY 4.0), vía el repositorio [udacity/machine-learning](https://github.com/udacity/machine-learning). | `m3_05` |
 | `taxis_nyc_2019_03.csv` | 6,433 viajes de taxi de la ciudad de Nueva York en marzo de 2019: horarios, distancia, tarifa, propina, forma de pago y zonas de origen y destino. | Registros de viajes de la NYC Taxi & Limousine Commission, vía el repositorio [seaborn-data](https://github.com/mwaskom/seaborn-data). | `m1_10` |
-| `glove_6B_50d_subconjunto.csv` | Vectores de 50 dimensiones de algunas palabras en inglés, extraídos sin cambios del modelo GloVe 6B. | Pennington, Socher y Manning (2014), Stanford NLP (licencia PDDL), vía [gensim-data](https://github.com/RaRe-Technologies/gensim-data). | `m4_09` y el simulador de embeddings |
+| `glove_6B_50d_subconjunto.csv` | Vectores de 50 dimensiones de 39 palabras en inglés, copiados sin cambios del modelo GloVe 6B (400,000 palabras, entrenado con Wikipedia 2014 y Gigaword 5). | Pennington, Socher y Manning (2014), Stanford NLP (licencia PDDL), vía [gensim-data](https://github.com/RaRe-Technologies/gensim-data). | `m4_09` y el simulador de embeddings del Módulo 4 |
 
 Otros conjuntos reales se cargan directamente desde las librerías: `load_wine`, `load_iris`, `load_breast_cancer`,
-`load_diabetes` y `load_digits` (scikit-learn), y la base de reseñas de películas IMDB (Keras, Maas et al., 2011).
+`load_diabetes` y `load_digits` (scikit-learn); la concentración de CO₂ en Mauna Loa (`statsmodels`); y, en Keras,
+las 50,000 reseñas de películas de IMDB (Maas et al., 2011) y los 70,000 dígitos escritos a mano de MNIST
+(LeCun, Cortes y Burges). Las coordenadas de las seis ciudades de `m3_03` son las del centro de cada ciudad,
+redondeadas a centésimas de grado.

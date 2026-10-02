@@ -27,11 +27,11 @@
 <section class="hero">
   <div class="eyebrow">Módulo 4 · Técnicas cognitivas e introducción a Big Data</div>
   <h1>Deep Learning: de la neurona a las redes convolucionales, recurrentes y el transfer learning</h1>
-  <p class="lead">Guía completa para estudiar el segundo examen. Cada tema trae la explicación con intuición, las fórmulas, un diagrama o gráfica, código que puedes ejecutar y <strong>la salida exacta que te debe salir</strong>.</p>
+  <p class="lead">Guía para estudiar el segundo examen. Cada tema incluye la explicación con su intuición, las fórmulas, un diagrama o una gráfica, y un programa que puede ejecutarse junto con <strong>la salida exacta que produce</strong>. Los ejemplos con datos usan conjuntos reales: dígitos escritos a mano, 50,000 reseñas de películas de IMDB y vectores de palabras de GloVe.</p>
   <div class="meta-row">
     <span class="chip"><span class="dot"></span>Prof. Oscar Daniel Acosta González</span>
     <span class="chip">8 presentaciones</span>
-    <span class="chip">14 programas verificados</span>
+    <span class="chip">15 programas verificados</span>
     <span class="chip">10 simuladores interactivos</span>
   </div>
   <details class="sources">
@@ -49,7 +49,7 @@
   </details>
   <div class="callout exam">
     <div class="callout-title">Para el examen</div>
-    <p>Lee esta página en orden (sigue la misma secuencia que las clases). Cuando termines, ve a <a href="examen-m4.html">Examen M4</a>: ahí hay hoja de fórmulas, ejercicios numéricos resueltos, un cuestionario con 70 preguntas y tarjetas de repaso. Las cajas amarillas como esta resumen lo que más probablemente te pregunten.</p>
+    <p>Conviene leer esta página en orden, porque sigue la misma secuencia que las clases. Al terminar, la página <a href="examen-m4.html">Examen M4</a> ofrece una hoja de fórmulas, ejercicios numéricos resueltos, un cuestionario con 70 preguntas y tarjetas de repaso. Los recuadros como este resumen lo que es más probable que se pregunte en el examen.</p>
   </div>
 </section>
 
@@ -300,7 +300,7 @@ Después de 1 paso: y_hat = 0.6961, pérdida = 0.3622</pre></div>
 </div>
 
 <h3 id="profunda">2.4 ¿Cuándo una red es "profunda"?</h3>
-<p>Según el curso, una red se considera <strong>profunda a partir de 5 capas ocultas</strong>; con menos es una red <strong>superficial</strong> (<em>shallow neural network</em>). Pero ojo con la pregunta trampa:</p>
+<p>Según el curso, una red se considera <strong>profunda a partir de 5 capas ocultas</strong>; con menos es una red <strong>superficial</strong> (<em>shallow neural network</em>). Pero hay que tener cuidado con una pregunta trampa:</p>
 <div class="callout warn">
   <div class="callout-title">¿Más neuronas = mejor desempeño? No necesariamente.</div>
   <p>Más capas y neuronas significan más parámetros: más riesgo de sobreajuste, más tiempo de cómputo y problemas de gradiente (que se desvanece o explota). <strong>La gran disrupción del deep learning no es el número de capas</strong>, sino que las capas ocultas pueden ser algo más que funciones de activación: por ejemplo, las primeras capas de una CNN son convoluciones que "resumen" la información de una imagen en valores más sencillos antes de pasarla a capas ocultas "comunes".</p>
@@ -402,8 +402,8 @@ Predicciones finales: [-1, -1, -1, 1]</pre></div>
 </div>
 
 <div class="callout note">
-  <div class="callout-title">ℹ️ Limitación famosa</div>
-  <p>Un perceptrón de una capa solo traza <strong>una recta</strong> (hiperplano): resuelve AND u OR, pero <strong>no XOR</strong>, que no es linealmente separable. Por eso necesitamos capas ocultas con activaciones no lineales ("la unión hace la fuerza", como decía el Módulo 2).</p>
+  <div class="callout-title">Limitación famosa</div>
+  <p>Un perceptrón de una capa solo traza <strong>una recta</strong> (hiperplano): resuelve AND u OR, pero <strong>no XOR</strong>, que no es linealmente separable. Por eso se necesitan capas ocultas con activaciones no lineales ("la unión hace la fuerza", como decía el Módulo 2).</p>
 </div>
 
 <h3 id="activaciones">3.2 Funciones de activación</h3>
@@ -509,7 +509,7 @@ clase predicha: 0</pre></div>
 
 <h3 id="ffnn-aplicaciones">3.4 Aplicaciones y un MLP en Keras</h3>
 <p>Aunque las feedforward son sencillas, su arquitectura simple es una ventaja: se pueden montar varias redes que trabajan <strong>de forma independiente</strong> con un "intermediario" que modera y combina sus resultados en una salida cohesiva (como muchas neuronas del cerebro trabajando en una tarea más grande).</p>
-<p>Así se ve un MLP real en Keras. Fíjate en cómo se calcula cada número de la columna <code>Param #</code>: <code>64·32 + 32 = 2,080</code> (64 entradas por 32 neuronas + 32 sesgos) y <code>32·10 + 10 = 330</code>. Dropout no tiene parámetros.</p>
+<p>Así se ve un MLP real en Keras, entrenado con los 1,797 dígitos escritos a mano de scikit-learn (imágenes de 8 × 8 píxeles). Conviene observar cómo se calcula cada número de la columna <code>Param #</code>: <code>64·32 + 32 = 2,080</code> (64 entradas por 32 neuronas + 32 sesgos) y <code>32·10 + 10 = 330</code>. Dropout no tiene parámetros.</p>
 
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo4/m4_k1_mlp_keras.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k1_mlp_keras.py" download>Descargar .py</a></div>
@@ -1450,18 +1450,18 @@ $$\cos(\theta) = \frac{\vec a \cdot \vec b}{\lVert \vec a \rVert\,\lVert \vec b 
 </div>
 
 <div class="widget" id="w-emb">
-  <div class="widget-title"><span class="tag">Simulador</span> Mapa de embeddings (2D de juguete)</div>
-  <p class="hint">Elige dos palabras para ver su similitud del coseno. En un embedding real hay cientos de dimensiones, pero la idea es la misma: palabras parecidas apuntan en direcciones parecidas.</p>
+  <div class="widget-title"><span class="tag">Simulador</span> Mapa de embeddings reales (GloVe, proyectado a 2D)</div>
+  <p class="hint">Elige dos palabras para ver su similitud del coseno. Los vectores son reales: 50 dimensiones por palabra, tomadas de GloVe (Stanford), que se entrenó con textos en inglés de Wikipedia y de noticias. El coseno se calcula con las 50 dimensiones; el dibujo es una proyección (PCA) a dos dimensiones que conserva el 47 % de la variación de estas 16 palabras, así que las distancias en el plano son solo aproximadas.</p>
   <div class="controls">
     <label>Palabra A <select id="emb-a"></select></label>
     <label>Palabra B <select id="emb-b"></select></label>
   </div>
-  <svg id="emb-svg" viewBox="0 0 640 340" role="img" aria-label="Palabras como vectores en 2D"></svg>
+  <svg id="emb-svg" viewBox="0 0 640 340" role="img" aria-label="Proyección a dos dimensiones de 16 palabras de GloVe"></svg>
   <div class="readout" id="emb-out"></div>
 </div>
 
 <h3 id="analogias">7.3 Analogías: rey − hombre + mujer ≈ reina</h3>
-<p>Modelos como <strong>Word2Vec</strong> aprenden direcciones con significado: la diferencia entre "rey" y "hombre" se parece a la diferencia entre "reina" y "mujer" (la dirección "género"). Por eso la aritmética de vectores produce analogías.</p>
+<p>Modelos como <strong>Word2Vec</strong> y GloVe aprenden direcciones con significado: la diferencia entre «rey» y «hombre» se parece a la diferencia entre «reina» y «mujer» (la dirección del género). Por eso la aritmética de vectores produce analogías. El programa de la sección 7.4 lo comprueba con los vectores reales de GloVe: la palabra más cercana a king − man + woman es queen. Las analogías, sin embargo, no siempre funcionan: paris − france + spain da primero «aires» y «buenos» (de Buenos Aires) y solo en tercer lugar madrid.</p>
 
 <h3 id="keras-embedding">7.4 La capa <code>Embedding</code> de Keras</h3>
 <p>Keras ofrece una capa de incrustación para texto. Requiere que la entrada esté <strong>codificada en enteros</strong> (cada palabra = un entero único), lo que se hace con la API <code>Tokenizer</code> (o hoy <code>TextVectorization</code>). La capa se inicializa con <strong>pesos aleatorios</strong> y aprende un embedding para todas las palabras del entrenamiento. Internamente es una <strong>tabla de búsqueda</strong>: una matriz de tamaño (vocabulario × dimensión) donde el entero de la palabra selecciona una fila.</p>
@@ -1506,17 +1506,19 @@ $$\cos(\theta) = \frac{\vec a \cdot \vec b}{\lVert \vec a \rVert\,\lVert \vec b 
 <tr><td><code>output_dim</code></td><td>Dimensión del espacio vectorial (hiperparámetro)</td><td>32, 100 o más</td></tr>
 <tr><td><code>input_length</code></td><td>Longitud de las secuencias de entrada</td><td>documentos de 1000 palabras → <strong>1000</strong></td></tr>
 </tbody></table></div>
-<div class="callout note"><div class="callout-title">ℹ️ Nota de versión</div><p>En Keras 3 (TensorFlow ≥ 2.16) el argumento <code>input_length</code> ya no se pasa a la capa; la longitud se indica con <code>keras.Input(shape=(1000,))</code>. El concepto es el mismo y es lo que te preguntarán.</p></div>
+<div class="callout note"><div class="callout-title">Nota de versión</div><p>En Keras 3 (TensorFlow ≥ 2.16) el argumento <code>input_length</code> ya no se pasa a la capa; la longitud se indica con <code>keras.Input(shape=(1000,))</code>. El concepto es el mismo, y es lo que se pregunta en el examen.</p></div>
 
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo4/m4_09_embeddings.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_09_embeddings.py" download>Descargar .py</a></div>
   <pre><code class="language-python"># Módulo 4 · One-hot vs Word Embeddings y similitud del coseno
+from pathlib import Path
 import numpy as np
+import pandas as pd
 
 def coseno(a, b):
-    return a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+    return float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b)))
 
-# --- One-hot con V = {Have, a, good, great, day} ---
+# --- One-hot con V = {Have, a, good, great, day} (ejemplo de la diapositiva) ---
 V = [&quot;Have&quot;, &quot;a&quot;, &quot;good&quot;, &quot;great&quot;, &quot;day&quot;]
 one_hot = {w: np.eye(len(V))[i] for i, w in enumerate(V)}
 print(&quot;one-hot &#x27;good&#x27; :&quot;, one_hot[&quot;good&quot;])
@@ -1525,23 +1527,44 @@ print(&quot;cos(good, great) =&quot;, coseno(one_hot[&quot;good&quot;], one_hot[
 print(&quot;cos(day, Have)   =&quot;, coseno(one_hot[&quot;day&quot;], one_hot[&quot;Have&quot;]))
 print(&quot;-&gt; con one-hot TODAS las palabras son igual de distintas (ángulo de 90°)\n&quot;)
 
-# --- Embedding de 4 dimensiones (valores de la diapositiva) ---
+# --- Embedding de 4 dimensiones (valores ilustrativos de la diapositiva) ---
 emb = {&quot;cat&quot;: np.array([1.2, -0.1, 4.3, 3.2]),
        &quot;mat&quot;: np.array([0.4, 2.5, -0.9, 0.5]),
        &quot;on&quot;:  np.array([2.1, 0.3, 0.1, 0.4])}
 for a, b in [(&quot;cat&quot;, &quot;mat&quot;), (&quot;cat&quot;, &quot;on&quot;), (&quot;mat&quot;, &quot;on&quot;)]:
     print(f&quot;cos({a}, {b}) = {coseno(emb[a], emb[b]): .4f}&quot;)
 
-# --- Analogía estilo Word2Vec con vectores de juguete [realeza, masculino, femenino] ---
-w2v = {&quot;rey&quot;:    np.array([0.95, 0.90, 0.05]),
-       &quot;reina&quot;:  np.array([0.95, 0.05, 0.90]),
-       &quot;hombre&quot;: np.array([0.10, 0.92, 0.04]),
-       &quot;mujer&quot;:  np.array([0.10, 0.03, 0.91]),
-       &quot;manzana&quot;: np.array([0.01, 0.10, 0.12])}
-objetivo = w2v[&quot;rey&quot;] - w2v[&quot;hombre&quot;] + w2v[&quot;mujer&quot;]
-ranking = sorted(((coseno(objetivo, v), w) for w, v in w2v.items()
-                  if w not in (&quot;rey&quot;, &quot;hombre&quot;, &quot;mujer&quot;)), reverse=True)
-print(&quot;\nrey - hombre + mujer ≈&quot;, [(w, round(float(s), 4)) for s, w in ranking])
+# --- Vectores reales: GloVe (Stanford NLP), 50 dimensiones, entrenados con Wikipedia 2014 y Gigaword 5 ---
+# El archivo contiene 39 palabras (en inglés) copiadas sin cambios de los 400,000 vectores de glove-wiki-gigaword-50.
+ARCHIVO = Path(__file__).resolve().parents[1] / &quot;datos&quot; / &quot;glove_6B_50d_subconjunto.csv&quot;
+if ARCHIVO.exists():
+    glove = pd.read_csv(ARCHIVO, index_col=&quot;palabra&quot;)
+else:                                                # descarga el modelo completo (69 MB) y toma las mismas palabras
+    import gzip, urllib.request
+    URL = &quot;https://github.com/RaRe-Technologies/gensim-data/releases/download/glove-wiki-gigaword-50/glove-wiki-gigaword-50.gz&quot;
+    PALABRAS = {&quot;king&quot;, &quot;man&quot;, &quot;woman&quot;, &quot;queen&quot;, &quot;daughter&quot;, &quot;prince&quot;, &quot;throne&quot;, &quot;princess&quot;, &quot;walked&quot;, &quot;walk&quot;, &quot;swim&quot;,
+                &quot;swam&quot;, &quot;raced&quot;, &quot;rowed&quot;, &quot;swimmers&quot;, &quot;swims&quot;, &quot;paris&quot;, &quot;france&quot;, &quot;spain&quot;, &quot;aires&quot;, &quot;buenos&quot;, &quot;madrid&quot;,
+                &quot;rome&quot;, &quot;santiago&quot;, &quot;good&quot;, &quot;great&quot;, &quot;excellent&quot;, &quot;bad&quot;, &quot;cat&quot;, &quot;dog&quot;, &quot;horse&quot;, &quot;mouse&quot;, &quot;mat&quot;, &quot;on&quot;,
+                &quot;apple&quot;, &quot;banana&quot;, &quot;orange&quot;, &quot;grape&quot;, &quot;computer&quot;}
+    with gzip.open(urllib.request.urlopen(URL), &quot;rt&quot;, encoding=&quot;utf-8&quot;) as f:
+        next(f)                                      # la primera línea es &quot;400000 50&quot;
+        filas = {p[0]: p[1:] for p in (linea.split() for linea in f) if p[0] in PALABRAS}
+    glove = pd.DataFrame.from_dict(filas, orient=&quot;index&quot;, dtype=float)
+print(f&quot;\nGloVe: {glove.shape[0]} palabras x {glove.shape[1]} dimensiones | &#x27;king&#x27; empieza con&quot;,
+      glove.loc[&quot;king&quot;].values[:4], &quot;...&quot;)
+for a, b in [(&quot;cat&quot;, &quot;dog&quot;), (&quot;cat&quot;, &quot;mat&quot;), (&quot;good&quot;, &quot;great&quot;), (&quot;good&quot;, &quot;excellent&quot;), (&quot;good&quot;, &quot;bad&quot;),
+             (&quot;apple&quot;, &quot;banana&quot;), (&quot;apple&quot;, &quot;computer&quot;)]:
+    print(f&quot;cos({a}, {b}) = {coseno(glove.loc[a].values, glove.loc[b].values):.4f}&quot;)
+
+def analogia(a, b, c, n=5):
+    &quot;&quot;&quot;Palabras más cercanas (coseno) al vector a - b + c, sin contar a, b ni c.&quot;&quot;&quot;
+    objetivo = (glove.loc[a] - glove.loc[b] + glove.loc[c]).values
+    sim = {w: coseno(v, objetivo) for w, v in zip(glove.index, glove.values) if w not in (a, b, c)}
+    return [(w, round(s, 3)) for w, s in sorted(sim.items(), key=lambda kv: -kv[1])[:n]]
+
+print()
+for a, b, c in [(&quot;king&quot;, &quot;man&quot;, &quot;woman&quot;), (&quot;walked&quot;, &quot;walk&quot;, &quot;swim&quot;), (&quot;paris&quot;, &quot;france&quot;, &quot;spain&quot;)]:
+    print(f&quot;{a} - {b} + {c} ≈ {analogia(a, b, c)}&quot;)
 
 # --- Lo que hace por dentro la capa Embedding: buscar una FILA de una matriz ---
 vocab_size, dim = 11, 4                   # índices 0..10 -&gt; input_dim = 11
@@ -1560,7 +1583,18 @@ cos(cat, mat) = -0.1359
 cos(cat, on) =  0.3538
 cos(mat, on) =  0.2878
 
-rey - hombre + mujer ≈ [(&#x27;reina&#x27;, 0.9995), (&#x27;manzana&#x27;, 0.584)]
+GloVe: 39 palabras x 50 dimensiones | &#x27;king&#x27; empieza con [ 0.50451   0.68607  -0.59517  -0.022801] ...
+cos(cat, dog) = 0.9218
+cos(cat, mat) = 0.3458
+cos(good, great) = 0.7983
+cos(good, excellent) = 0.8062
+cos(good, bad) = 0.7965
+cos(apple, banana) = 0.5608
+cos(apple, computer) = 0.6403
+
+king - man + woman ≈ [(&#x27;queen&#x27;, 0.861), (&#x27;daughter&#x27;, 0.768), (&#x27;prince&#x27;, 0.764), (&#x27;throne&#x27;, 0.763), (&#x27;princess&#x27;, 0.751)]
+walked - walk + swim ≈ [(&#x27;swam&#x27;, 0.799), (&#x27;raced&#x27;, 0.685), (&#x27;rowed&#x27;, 0.685), (&#x27;swimmers&#x27;, 0.667), (&#x27;swims&#x27;, 0.667)]
+paris - france + spain ≈ [(&#x27;aires&#x27;, 0.846), (&#x27;buenos&#x27;, 0.842), (&#x27;madrid&#x27;, 0.802), (&#x27;rome&#x27;, 0.755), (&#x27;santiago&#x27;, 0.747)]
 
 Matriz E: (11, 4) -&gt; parámetros = 44
 Embedding de la oración [3, 7, 1]:
@@ -1568,22 +1602,24 @@ Embedding de la oración [3, 7, 1]:
  [-0.46  0.22 -1.01 -0.21]
  [-0.54  0.36  1.3   0.95]]</pre></div>
 </div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>Con one-hot, «good» y «great» tienen coseno 0, igual que cualquier otro par de palabras distintas. Los valores de 4 dimensiones de la diapositiva son ilustrativos. Con los vectores de GloVe, en cambio, las similitudes reflejan el uso real del idioma: cat y dog tienen un coseno de 0.92, mientras que cat y mat apenas llegan a 0.35, aunque aparezcan juntas en la frase de la diapositiva.</p><p>Hay dos resultados que conviene notar. Primero, good y bad son casi tan similares (0.797) como good y great (0.798): los embeddings capturan que las palabras aparecen en contextos parecidos, no que signifiquen lo mismo, y los antónimos suelen compartir contextos. Segundo, apple se parece más a computer (0.640) que a banana (0.561), porque en los textos de entrenamiento abundan las menciones a la empresa Apple. El subconjunto de 39 palabras incluye las cinco más cercanas que se obtienen al buscar en el vocabulario completo de 400,000 palabras, así que las analogías coinciden con las de la búsqueda completa.</p></div>
 
 <h3 id="embedding-aplicaciones">7.5 Aplicaciones</h3>
 <p>Búsqueda de documentos y recuperación de información, traducción, detectores de spam, clasificación de documentos, topic modeling, sistemas de recomendación de música/video, etc.</p>
 
 <h3 id="sentimiento-keras">7.6 Todo junto: Embedding + RNN/LSTM/GRU en Keras</h3>
-<p>Primero comparamos cuántos parámetros tiene cada celda recurrente (misma entrada de 16 dimensiones y 32 unidades), luego entrenamos un mini clasificador de sentimiento (muchos a uno).</p>
+<p>Primero se compara cuántos parámetros tiene cada celda recurrente, con la misma entrada de 16 dimensiones y 32 unidades. Después se entrena un clasificador de sentimiento (muchos a uno) con 25,000 reseñas reales de películas publicadas en IMDB (Maas et al., 2011) y se evalúa con otras 25,000. Cada reseña se recorta o se rellena a 200 palabras, y solo se consideran las 10,000 palabras más frecuentes.</p>
 <div class="code-card">
   <div class="code-head"><span class="fname">codigo/modulo4/m4_k3_rnn_keras.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k3_rnn_keras.py" download>Descargar .py</a></div>
-  <pre><code class="language-python"># Módulo 4 · Embedding + SimpleRNN / LSTM / GRU con Keras (clasificación de sentimiento)
+  <pre><code class="language-python"># Módulo 4 · Embedding + SimpleRNN / LSTM / GRU con Keras (clasificación de sentimiento con reseñas de IMDB)
 import os
 os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;
-import numpy as np
+import tensorflow as tf
 import keras
 from keras import layers
 
 keras.utils.set_random_seed(42)
+tf.config.experimental.enable_op_determinism()      # mismos resultados en cada ejecución
 
 # ---------- Parte A: comparar cuántos parámetros tiene cada celda ----------
 VOCAB, DIM, LARGO = 10000, 16, 100
@@ -1597,45 +1633,58 @@ for Celda in (layers.SimpleRNN, layers.LSTM, layers.GRU):
     capas = [(l.name, l.count_params()) for l in m.layers]
     print(f&quot;{Celda.__name__:&lt;10} -&gt; {capas}  total = {m.count_params():,}&quot;)
 
-# ---------- Parte B: mini ejemplo de sentimiento (1 = positivo, 0 = negativo) ----------
-textos = [&quot;me encanta esta película&quot;, &quot;excelente actuación y gran historia&quot;,
-          &quot;muy buena la recomiendo&quot;, &quot;una obra maestra increíble&quot;,
-          &quot;me gustó muchísimo&quot;, &quot;gran película muy divertida&quot;,
-          &quot;pésima no la recomiendo&quot;, &quot;muy aburrida y lenta&quot;,
-          &quot;la peor película del año&quot;, &quot;terrible actuación mala historia&quot;,
-          &quot;no me gustó nada&quot;, &quot;aburrida y sin sentido&quot;]
-etiquetas = np.array([1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+# ---------- Parte B: sentimiento en reseñas reales de películas (IMDB) ----------
+# 50,000 reseñas de IMDB (Maas et al., 2011): 25,000 para entrenar y 25,000 para probar, mitad positivas
+# (1) y mitad negativas (0). Keras las entrega ya convertidas en enteros: cada palabra es su lugar en el
+# ranking de frecuencia, desplazado 3 posiciones (0 = relleno, 1 = inicio de reseña, 2 = palabra fuera del vocabulario).
+(x_tr, y_tr), (x_te, y_te) = keras.datasets.imdb.load_data(num_words=VOCAB)
+palabra = {i + 3: w for w, i in keras.datasets.imdb.get_word_index().items()}
+texto = lambda seq, n: &quot; &quot;.join(palabra.get(i, &quot;?&quot;) for i in seq[1:n + 1])
+print(f&quot;\nReseñas: {len(x_tr):,} de entrenamiento y {len(x_te):,} de prueba | positivas: {y_tr.mean():.0%}&quot;)
+print(&quot;Inicio de la 1.ª reseña de entrenamiento:&quot;, texto(x_tr[0], 12), &quot;...&quot;)
+print(&quot;  como enteros:&quot;, x_tr[0][:13])
 
-vectorizador = layers.TextVectorization(max_tokens=100, output_sequence_length=6)
-vectorizador.adapt(textos)                           # equivale al Tokenizer: palabra -&gt; entero
-X = vectorizador(np.array(textos))
-print(&quot;\n&#x27;me encanta esta película&#x27; -&gt;&quot;, X[0].numpy(), &quot;(0 = relleno/padding)&quot;)
-vocab_size = len(vectorizador.get_vocabulary())
+LARGO = 200
+x_tr = keras.utils.pad_sequences(x_tr, maxlen=LARGO)         # recorta o rellena cada reseña a 200 palabras
+x_te_pad = keras.utils.pad_sequences(x_te, maxlen=LARGO)
+print(&quot;Tensor de entrada:&quot;, x_tr.shape)
 
 modelo = keras.Sequential([
-    keras.Input(shape=(6,)),
-    layers.Embedding(input_dim=vocab_size, output_dim=8),
-    layers.LSTM(8),
+    keras.Input(shape=(LARGO,)),
+    layers.Embedding(input_dim=VOCAB, output_dim=32),
+    layers.LSTM(32),
     layers.Dense(1, activation=&quot;sigmoid&quot;),
 ])
-modelo.compile(optimizer=keras.optimizers.Adam(0.01), loss=&quot;binary_crossentropy&quot;,
-               metrics=[&quot;accuracy&quot;])
-modelo.fit(X, etiquetas, epochs=60, verbose=0)
-print(&quot;Accuracy en entrenamiento:&quot;, round(modelo.evaluate(X, etiquetas, verbose=0)[1], 3))
+modelo.compile(optimizer=&quot;adam&quot;, loss=&quot;binary_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+hist = modelo.fit(x_tr, y_tr, epochs=3, batch_size=128, validation_split=0.2, verbose=0)
+for e, (a, va) in enumerate(zip(hist.history[&quot;accuracy&quot;], hist.history[&quot;val_accuracy&quot;]), start=1):
+    print(f&quot;Época {e}: accuracy entrenamiento = {a:.3f} | validación = {va:.3f}&quot;)
+print(f&quot;Accuracy en las {len(x_te):,} reseñas de prueba: {modelo.evaluate(x_te_pad, y_te, verbose=0)[1]:.3f}&quot;)
 
-nuevas = np.array([&quot;muy buena historia&quot;, &quot;pésima y aburrida&quot;])
-for frase, p in zip(nuevas, modelo.predict(vectorizador(nuevas), verbose=0).ravel()):
-    print(f&quot;&#x27;{frase}&#x27; -&gt; P(positivo) = {p:.3f}&quot;)</code></pre>
+for k in (1, 3, 5):                                          # tres reseñas de prueba, con su etiqueta real
+    p = modelo.predict(x_te_pad[k:k + 1], verbose=0)[0, 0]
+    print(f&quot;&#x27;{texto(x_te[k], 12)} ...&#x27;\n   -&gt; P(positiva) = {p:.3f} | real: {&#x27;positiva&#x27; if y_te[k] else &#x27;negativa&#x27;}&quot;)</code></pre>
   <div class="output"><div class="out-label">Salida del programa</div><pre>SimpleRNN  -&gt; [(&#x27;embedding&#x27;, 160000), (&#x27;simple_rnn&#x27;, 1568), (&#x27;dense&#x27;, 33)]  total = 161,601
 LSTM       -&gt; [(&#x27;embedding_1&#x27;, 160000), (&#x27;lstm&#x27;, 6272), (&#x27;dense_1&#x27;, 33)]  total = 166,305
 GRU        -&gt; [(&#x27;embedding_2&#x27;, 160000), (&#x27;gru&#x27;, 4800), (&#x27;dense_2&#x27;, 33)]  total = 164,833
 
-&#x27;me encanta esta película&#x27; -&gt; [ 5 29 28  3  0  0] (0 = relleno/padding)
-Accuracy en entrenamiento: 1.0
-&#x27;muy buena historia&#x27; -&gt; P(positivo) = 0.996
-&#x27;pésima y aburrida&#x27; -&gt; P(positivo) = 0.004</pre></div>
-  <div class="code-note">Verifica: SimpleRNN = 32·(32+16+1) = 1,568 · LSTM = 4·1,568 = 6,272 · GRU (Keras, reset_after=True) = 3·32·(32+16+2) = 4,800 · Embedding = 10,000·16 = 160,000. Las probabilidades del mini ejemplo pueden variar ligeramente.</div>
+Reseñas: 25,000 de entrenamiento y 25,000 de prueba | positivas: 50%
+Inicio de la 1.ª reseña de entrenamiento: this film was just brilliant casting location scenery story direction everyone&#x27;s really ...
+  como enteros: [1, 14, 22, 16, 43, 530, 973, 1622, 1385, 65, 458, 4468, 66]
+Tensor de entrada: (25000, 200)
+Época 1: accuracy entrenamiento = 0.746 | validación = 0.852
+Época 2: accuracy entrenamiento = 0.899 | validación = 0.874
+Época 3: accuracy entrenamiento = 0.915 | validación = 0.869
+Accuracy en las 25,000 reseñas de prueba: 0.861
+&#x27;this film requires a lot of patience because it focuses on mood ...&#x27;
+   -&gt; P(positiva) = 0.975 | real: positiva
+&#x27;i generally love this type of movie however this time i found ...&#x27;
+   -&gt; P(positiva) = 0.384 | real: negativa
+&#x27;i&#x27;m absolutely disgusted this movie isn&#x27;t being sold all who love this ...&#x27;
+   -&gt; P(positiva) = 0.777 | real: positiva</pre></div>
+  <div class="code-note">Verifica: SimpleRNN = 32·(32+16+1) = 1,568 · LSTM = 4·1,568 = 6,272 · GRU (Keras, reset_after=True) = 3·32·(32+16+2) = 4,800 · Embedding = 10,000·16 = 160,000. Con la semilla fija y las operaciones deterministas de TensorFlow, el entrenamiento da exactamente estos números en cada ejecución; en otra computadora o con otra versión de TensorFlow pueden variar ligeramente.</div>
 </div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>La primera reseña de entrenamiento empieza con «this film was just brilliant…», y Keras la entrega como enteros: el 1 marca el inicio de la reseña, el 14 corresponde a «this» y el 22 a «film». Tras tres épocas, el modelo acierta en el 86.1 % de las 25,000 reseñas de prueba. En la tercera época la exactitud de validación deja de mejorar (de 0.874 a 0.869) mientras la de entrenamiento sigue subiendo (0.915), una primera señal de sobreajuste. La segunda reseña de prueba muestra por qué conviene una red recurrente: empieza con «i generally love this type of movie», pero continúa con «however this time…», y el modelo la califica como negativa (0.384). La tercera es más difícil: «i'm absolutely disgusted» suena negativo, pero el autor está molesto porque la película no está a la venta, y el modelo acierta al calificarla como positiva (0.777).</p></div>
 
 <!-- ===================================================== -->
 <h2 id="lstm-gru">8. LSTM vs GRU y redes neuronales recursivas</h2>
@@ -1841,16 +1890,97 @@ GRU
 <h3 id="cuando-transfer">9.2 ¿Cuándo usarlo? Los tres beneficios</h3>
 <p>Transfer learning es una <strong>optimización</strong>, un atajo para ahorrar tiempo o tener mejor rendimiento. Normalmente no es obvio que ayudará hasta que se desarrolla y evalúa el modelo. Hay tres beneficios posibles:</p>
 <div class="chart-card">
-  <h4>Desempeño durante el entrenamiento, con y sin transferencia</h4>
-  <p class="sub">Curvas ilustrativas (como la diapositiva 10 de la clase 08).</p>
-  <div class="legend"><span><i style="background:var(--s1)"></i>con transferencia</span><span><i style="background:var(--muted-series)"></i>sin transferencia</span></div>
-  <div class="chart-box"><canvas id="chart-transfer" aria-label="Curvas de aprendizaje con y sin transferencia"></canvas></div>
+  <h4>Experimento real con MNIST: exactitud en prueba durante el entrenamiento</h4>
+  <p class="sub">Dígitos 5 a 9 con solo 500 imágenes de entrenamiento. La base convolucional transferida se aprendió antes con los dígitos 0 a 4. Resultados del programa de abajo.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>con transferencia, base congelada</span><span><i style="background:var(--s2)"></i>con transferencia, ajuste fino</span><span><i style="background:var(--muted-series)"></i>desde cero</span></div>
+  <div class="chart-box"><canvas id="chart-transfer" aria-label="Curvas de aprendizaje con y sin transferencia en MNIST"></canvas></div>
 </div>
 <ol class="steps">
   <li><strong>Comienzo superior (higher start):</strong> la habilidad inicial, antes de refinar, es mayor de lo que sería de otra manera.</li>
   <li><strong>Pendiente más alta (higher slope):</strong> la habilidad mejora más rápido durante el entrenamiento.</li>
   <li><strong>Asíntota superior (higher asymptote):</strong> la habilidad final a la que converge el modelo es mejor.</li>
 </ol>
+<p>La gráfica proviene de un experimento real y pequeño, que puede ejecutarse en una computadora personal. Con MNIST (70,000 dígitos escritos a mano), primero se entrena una red convolucional para distinguir los dígitos 0 a 4. Después, su base convolucional se reutiliza para distinguir los dígitos 5 a 9 con solo 500 imágenes de entrenamiento, y se compara con la misma red entrenada desde cero.</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_k5_transferencia_mnist.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k5_transferencia_mnist.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Un experimento real de transfer learning con MNIST
+# Datos reales: 70,000 dígitos escritos a mano (MNIST; LeCun, Cortes y Burges), 60,000 de entrenamiento y 10,000 de prueba.
+# Tarea origen: distinguir los dígitos 0 a 4, con todos sus ejemplos (unos 30,000).
+# Tarea destino: distinguir los dígitos 5 a 9 con solo 500 imágenes de entrenamiento.
+# Se compara entrenar la red destino desde cero contra reutilizar la base convolucional aprendida en la tarea
+# origen, ya sea congelada (extracción de características) o reentrenándola (ajuste fino).
+import os
+os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;
+import numpy as np
+import tensorflow as tf
+import keras
+from keras import layers
+
+keras.utils.set_random_seed(42)
+tf.config.experimental.enable_op_determinism()      # mismos resultados en cada ejecución
+
+(x_tr, y_tr), (x_te, y_te) = keras.datasets.mnist.load_data()
+x_tr, x_te = (x_tr / 255.0)[..., None], (x_te / 255.0)[..., None]   # píxeles en [0, 1], 1 canal
+origen = y_tr &lt; 5
+destino = np.flatnonzero(y_tr &gt;= 5)[:500]                         # solo 500 imágenes de 5 a 9
+prueba = y_te &gt;= 5
+print(f&quot;Origen: {origen.sum():,} imágenes (0-4) | destino: {len(destino)} imágenes (5-9) | prueba: {prueba.sum():,}&quot;)
+
+def base_convolucional():
+    return keras.Sequential([keras.Input(shape=(28, 28, 1)),
+                             layers.Conv2D(32, (3, 3), activation=&quot;relu&quot;), layers.MaxPooling2D((2, 2)),
+                             layers.Conv2D(64, (3, 3), activation=&quot;relu&quot;), layers.MaxPooling2D((2, 2)),
+                             layers.Flatten()], name=&quot;base&quot;)
+
+# 1) Entrenar la base en la tarea origen (una época)
+base = base_convolucional()
+modelo_origen = keras.Sequential([base, layers.Dense(5, activation=&quot;softmax&quot;)])
+modelo_origen.compile(optimizer=&quot;adam&quot;, loss=&quot;sparse_categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+modelo_origen.fit(x_tr[origen], y_tr[origen], epochs=1, batch_size=128, verbose=0)
+print(f&quot;Tarea origen, accuracy en prueba (0-4): {modelo_origen.evaluate(x_te[~prueba], y_te[~prueba], verbose=0)[1]:.3f}&quot;)
+
+# 2) Tarea destino: la misma arquitectura entrenada de tres maneras
+pesos_origen = base.get_weights()
+def entrenar_destino(pesos=None, congelar=False):
+    b = base_convolucional()
+    if pesos is not None:
+        b.set_weights(pesos)                                       # reutiliza lo aprendido en 0-4
+    b.trainable = not congelar
+    modelo = keras.Sequential([b, layers.Dense(5, activation=&quot;softmax&quot;)])
+    modelo.compile(optimizer=&quot;adam&quot;, loss=&quot;sparse_categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+    hist = modelo.fit(x_tr[destino], y_tr[destino] - 5, epochs=15, batch_size=32, verbose=0,
+                      validation_data=(x_te[prueba], y_te[prueba] - 5))
+    return hist.history[&quot;val_accuracy&quot;]
+
+desde_cero = entrenar_destino()
+congelada = entrenar_destino(pesos_origen, congelar=True)        # extracción de características
+ajuste_fino = entrenar_destino(pesos_origen, congelar=False)     # fine-tuning de toda la base
+print(&quot;\nAccuracy en las imágenes de prueba de 5 a 9, por época:&quot;)
+print(f&quot;{&#x27;época&#x27;:&gt;5}{&#x27;desde cero&#x27;:&gt;13}{&#x27;base congelada&#x27;:&gt;17}{&#x27;ajuste fino&#x27;:&gt;14}&quot;)
+for e, fila in enumerate(zip(desde_cero, congelada, ajuste_fino), start=1):
+    print(f&quot;{e:&gt;5}&quot; + &quot;&quot;.join(f&quot;{v:&gt;{w}.3f}&quot; for v, w in zip(fila, (13, 17, 14))))</code></pre>
+  <div class="output"><div class="out-label">Salida del programa</div><pre>Origen: 30,596 imágenes (0-4) | destino: 500 imágenes (5-9) | prueba: 4,861
+Tarea origen, accuracy en prueba (0-4): 0.991
+
+Accuracy en las imágenes de prueba de 5 a 9, por época:
+época   desde cero   base congelada   ajuste fino
+    1        0.624            0.794         0.809
+    2        0.838            0.869         0.870
+    3        0.863            0.893         0.893
+    4        0.881            0.909         0.907
+    5        0.888            0.914         0.918
+    6        0.919            0.918         0.923
+    7        0.925            0.924         0.920
+    8        0.920            0.927         0.915
+    9        0.921            0.930         0.916
+   10        0.931            0.933         0.923
+   11        0.939            0.935         0.937
+   12        0.943            0.937         0.949
+   13        0.944            0.938         0.949
+   14        0.945            0.941         0.951
+   15        0.945            0.942         0.949</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">Cómo leer la salida</div><p>En la tarea de origen, la red alcanza 99.1 % de exactitud con una sola época. En la tarea destino, los dos primeros beneficios aparecen con claridad: tras la primera época, la red desde cero acierta el 62.4 % de las imágenes de prueba, mientras que las versiones con transferencia llegan a 79.4 % (base congelada) y 80.9 % (ajuste fino), y mantienen la ventaja durante las primeras cinco épocas. La asíntota superior, en cambio, apenas se nota: después de 15 épocas, las tres versiones terminan entre 94.2 % y 94.9 %. Como dice la clase, no es obvio de antemano que la transferencia ayudará; hay que probarlo y evaluarlo.</p></div>
 
 <h3 id="como-transfer">9.3 Cómo se hace (enfoque de modelo preentrenado)</h3>
 <ol class="steps">
@@ -1930,7 +2060,7 @@ resumen(modelo, &quot;Fase 2 (fine-tuning block5)&quot;)
   <div class="output"><div class="out-label">Salida del programa</div><pre>Salida de la base convolucional: (None, 7, 7, 512)
 Fase 1 (base congelada): entrenables = 132,099 | congelados = 14,714,688
 Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</pre></div>
-  <div class="code-note">Fase 1: solo se entrenan 132,099 parámetros (la cabeza: 512·256+256 = 131,328 y 256·3+3 = 771) y quedan congelados los 14,714,688 de VGG16. Fase 2: se descongelan las 3 convoluciones de block5 (3 × 2,359,808 = 7,079,424). La salida se verificó con weights=None (mismos conteos, sin descargar); con weights='imagenet' Keras descarga los pesos (~58 MB) la primera vez.</div>
+  <div class="code-note">Fase 1: solo se entrenan 132,099 parámetros (la cabeza: 512·256+256 = 131,328 y 256·3+3 = 771) y quedan congelados los 14,714,688 de VGG16. Fase 2: se descongelan las 3 convoluciones de block5 (3 × 2,359,808 = 7,079,424). La salida se verificó con weights='imagenet', para lo cual Keras descarga los pesos (~58 MB) la primera vez; con weights=None se obtienen los mismos conteos sin descargar nada.</div>
 </div>
 
 <!-- ===================================================== -->
@@ -1966,6 +2096,6 @@ Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</p
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/js/main.js?v=neo1" defer></script>
-<script src="assets/js/m4.js?v=neo1" defer></script>
+<script src="assets/js/m4.js?v=real2" defer></script>
 </body>
 </html>

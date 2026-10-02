@@ -1,11 +1,12 @@
-# Módulo 4 · Embedding + SimpleRNN / LSTM / GRU con Keras (clasificación de sentimiento)
+# Módulo 4 · Embedding + SimpleRNN / LSTM / GRU con Keras (clasificación de sentimiento con reseñas de IMDB)
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-import numpy as np
+import tensorflow as tf
 import keras
 from keras import layers
 
 keras.utils.set_random_seed(42)
+tf.config.experimental.enable_op_determinism()      # mismos resultados en cada ejecución
 
 # ---------- Parte A: comparar cuántos parámetros tiene cada celda ----------
 VOCAB, DIM, LARGO = 10000, 16, 100
@@ -19,32 +20,34 @@ for Celda in (layers.SimpleRNN, layers.LSTM, layers.GRU):
     capas = [(l.name, l.count_params()) for l in m.layers]
     print(f"{Celda.__name__:<10} -> {capas}  total = {m.count_params():,}")
 
-# ---------- Parte B: mini ejemplo de sentimiento (1 = positivo, 0 = negativo) ----------
-textos = ["me encanta esta película", "excelente actuación y gran historia",
-          "muy buena la recomiendo", "una obra maestra increíble",
-          "me gustó muchísimo", "gran película muy divertida",
-          "pésima no la recomiendo", "muy aburrida y lenta",
-          "la peor película del año", "terrible actuación mala historia",
-          "no me gustó nada", "aburrida y sin sentido"]
-etiquetas = np.array([1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+# ---------- Parte B: sentimiento en reseñas reales de películas (IMDB) ----------
+# 50,000 reseñas de IMDB (Maas et al., 2011): 25,000 para entrenar y 25,000 para probar, mitad positivas
+# (1) y mitad negativas (0). Keras las entrega ya convertidas en enteros: cada palabra es su lugar en el
+# ranking de frecuencia, desplazado 3 posiciones (0 = relleno, 1 = inicio de reseña, 2 = palabra fuera del vocabulario).
+(x_tr, y_tr), (x_te, y_te) = keras.datasets.imdb.load_data(num_words=VOCAB)
+palabra = {i + 3: w for w, i in keras.datasets.imdb.get_word_index().items()}
+texto = lambda seq, n: " ".join(palabra.get(i, "?") for i in seq[1:n + 1])
+print(f"\nReseñas: {len(x_tr):,} de entrenamiento y {len(x_te):,} de prueba | positivas: {y_tr.mean():.0%}")
+print("Inicio de la 1.ª reseña de entrenamiento:", texto(x_tr[0], 12), "...")
+print("  como enteros:", x_tr[0][:13])
 
-vectorizador = layers.TextVectorization(max_tokens=100, output_sequence_length=6)
-vectorizador.adapt(textos)                           # equivale al Tokenizer: palabra -> entero
-X = vectorizador(np.array(textos))
-print("\n'me encanta esta película' ->", X[0].numpy(), "(0 = relleno/padding)")
-vocab_size = len(vectorizador.get_vocabulary())
+LARGO = 200
+x_tr = keras.utils.pad_sequences(x_tr, maxlen=LARGO)         # recorta o rellena cada reseña a 200 palabras
+x_te_pad = keras.utils.pad_sequences(x_te, maxlen=LARGO)
+print("Tensor de entrada:", x_tr.shape)
 
 modelo = keras.Sequential([
-    keras.Input(shape=(6,)),
-    layers.Embedding(input_dim=vocab_size, output_dim=8),
-    layers.LSTM(8),
+    keras.Input(shape=(LARGO,)),
+    layers.Embedding(input_dim=VOCAB, output_dim=32),
+    layers.LSTM(32),
     layers.Dense(1, activation="sigmoid"),
 ])
-modelo.compile(optimizer=keras.optimizers.Adam(0.01), loss="binary_crossentropy",
-               metrics=["accuracy"])
-modelo.fit(X, etiquetas, epochs=60, verbose=0)
-print("Accuracy en entrenamiento:", round(modelo.evaluate(X, etiquetas, verbose=0)[1], 3))
+modelo.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+hist = modelo.fit(x_tr, y_tr, epochs=3, batch_size=128, validation_split=0.2, verbose=0)
+for e, (a, va) in enumerate(zip(hist.history["accuracy"], hist.history["val_accuracy"]), start=1):
+    print(f"Época {e}: accuracy entrenamiento = {a:.3f} | validación = {va:.3f}")
+print(f"Accuracy en las {len(x_te):,} reseñas de prueba: {modelo.evaluate(x_te_pad, y_te, verbose=0)[1]:.3f}")
 
-nuevas = np.array(["muy buena historia", "pésima y aburrida"])
-for frase, p in zip(nuevas, modelo.predict(vectorizador(nuevas), verbose=0).ravel()):
-    print(f"'{frase}' -> P(positivo) = {p:.3f}")
+for k in (1, 3, 5):                                          # tres reseñas de prueba, con su etiqueta real
+    p = modelo.predict(x_te_pad[k:k + 1], verbose=0)[0, 0]
+    print(f"'{texto(x_te[k], 12)} ...'\n   -> P(positiva) = {p:.3f} | real: {'positiva' if y_te[k] else 'negativa'}")

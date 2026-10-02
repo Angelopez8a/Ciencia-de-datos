@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 3 · Modelación no supervisada | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Reducción de dimensiones (PCA), K-means, clustering jerárquico, DBSCAN y el ciclo completo de clustering con métricas y perfilamiento.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html" aria-current="page">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m4.html">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 3 · Modelación no supervisada</div>
+  <h1>Encontrar estructura sin variable objetivo: reducción de dimensiones y clustering</h1>
+  <p class="lead">En el aprendizaje no supervisado solo tenemos \(X\). Los objetivos: <strong>comprimir</strong> la información (PCA), <strong>agrupar</strong> observaciones parecidas (K-means, jerárquico, DBSCAN) y <strong>describir</strong> esos grupos para el negocio (perfilamiento).</p>
+  <div class="meta-row">
+    <span class="chip"><span class="dot" style="background:var(--s3)"></span>Prácticas: reducción de dimensiones · jerárquico · DBSCAN · ciclo de clustering</span>
+    <span class="chip">5 programas verificados</span>
+  </div>
+  <div class="callout note">
+    <div class="callout-title">ℹ️ Sobre esta página</div>
+    <p>La carpeta <code>modulo3</code> solo contiene una captura con la lista de tareas del módulo: <em>1. Práctica reducción de dimensiones (partes 1 y 2), 2. Práctica clustering jerárquico, 3. Práctica DBSCAN, 4. Práctica ciclo clustering</em>, Quiz 2, Examen y Proyecto final. No había presentaciones, así que esta página desarrolla esos cuatro temas con el mismo estilo (teoría, diagramas, código y salidas verificadas). Si consigues las diapositivas, se pueden integrar.</p>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<h2 id="no-supervisado">1. ¿Qué es la modelación no supervisada?</h2>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>Supervisado (Módulo 2)</th><th>No supervisado (Módulo 3)</th></tr></thead>
+<tbody>
+<tr><td>Datos</td><td>pares \((X, y)\)</td><td>solo \(X\)</td></tr>
+<tr><td>Objetivo</td><td>predecir \(y\)</td><td>descubrir estructura: grupos, ejes principales, anomalías</td></tr>
+<tr><td>Evaluación</td><td>contra la verdad (accuracy, AUC, MAE)</td><td>métricas internas (silueta, inercia) + utilidad para el negocio</td></tr>
+<tr><td>Ejemplos</td><td>churn, scoring, demanda</td><td>segmentación de clientes, compresión, detección de atípicos</td></tr>
+</tbody></table></div>
+<p>Casi todos los métodos se basan en <strong>distancias</strong>, por eso la regla de oro del Módulo 1 sigue vigente: <strong>estandarizar antes</strong> (si una variable está en miles y otra en unidades, la primera domina la distancia).</p>
+<div class="formula">$$d_{\text{euclidiana}}(a,b) = \sqrt{\sum_i (a_i - b_i)^2}\qquad d_{\text{manhattan}}(a,b) = \sum_i |a_i - b_i| \qquad \text{sim}_{\cos}(a,b) = \frac{a\cdot b}{\lVert a\rVert\lVert b\rVert}$$</div>
+
+<!-- ===================================================== -->
+<h2 id="pca">2. Reducción de dimensiones con PCA (paso a paso)</h2>
+<p>PCA busca nuevas variables (<strong>componentes principales</strong>) que son combinaciones lineales de las originales, ortogonales entre sí y ordenadas por la varianza que explican. El algoritmo:</p>
+<ol class="steps">
+  <li><strong>Estandarizar</strong> (o al menos centrar) las variables.</li>
+  <li>Calcular la <strong>matriz de covarianza</strong> \(C = \frac{1}{n-1}X_c^T X_c\).</li>
+  <li>Obtener <strong>eigenvalores</strong> \(\lambda_k\) y <strong>eigenvectores</strong> \(v_k\) de \(C\): cada eigenvector es una dirección (componente) y su eigenvalor la <strong>varianza</strong> en esa dirección.</li>
+  <li>Ordenar de mayor a menor \(\lambda\) y quedarse con las \(k\) primeras.</li>
+  <li><strong>Proyectar</strong>: \(Z = X_c V_k\).</li>
+</ol>
+<div class="formula">$$\text{Varianza explicada}_k = \frac{\lambda_k}{\sum_j \lambda_j}\qquad\qquad \text{¿Cuántas componentes? } \to \text{acumulada} \ge 80\text{–}90\%,\ \text{codo del scree plot, o } \lambda_k > 1 \text{ (Kaiser, datos estandarizados)}$$</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo3/m3_01_pca.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_01_pca.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 3 · PCA paso a paso: covarianza -&gt; eigenvectores -&gt; proyección (y comparación con sklearn)
+import numpy as np
+from sklearn.decomposition import PCA
+
+np.set_printoptions(precision=4, suppress=True)
+X = np.array([[2.5, 2.4], [0.5, 0.7], [2.2, 2.9], [1.9, 2.2], [3.1, 3.0],
+              [2.3, 2.7], [2.0, 1.6], [1.0, 1.1], [1.5, 1.6], [1.1, 0.9]])
+
+Xc = X - X.mean(axis=0)                      # 1) centrar (en la práctica: estandarizar)
+C = np.cov(Xc, rowvar=False)                 # 2) matriz de covarianza
+valores, vectores = np.linalg.eigh(C)        # 3) eigen-descomposición
+orden = np.argsort(valores)[::-1]
+valores, vectores = valores[orden], vectores[:, orden]
+print(&quot;Matriz de covarianza:\n&quot;, C)
+print(&quot;Eigenvalores (varianza de cada componente):&quot;, valores)
+print(&quot;Proporción de varianza explicada:&quot;, valores / valores.sum())
+Z = Xc @ vectores[:, :1]                     # 4) proyectar en la 1a componente
+print(&quot;Datos proyectados en PC1:&quot;, Z.ravel())
+
+pca = PCA(n_components=2).fit(X)
+print(&quot;\nsklearn explained_variance_ratio_:&quot;, pca.explained_variance_ratio_)
+print(&quot;sklearn PC1 (signo puede variar):&quot;, pca.transform(X)[:, 0])</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Matriz de covarianza:
+ [[0.6166 0.6154]
+ [0.6154 0.7166]]
+Eigenvalores (varianza de cada componente): [1.284  0.0491]
+Proporción de varianza explicada: [0.9632 0.0368]
+Datos proyectados en PC1: [ 0.828  -1.7776  0.9922  0.2742  1.6758  0.9129 -0.0991 -1.1446 -0.438
+ -1.2238]
+
+sklearn explained_variance_ratio_: [0.9632 0.0368]
+sklearn PC1 (signo puede variar): [ 0.828  -1.7776  0.9922  0.2742  1.6758  0.9129 -0.0991 -1.1446 -0.438
+ -1.2238]</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Lectura</div><p>Las dos variables están muy correlacionadas, así que una sola componente (PC1) conserva el 96.3 % de la información: pasamos de 2 dimensiones a 1 perdiendo solo 3.7 %. sklearn da exactamente lo mismo (el signo de un eigenvector es arbitrario). Para el caso con 13 variables (Wine) revisa la <a href="modulo1.html#pca">gráfica del Módulo 1</a>: 5 componentes explican &gt; 80 %.</p></div>
+<div class="callout exam"><div class="callout-title">📝 Para la práctica</div><ul>
+<li><strong>Loadings</strong> (<code>pca.components_</code>): el peso de cada variable original en cada componente; sirven para nombrar las componentes ("PC1 = tamaño", "PC2 = gasto vs frecuencia").</li>
+<li>PCA es lineal y no supervisado: no sabe cuál variable importa para predecir, solo cuál varía más.</li>
+<li>t-SNE (y UMAP) son no lineales: excelentes para visualizar clusters en 2D, no para alimentar modelos.</li>
+</ul></div>
+
+<!-- ===================================================== -->
+<h2 id="kmeans">3. K-means</h2>
+<p>Agrupa en \(k\) clusters minimizando la distancia de cada punto al <strong>centroide</strong> (media) de su grupo.</p>
+<ol class="steps">
+  <li>Elegir \(k\) y colocar \(k\) centroides iniciales (sklearn usa <strong>k-means++</strong>: centroides iniciales alejados entre sí).</li>
+  <li><strong>Asignar</strong> cada punto al centroide más cercano.</li>
+  <li><strong>Actualizar</strong> cada centroide como la media de sus puntos.</li>
+  <li>Repetir 2–3 hasta que las asignaciones no cambien (<code>n_init</code> repite todo con varias semillas y se queda con la mejor).</li>
+</ol>
+<div class="formula">$$\text{Inercia (WCSS)} = \sum_{j=1}^{k}\sum_{x_i\in C_j}\lVert x_i - \mu_j\rVert^2 \qquad\qquad s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}$$
+<div class="where">\(a(i)\) = distancia promedio de \(i\) a su propio cluster; \(b(i)\) = distancia promedio al cluster vecino más cercano. Silueta cerca de 1: bien agrupado; cerca de 0: en la frontera; negativa: mal asignado. <strong>Davies-Bouldin</strong>: menor es mejor. <strong>Calinski-Harabasz</strong>: mayor es mejor.</div></div>
+<div class="two-col">
+<div class="chart-card">
+  <h4>Método del codo</h4>
+  <p class="sub">La inercia siempre baja con más k; buscamos el "codo" donde deja de bajar mucho: k = 4.</p>
+  <div class="chart-box short"><canvas id="chart-elbow" aria-label="Inercia por k"></canvas></div>
+</div>
+<div class="chart-card">
+  <h4>Coeficiente de silueta</h4>
+  <p class="sub">Máximo en k = 4 (0.802): confirma el codo.</p>
+  <div class="chart-box short"><canvas id="chart-sil" aria-label="Silueta por k"></canvas></div>
+</div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo3/m3_02_kmeans.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_02_kmeans.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 3 · K-means: método del codo (inercia) y coeficiente de silueta para elegir k
+from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+
+X, _ = make_blobs(n_samples=600, centers=4, cluster_std=1.0, random_state=7)
+X = StandardScaler().fit_transform(X)
+
+print(f&quot;{&#x27;k&#x27;:&gt;2}{&#x27;Inercia (WCSS)&#x27;:&gt;16}{&#x27;Silueta&#x27;:&gt;10}{&#x27;Davies-B&#x27;:&gt;10}{&#x27;Calinski-H&#x27;:&gt;12}&quot;)
+for k in range(2, 9):
+    km = KMeans(n_clusters=k, n_init=10, random_state=0).fit(X)
+    et = km.labels_
+    print(f&quot;{k:&gt;2}{km.inertia_:&gt;16.1f}{silhouette_score(X, et):&gt;10.3f}&quot;
+          f&quot;{davies_bouldin_score(X, et):&gt;10.3f}{calinski_harabasz_score(X, et):&gt;12.1f}&quot;)
+
+km = KMeans(n_clusters=4, n_init=10, random_state=0).fit(X)
+print(&quot;\nCentroides (k=4):\n&quot;, km.cluster_centers_.round(2))
+print(&quot;Tamaño de cada cluster:&quot;, [int((km.labels_ == c).sum()) for c in range(4)])</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> k  Inercia (WCSS)   Silueta  Davies-B  Calinski-H
+ 2           490.8     0.593     0.785       864.0
+ 3           129.8     0.766     0.333      2460.6
+ 4            31.1     0.802     0.283      7462.0
+ 5            27.9     0.683     0.583      6240.6
+ 6            25.0     0.580     0.790      5591.9
+ 7            21.9     0.450     0.968      5314.6
+ 8            19.0     0.355     1.079      5263.0
+
+Centroides (k=4):
+ [[ 1.47  0.04]
+ [-1.31  0.9 ]
+ [ 0.03 -1.62]
+ [-0.19  0.67]]
+Tamaño de cada cluster: [150, 150, 150, 150]</pre></div>
+</div>
+<div class="callout warn"><div class="callout-title">⚠️ Limitaciones de K-means</div><p>Hay que fijar \(k\); asume clusters <strong>esféricos y de tamaño parecido</strong>; es sensible a la escala, a los atípicos y a la inicialización; todo punto termina en algún cluster (no detecta ruido). Por eso existen el jerárquico y DBSCAN.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="jerarquico">4. Clustering jerárquico</h2>
+<p>Construye una <strong>jerarquía</strong> de agrupaciones representada en un <strong>dendrograma</strong>. El más común es el <strong>aglomerativo</strong> (bottom-up): empieza con cada punto como su propio cluster y en cada paso une los dos clusters más cercanos hasta tener uno solo. (El <strong>divisivo</strong> hace lo contrario: top-down.)</p>
+<h3 id="enlaces">4.1 Criterios de enlace (linkage)</h3>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Enlace</th><th>Distancia entre clusters A y B</th><th>Comportamiento</th></tr></thead>
+<tbody>
+<tr><td>Single (simple)</td><td>mínima distancia entre un punto de A y uno de B</td><td>encadena; detecta formas alargadas; sensible al ruido</td></tr>
+<tr><td>Complete (completo)</td><td>máxima distancia entre puntos de A y B</td><td>clusters compactos</td></tr>
+<tr><td>Average (promedio)</td><td>promedio de todas las distancias entre pares</td><td>intermedio</td></tr>
+<tr><td>Ward</td><td>aumento de la varianza (WCSS) al unirlos</td><td>clusters compactos de tamaño similar (el más usado)</td></tr>
+</tbody></table></div>
+<figure class="figure">
+  <svg viewBox="0 0 640 300" role="img" aria-label="Dendrograma con enlace ward de seis puntos">
+    <line x1="60" y1="20" x2="60" y2="260" class="d-line"/>
+    <g class="d-text-3"><text x="52" y="264" text-anchor="end">0</text><text x="52" y="174" text-anchor="end">4</text><text x="52" y="84" text-anchor="end">8</text><text x="52" y="38" text-anchor="end">10</text></g>
+    <text x="22" y="140" class="d-text-3" transform="rotate(-90 22 140)" text-anchor="middle">distancia de unión</text>
+    <!-- y = 260 - d*22.5 -->
+    <g stroke="var(--s1)" stroke-width="2.5" fill="none"><path d="M110 260 V248.75 H180 V260"/></g>
+    <g stroke="var(--s3)" stroke-width="2.5" fill="none"><path d="M280 260 V248.75 H350 V260"/></g>
+    <g stroke="var(--s7)" stroke-width="2.5" fill="none"><path d="M450 260 V242 H520 V260"/></g>
+    <g stroke="var(--ink-3)" stroke-width="2" fill="none"><path d="M315 248.75 V83.4 H485 V242"/><path d="M145 248.75 V32.1 H400 V83.4"/></g>
+    <g class="d-text" text-anchor="middle"><text x="110" y="282">A</text><text x="180" y="282">B</text><text x="280" y="282">C</text><text x="350" y="282">D</text><text x="450" y="282">E</text><text x="520" y="282">F</text></g>
+    <line x1="70" y1="150" x2="600" y2="150" stroke="var(--crit)" stroke-width="1.5"/>
+    <text x="598" y="144" text-anchor="end" class="d-text-2">corte → 3 clusters</text>
+    <text x="330" y="78" class="d-text-3">7.85</text><text x="273" y="27" class="d-text-3">10.13</text>
+  </svg>
+  <figcaption>Dendrograma real del programa (enlace ward): A-B y C-D se unen a 0.5, E-F a 0.8; luego (C,D) con (E,F) a 7.85 y todo a 10.13. Cortar entre 0.8 y 7.85 da 3 clusters.</figcaption>
+</figure>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo3/m3_03_jerarquico.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_03_jerarquico.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 3 · Clustering jerárquico aglomerativo: matriz de enlace (linkage) y corte del dendrograma
+import numpy as np
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.cluster import AgglomerativeClustering
+
+puntos = np.array([[1, 1], [1.5, 1], [5, 5], [5, 5.5], [9, 1], [9, 1.8]])
+nombres = [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;]
+
+for metodo in [&quot;single&quot;, &quot;complete&quot;, &quot;average&quot;, &quot;ward&quot;]:
+    Z = linkage(puntos, method=metodo)
+    print(f&quot;Enlace &#x27;{metodo}&#x27;:&quot;)
+    for i, (a, b, dist, n) in enumerate(Z):
+        print(f&quot;  paso {i + 1}: une {int(a)} y {int(b)} a distancia {dist:.3f} -&gt; nuevo grupo con {int(n)} puntos&quot;)
+
+Z = linkage(puntos, method=&quot;ward&quot;)
+etiquetas = fcluster(Z, t=3, criterion=&quot;maxclust&quot;)          # &quot;cortar&quot; el árbol en 3 grupos
+print(&quot;\nCorte en 3 clusters (ward):&quot;, dict(zip(nombres, etiquetas.tolist())))
+
+ac = AgglomerativeClustering(n_clusters=3, linkage=&quot;ward&quot;).fit(puntos)
+print(&quot;sklearn AgglomerativeClustering:&quot;, dict(zip(nombres, ac.labels_.tolist())))</code></pre>
+  <div class="output collapsed"><div class="out-label">Salida que debes obtener</div><pre>Enlace &#x27;single&#x27;:
+  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
+  paso 4: une 7 y 8 a distancia 5.122 -&gt; nuevo grupo con 4 puntos
+  paso 5: une 6 y 9 a distancia 5.315 -&gt; nuevo grupo con 6 puntos
+Enlace &#x27;complete&#x27;:
+  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
+  paso 4: une 6 y 7 a distancia 6.021 -&gt; nuevo grupo con 4 puntos
+  paso 5: une 8 y 9 a distancia 8.040 -&gt; nuevo grupo con 6 puntos
+Enlace &#x27;average&#x27;:
+  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
+  paso 4: une 7 y 8 a distancia 5.562 -&gt; nuevo grupo con 4 puntos
+  paso 5: une 6 y 9 a distancia 6.722 -&gt; nuevo grupo con 6 puntos
+Enlace &#x27;ward&#x27;:
+  paso 1: une 0 y 1 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 2: une 2 y 3 a distancia 0.500 -&gt; nuevo grupo con 2 puntos
+  paso 3: une 4 y 5 a distancia 0.800 -&gt; nuevo grupo con 2 puntos
+  paso 4: une 7 y 8 a distancia 7.851 -&gt; nuevo grupo con 4 puntos
+  paso 5: une 6 y 9 a distancia 10.128 -&gt; nuevo grupo con 6 puntos
+
+Corte en 3 clusters (ward): {&#x27;A&#x27;: 1, &#x27;B&#x27;: 1, &#x27;C&#x27;: 2, &#x27;D&#x27;: 2, &#x27;E&#x27;: 3, &#x27;F&#x27;: 3}
+sklearn AgglomerativeClustering: {&#x27;A&#x27;: 1, &#x27;B&#x27;: 1, &#x27;C&#x27;: 2, &#x27;D&#x27;: 2, &#x27;E&#x27;: 0, &#x27;F&#x27;: 0}</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Ventajas y desventajas</div><p><strong>+</strong> No hay que fijar \(k\) de antemano (se decide al cortar el dendrograma); el dendrograma es muy interpretable. <strong>−</strong> Costoso en memoria y tiempo (\(O(n^2)\) distancias), no escala a millones de registros; una unión no se deshace. Los números de etiqueta son arbitrarios (sklearn y scipy los nombran distinto pero forman los mismos grupos).</p></div>
+
+<!-- ===================================================== -->
+<h2 id="dbscan">5. DBSCAN (clustering por densidad)</h2>
+<p><strong>D</strong>ensity-<strong>B</strong>ased <strong>S</strong>patial <strong>C</strong>lustering of <strong>A</strong>pplications with <strong>N</strong>oise. Un cluster es una región densa de puntos separada por regiones poco densas. Dos parámetros:</p>
+<ul>
+  <li><strong>eps (ε):</strong> radio de vecindad.</li>
+  <li><strong>min_samples:</strong> número mínimo de puntos dentro del radio para considerar una región densa.</li>
+</ul>
+<div class="glossary">
+  <div class="gterm"><b>Punto núcleo (core)</b><span>Tiene al menos <code>min_samples</code> vecinos dentro de ε.</span></div>
+  <div class="gterm"><b>Punto frontera (border)</b><span>No es núcleo, pero está dentro del ε de un núcleo.</span></div>
+  <div class="gterm"><b>Ruido (noise)</b><span>Ni núcleo ni frontera: etiqueta <strong>−1</strong>. ¡DBSCAN detecta atípicos!</span></div>
+</div>
+<p>El algoritmo toma un núcleo no visitado, crea un cluster y lo expande con todos los puntos alcanzables por densidad; repite hasta visitar todo. <strong>No hay que fijar \(k\)</strong> y encuentra <strong>formas arbitrarias</strong>.</p>
+<div class="chart-card">
+  <h4>K-means vs DBSCAN en datos con forma de "lunas" (+3 atípicos)</h4>
+  <p class="sub">K-means corta las lunas con una recta (ARI = 0.475). DBSCAN (ε = 0.25, min_samples = 5) las recupera perfectamente (ARI = 1.000) y marca los 3 atípicos como ruido (gris).</p>
+  <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>cluster 0</span><span><i class="sq" style="background:var(--s2)"></i>cluster 1</span><span><i class="sq" style="background:var(--muted-series)"></i>ruido (−1)</span></div>
+  <div class="small-multiples">
+    <div class="chart-box short"><canvas id="chart-moons-km" aria-label="K-means sobre lunas"></canvas></div>
+    <div class="chart-box short"><canvas id="chart-moons-db" aria-label="DBSCAN sobre lunas"></canvas></div>
+  </div>
+</div>
+<h3 id="eps">5.1 ¿Cómo elegir ε? La gráfica de k-distancias</h3>
+<p>Para cada punto se calcula la distancia a su k-ésimo vecino (k = min_samples), se ordenan de menor a mayor y se grafican. El <strong>codo</strong> (donde la curva sube bruscamente) sugiere ε: por debajo, los puntos están en zonas densas; por encima, son ruido.</p>
+<div class="chart-card">
+  <h4>Distancia al 5.º vecino (ordenada)</h4>
+  <p class="sub">El codo aparece alrededor de 0.2–0.3; con ε = 0.25 se obtienen los 2 clusters correctos.</p>
+  <div class="chart-box short"><canvas id="chart-kdist" aria-label="Gráfica de k-distancias"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo3/m3_04_dbscan.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_04_dbscan.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 3 · DBSCAN vs K-means en formas no esféricas (lunas) + elección de eps con k-distancias
+import numpy as np
+from sklearn.datasets import make_moons
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import adjusted_rand_score
+
+X, y = make_moons(n_samples=400, noise=0.07, random_state=0)
+X = np.vstack([X, [[2.5, 1.5], [-1.5, -0.8], [0.5, 1.6]]])      # 3 puntos atípicos
+y = np.r_[y, [-1, -1, -1]]
+X = StandardScaler().fit_transform(X)
+
+# Gráfica de k-distancias: distancia al 5º vecino de cada punto (min_samples = 5)
+dist, _ = NearestNeighbors(n_neighbors=5).fit(X).kneighbors(X)
+k_dist = np.sort(dist[:, -1])
+print(&quot;Percentiles de la 5-distancia (el &#x27;codo&#x27; sugiere eps):&quot;,
+      np.percentile(k_dist, [50, 90, 95, 99]).round(3))
+
+for eps in [0.1, 0.25, 0.5]:
+    db = DBSCAN(eps=eps, min_samples=5).fit(X)
+    et = db.labels_
+    n_cl = len(set(et)) - (1 if -1 in et else 0)
+    print(f&quot;eps={eps:&lt;5} clusters={n_cl}  ruido={int((et == -1).sum()):&gt;3}  &quot;
+          f&quot;núcleo={len(db.core_sample_indices_):&gt;3}  ARI vs real={adjusted_rand_score(y, et):.3f}&quot;)
+
+km = KMeans(n_clusters=2, n_init=10, random_state=0).fit(X)
+print(f&quot;K-means k=2           ARI vs real={adjusted_rand_score(y, km.labels_):.3f}  (no sabe de ruido)&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Percentiles de la 5-distancia (el &#x27;codo&#x27; sugiere eps): [0.103 0.173 0.203 0.308]
+eps=0.1   clusters=28  ruido=114  núcleo=190  ARI vs real=0.043
+eps=0.25  clusters=2  ruido=  3  núcleo=392  ARI vs real=1.000
+eps=0.5   clusters=1  ruido=  3  núcleo=400  ARI vs real=0.029
+K-means k=2           ARI vs real=0.475  (no sabe de ruido)</pre></div>
+</div>
+<div class="callout warn"><div class="callout-title">⚠️ Sensibilidad a ε</div><p>ε = 0.1 (muy chico) fragmenta todo en 28 clusters y 114 puntos de ruido; ε = 0.5 (muy grande) une las dos lunas en una. DBSCAN también sufre si los clusters tienen <strong>densidades muy distintas</strong> o con muchas dimensiones (las distancias pierden sentido).</p></div>
+
+<!-- ===================================================== -->
+<h2 id="ciclo">6. El ciclo completo de clustering</h2>
+<figure class="figure">
+  <svg viewBox="0 0 760 120" role="img" aria-label="Ciclo de clustering en seis pasos">
+    <defs><marker id="ca" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <g>
+      <rect x="5" y="30" width="110" height="56" rx="10" class="d-fill-1"/><text x="60" y="54" text-anchor="middle" class="d-text">1 · Preparar</text><text x="60" y="72" text-anchor="middle" class="d-text-3">limpiar, variables</text>
+      <rect x="130" y="30" width="110" height="56" rx="10" class="d-fill-1"/><text x="185" y="54" text-anchor="middle" class="d-text">2 · Escalar</text><text x="185" y="72" text-anchor="middle" class="d-text-3">StandardScaler</text>
+      <rect x="255" y="30" width="110" height="56" rx="10" class="d-fill-3"/><text x="310" y="54" text-anchor="middle" class="d-text">3 · Reducir</text><text x="310" y="72" text-anchor="middle" class="d-text-3">PCA (opcional)</text>
+      <rect x="380" y="30" width="110" height="56" rx="10" class="d-fill-3"/><text x="435" y="54" text-anchor="middle" class="d-text">4 · Agrupar</text><text x="435" y="72" text-anchor="middle" class="d-text-3">K-means, jerárq., DBSCAN</text>
+      <rect x="505" y="30" width="110" height="56" rx="10" class="d-fill-7"/><text x="560" y="54" text-anchor="middle" class="d-text">5 · Evaluar</text><text x="560" y="72" text-anchor="middle" class="d-text-3">codo, silueta</text>
+      <rect x="630" y="30" width="125" height="56" rx="10" class="d-fill-2"/><text x="692" y="54" text-anchor="middle" class="d-text">6 · Perfilar</text><text x="692" y="72" text-anchor="middle" class="d-text-3">medias, nombres</text>
+      <g class="d-arrow"><path d="M115 58 H127" marker-end="url(#ca)"/><path d="M240 58 H252" marker-end="url(#ca)"/><path d="M365 58 H377" marker-end="url(#ca)"/><path d="M490 58 H502" marker-end="url(#ca)"/><path d="M615 58 H627" marker-end="url(#ca)"/></g>
+      <path d="M692 88 V108 H60 V90" class="d-arrow" marker-end="url(#ca)"/><text x="380" y="104" text-anchor="middle" class="d-text-3">iterar: si los segmentos no tienen sentido de negocio, se ajustan variables o k</text>
+    </g>
+  </svg>
+  <figcaption>El "ciclo de clustering" de la práctica 4.</figcaption>
+</figure>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo3/m3_05_ciclo_clustering.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo3/m3_05_ciclo_clustering.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 3 · Ciclo completo de clustering: preparar -&gt; estandarizar -&gt; reducir -&gt; agrupar -&gt; evaluar -&gt; perfilar
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+rng = np.random.default_rng(5)
+def grupo(n, gasto, visitas, antig, desc):
+    return pd.DataFrame({&quot;gasto_mensual&quot;: rng.normal(gasto, gasto * 0.15, n),
+                         &quot;visitas_mes&quot;: rng.poisson(visitas, n),
+                         &quot;antiguedad_meses&quot;: rng.normal(antig, 6, n).clip(1),
+                         &quot;uso_descuentos&quot;: rng.beta(*desc, n)})
+clientes = pd.concat([grupo(300, 800, 2, 40, (2, 8)), grupo(200, 3500, 8, 60, (2, 5)),
+                      grupo(250, 1200, 12, 10, (8, 2))], ignore_index=True)
+print(&quot;1) Datos:&quot;, clientes.shape)
+
+X = StandardScaler().fit_transform(clientes)               # 2) misma escala
+pca = PCA(n_components=0.9).fit(X)                          # 3) quedarnos con 90% de varianza
+Xp = pca.transform(X)
+print(f&quot;3) PCA: {Xp.shape[1]} componentes explican {pca.explained_variance_ratio_.sum():.1%}&quot;)
+
+sil = {k: silhouette_score(Xp, KMeans(k, n_init=10, random_state=0).fit_predict(Xp)) for k in range(2, 7)}
+k = max(sil, key=sil.get)
+print(&quot;4-5) Silueta por k:&quot;, {kk: round(v, 3) for kk, v in sil.items()}, &quot;-&gt; k elegido =&quot;, k)
+
+clientes[&quot;segmento&quot;] = KMeans(k, n_init=10, random_state=0).fit_predict(Xp)
+perfil = clientes.groupby(&quot;segmento&quot;).agg(n=(&quot;gasto_mensual&quot;, &quot;size&quot;), gasto=(&quot;gasto_mensual&quot;, &quot;mean&quot;),
+                                          visitas=(&quot;visitas_mes&quot;, &quot;mean&quot;),
+                                          antiguedad=(&quot;antiguedad_meses&quot;, &quot;mean&quot;),
+                                          descuentos=(&quot;uso_descuentos&quot;, &quot;mean&quot;)).round(2)
+print(&quot;6) Perfilamiento de segmentos (medias):\n&quot;, perfil.to_string())</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>1) Datos: (750, 4)
+3) PCA: 2 componentes explican 92.2%
+4-5) Silueta por k: {2: 0.603, 3: 0.773, 4: 0.662, 5: 0.572, 6: 0.424} -&gt; k elegido = 3
+6) Perfilamiento de segmentos (medias):
+             n    gasto  visitas  antiguedad  descuentos
+segmento                                               
+0         200  3538.93     7.71       59.95        0.28
+1         250  1199.67    11.96       10.08        0.80
+2         300   795.18     1.87       40.32        0.21</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Perfilamiento: darle nombre a los segmentos</div><p>El paso más importante para el negocio. Con las medias de cada segmento: <strong>segmento 0</strong> (gasto ~3,539, 7.7 visitas, 60 meses, pocos descuentos) = <em>"clientes premium leales"</em>; <strong>segmento 1</strong> (gasto ~1,200, 12 visitas, 10 meses, 80 % descuentos) = <em>"nuevos cazadores de ofertas"</em>; <strong>segmento 2</strong> (gasto ~795, 1.9 visitas, 40 meses) = <em>"ocasionales de bajo valor"</em>. Cada uno recibe una estrategia distinta.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="comparacion">7. ¿Qué algoritmo uso?</h2>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>K-means</th><th>Jerárquico</th><th>DBSCAN</th></tr></thead>
+<tbody>
+<tr><td>¿Fijar k?</td><td>sí</td><td>no (se corta el dendrograma)</td><td>no (se fijan ε y min_samples)</td></tr>
+<tr><td>Forma de clusters</td><td>esféricos, tamaño similar</td><td>depende del enlace</td><td>arbitraria</td></tr>
+<tr><td>Ruido / atípicos</td><td>no los detecta</td><td>no</td><td>sí (etiqueta −1)</td></tr>
+<tr><td>Escala a muchos datos</td><td>muy bien</td><td>mal (\(O(n^2)\))</td><td>bien con índices espaciales</td></tr>
+<tr><td>Interpretabilidad</td><td>centroides</td><td>dendrograma</td><td>regiones densas</td></tr>
+<tr><td>Métrica para elegir</td><td>codo, silueta</td><td>dendrograma, silueta</td><td>k-distancias, silueta (sin ruido)</td></tr>
+</tbody></table></div>
+
+<h2 id="repaso-m3">8. Preguntas de repaso</h2>
+<details class="qa"><summary>¿Por qué hay que estandarizar antes de PCA y de clustering?</summary><div class="ans"><p>PCA se basa en la covarianza y el clustering en distancias: una variable con valores grandes dominaría la varianza/distancia aunque no sea la más importante. Estandarizar pone a todas en la misma escala.</p></div></details>
+<details class="qa"><summary>¿Qué representa un eigenvalor en PCA?</summary><div class="ans"><p>La varianza de los datos en la dirección de su eigenvector (componente). Dividido entre la suma de eigenvalores da la proporción de varianza explicada.</p></div></details>
+<details class="qa"><summary>¿Por qué la inercia no sirve sola para elegir k?</summary><div class="ans"><p>Porque siempre disminuye al aumentar k (con k = n vale 0). Se busca el codo, o se usa la silueta, que sí penaliza tener demasiados clusters.</p></div></details>
+<details class="qa"><summary>Diferencia entre punto núcleo, frontera y ruido en DBSCAN.</summary><div class="ans"><p>Núcleo: tiene ≥ min_samples vecinos en ε. Frontera: no es núcleo pero cae en el ε de un núcleo. Ruido: ninguno de los dos; se etiqueta −1.</p></div></details>
+<details class="qa"><summary>¿Qué hace el enlace de Ward?</summary><div class="ans"><p>Une, en cada paso, el par de clusters cuyo merge aumenta lo menos posible la suma de cuadrados dentro de los clusters (varianza); produce grupos compactos y de tamaño similar.</p></div></details>
+<details class="qa"><summary>¿Qué es el perfilamiento y por qué importa?</summary><div class="ans"><p>Describir cada cluster con estadísticas de las variables originales (medias, proporciones) para interpretarlo y nombrarlo. Sin perfilamiento, los clusters no se traducen en acciones de negocio.</p></div></details>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="modulo2.html"><small>← Anterior</small>Módulo 2 · Supervisado</a>
+  <a class="next" href="modulo4.html"><small>Siguiente →</small>Módulo 4 · Deep Learning</a>
+</nav>
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="assets/js/data.js?v=180c6754" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/m3.js?v=e4715408" defer></script>
+</body>
+</html>

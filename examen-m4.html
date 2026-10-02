@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examen M4 · Práctica de Deep Learning | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Hoja de fórmulas, ejercicios resueltos, cuestionario de 70 preguntas y tarjetas de repaso para el segundo examen del Módulo 4.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m4.html" aria-current="page">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 4 · Preparación para el segundo examen</div>
+  <h1>Examen M4: practica hasta que te salga solo</h1>
+  <p class="lead">Cuatro herramientas en una página: la <strong>hoja de fórmulas</strong>, <strong>ejercicios numéricos resueltos</strong> paso a paso, un <strong>cuestionario de 70 preguntas</strong> con explicación y <strong>tarjetas de repaso</strong> para memorizar definiciones.</p>
+  <div class="callout tip">
+    <div class="callout-title">🗓️ Plan de estudio sugerido (2–3 sesiones)</div>
+    <ol>
+      <li><strong>Sesión 1:</strong> lee el <a href="modulo4.html">Módulo 4</a> secciones 1–5 (redes, activaciones, CNN, dropout, optimizadores). Juega con los simuladores. Responde las preguntas de esos temas aquí abajo (filtro por tema).</li>
+      <li><strong>Sesión 2:</strong> secciones 6–9 (RNN, embeddings, LSTM/GRU, transfer learning) y sus preguntas.</li>
+      <li><strong>Sesión 3:</strong> hoja de fórmulas → ejercicios resueltos (tápalos e intenta primero) → cuestionario completo en modo aleatorio → repasa solo las falladas → tarjetas.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<h2 id="formulas">1. Hoja de fórmulas</h2>
+<div class="two-col">
+<div class="formula"><strong>Regla de actualización (gradiente descendente)</strong>
+$$\theta \leftarrow \theta - \alpha\,\frac{\partial \mathcal{L}}{\partial \theta}$$</div>
+<div class="formula"><strong>Neurona</strong>
+$$z = \sum_i w_i x_i + b,\qquad a = g(z)$$</div>
+<div class="formula"><strong>Sigmoid y su derivada</strong>
+$$\sigma(x) = \frac{1}{1+e^{-x}},\quad \sigma'(x) = \sigma(x)\,(1-\sigma(x))\le 0.25$$</div>
+<div class="formula"><strong>Tanh y ReLU</strong>
+$$\tanh(x)=\frac{e^x-e^{-x}}{e^x+e^{-x}}\in(-1,1),\qquad \text{ReLU}(x)=\max(0,x)$$</div>
+<div class="formula"><strong>Softmax</strong>
+$$\sigma(\vec z)_i = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}},\qquad \sum_i \sigma(\vec z)_i = 1$$</div>
+<div class="formula"><strong>Pérdidas</strong>
+$$\text{CE} = -\sum_i y_i \log \hat y_i,\qquad \text{MSE} = \frac{1}{N}\sum_i (y_i-\hat y_i)^2$$</div>
+<div class="formula"><strong>Perceptrón + regla delta</strong>
+$$\hat y = \begin{cases}1 & w\cdot x+b>0\\-1&\text{otro}\end{cases},\quad w \leftarrow w + \eta(y-\hat y)x$$</div>
+<div class="formula"><strong>Tamaño de salida (conv / pooling)</strong>
+$$O = \frac{W - K + 2P}{S} + 1$$</div>
+<div class="formula"><strong>Parámetros</strong>
+$$\text{Dense}: n_{in}n_{out}+n_{out}\qquad \text{Conv2D}: (K^2 C_{in}+1)F$$</div>
+<div class="formula"><strong>Parámetros recurrentes (u = unidades, d = entrada)</strong>
+$$\text{RNN}: u(u+d+1)\quad \text{LSTM}: 4u(u+d+1)\quad \text{GRU}_{Keras}: 3u(u+d+2)$$</div>
+<div class="formula"><strong>Embedding y coseno</strong>
+$$\text{params}=V\cdot D,\qquad \cos\theta = \frac{a\cdot b}{\lVert a\rVert\lVert b\rVert}$$</div>
+<div class="formula"><strong>RNN</strong>
+$$h_t = \tanh(W_{hh}h_{t-1}+W_{xh}x_t+b),\quad \mathcal{L}=\sum_t \mathcal{L}_t\ (\text{BPTT})$$</div>
+<div class="formula"><strong>LSTM</strong>
+$$c_t = G_u * \tilde c_t + G_f * c_{t-1},\quad a_t = G_o * \tanh(c_t)$$</div>
+<div class="formula"><strong>GRU</strong>
+$$c_t = G_u * \tilde c_t + (1-G_u) * c_{t-1},\quad a_t = c_t$$</div>
+<div class="formula"><strong>Momentum</strong>
+$$v \leftarrow \beta v + \nabla J,\quad \theta \leftarrow \theta - \alpha v$$</div>
+<div class="formula"><strong>Adam</strong>
+$$m\leftarrow\beta_1 m+(1-\beta_1)g,\ v\leftarrow\beta_2 v+(1-\beta_2)g^2,\ \theta\leftarrow\theta-\alpha\frac{\hat m}{\sqrt{\hat v}+\epsilon}$$</div>
+<div class="formula"><strong>Iteraciones</strong>
+$$\text{iter/época} = \left\lceil \frac{N}{\text{batch}} \right\rceil,\quad \text{total} = \text{iter/época}\times\text{épocas}$$</div>
+<div class="formula"><strong>Dropout (inverted)</strong>
+$$\tilde a = \frac{a \cdot m}{1-p},\quad m\sim\text{Bernoulli}(1-p),\quad \mathbb{E}[\text{activas}] = n(1-p)$$</div>
+</div>
+
+<h3 id="tablas">Tablas comparativas rápidas</h3>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Concepto</th><th>Lo que debes recordar</th></tr></thead>
+<tbody>
+<tr><td>Profunda vs superficial</td><td>Profunda a partir de <strong>5 capas ocultas</strong> (criterio del curso). Más neuronas ≠ mejor.</td></tr>
+<tr><td>Feedforward vs recurrente</td><td>Feedforward: sin ciclos, una sola dirección. Recurrente: ciclos, memoria, pesos compartidos en el tiempo, BPTT.</td></tr>
+<tr><td>Forward vs backprop</td><td>Forward: entrada → salida (predicción). Backprop: error y gradiente de salida → entrada (actualizar pesos).</td></tr>
+<tr><td>Batch / época / iteración</td><td>Batch: fragmento de datos. Iteración: una actualización (un batch). Época: pasar todos los batches una vez.</td></tr>
+<tr><td>Capa de entrada</td><td>Una neurona por variable, <strong>sin pesos</strong>.</td></tr>
+<tr><td>CNN pipeline</td><td>Conv → ReLU → Pooling (repetir) → Flatten → Fully connected → Softmax.</td></tr>
+<tr><td>Pooling 2×2 / stride 2</td><td>Cada dimensión a la mitad; quedan 1/4 de los valores; no tiene parámetros.</td></tr>
+<tr><td>Arquitecturas</td><td>LeNet-5 = 2 conv + 3 FC = 5 · AlexNet = 5 + 3 = 8 · VGG16 = 13 + 3 = 16.</td></tr>
+<tr><td>Optimizadores</td><td>SGD (gradiente) · Momentum (inercia) · Adagrad (LR por parámetro, acumulado; se encoge) · Adadelta (sin LR, Zeiler 2012) · RMSProp (media móvil de g²) · Adam (momentum + RMSProp).</td></tr>
+<tr><td>Tipos de RNN</td><td>uno a uno, uno a muchos (música), muchos a uno (sentimiento), muchos a muchos (traducción / etiquetado).</td></tr>
+<tr><td>LSTM vs GRU</td><td>LSTM: 3 puertas (olvido, entrada, salida) + estado de celda; Hochreiter &amp; Schmidhuber. GRU: 2 puertas (reinicio, actualización), sin estado separado, menos parámetros, más rápida. Ninguna es siempre mejor.</td></tr>
+<tr><td>Embedding (Keras)</td><td>input_dim = vocabulario (0..10 → 11) · output_dim = dimensión · input_length = longitud de secuencia. Entrada en enteros (Tokenizer). Pesos aleatorios al inicio, entrenables.</td></tr>
+<tr><td>Transfer learning</td><td>Transferencia inductiva. Beneficios: comienzo superior, pendiente más alta, asíntota superior. Pasos: seleccionar, reutilizar, optimizar. VGG (Oxford), Inception (Google), ResNet (Microsoft); word2vec (Google), GloVe (Stanford).</td></tr>
+</tbody></table></div>
+
+<!-- ===================================================== -->
+<h2 id="ejercicios">2. Ejercicios numéricos resueltos</h2>
+<p>Intenta resolver cada uno antes de abrir la solución. Todos los resultados están verificados con los programas del Módulo 4.</p>
+
+<details class="qa"><summary>E1. Una neurona con sigmoide recibe x = [1, 0.5], w = [0.7, 0.1], b = 0. ¿Cuál es su salida?</summary>
+<div class="ans"><p>\(z = 0.7\cdot1 + 0.1\cdot0.5 + 0 = 0.75\). \(\sigma(0.75) = 1/(1+e^{-0.75}) = 1/(1+0.4724) = \mathbf{0.6792}\). (Es la neurona oculta 2 del ejemplo de la red 2-3-1.)</p></div></details>
+
+<details class="qa"><summary>E2. Calcula softmax([2, 1, 0.1]).</summary>
+<div class="ans"><p>\(e^2=7.389,\ e^1=2.718,\ e^{0.1}=1.105\); suma = 11.212. Probabilidades: 7.389/11.212 = <strong>0.659</strong>, 2.718/11.212 = <strong>0.242</strong>, 1.105/11.212 = <strong>0.099</strong>. Suman 1; la clase predicha es la primera.</p></div></details>
+
+<details class="qa"><summary>E3. Convoluciona la esquina superior izquierda de la imagen [[1,1,1],[0,1,1],[0,0,1]] con el kernel [[1,0,1],[0,1,0],[1,0,1]].</summary>
+<div class="ans"><p>Multiplica elemento a elemento y suma: \(1\cdot1+1\cdot0+1\cdot1+0\cdot0+1\cdot1+1\cdot0+0\cdot1+0\cdot0+1\cdot1 = \mathbf{4}\). Es el primer valor del mapa [[4,3,4],[2,4,3],[2,3,4]] de la diapositiva.</p></div></details>
+
+<details class="qa"><summary>E4. Imagen de 32×32×3, Conv2D con 16 filtros de 5×5, padding 0, stride 1. ¿Forma de salida y parámetros?</summary>
+<div class="ans"><p>\(O = (32-5+0)/1+1 = 28\) → salida <strong>(28, 28, 16)</strong>. Parámetros: \((5\cdot5\cdot3+1)\cdot16 = 76\cdot16 = \mathbf{1,216}\).</p></div></details>
+
+<details class="qa"><summary>E5. Aplica max pooling y average pooling 2×2 (stride 2) a [[2,2,7,3],[9,4,6,1],[8,5,2,4],[3,1,2,6]].</summary>
+<div class="ans"><p>Bloques: {2,2,9,4}, {7,3,6,1}, {8,5,3,1}, {2,4,2,6}. Max: <strong>[[9,7],[8,6]]</strong>. Promedio: <strong>[[4.25, 4.25],[4.25, 3.5]]</strong>. De 16 valores quedan 4.</p></div></details>
+
+<details class="qa"><summary>E6. Un conjunto de 1,000 ejemplos, batch de 32, 10 épocas. ¿Cuántas iteraciones por época y cuántas actualizaciones en total?</summary>
+<div class="ans"><p>\(\lceil 1000/32 \rceil = \lceil 31.25 \rceil = \mathbf{32}\) iteraciones por época (el último lote tiene 8 ejemplos). Total: \(32\times10 = \mathbf{320}\) actualizaciones de pesos.</p></div></details>
+
+<details class="qa"><summary>E7. Una capa Dense recibe la salida aplanada de un volumen 5×5×64 y tiene 10 neuronas. ¿Cuántos parámetros?</summary>
+<div class="ans"><p>Flatten: \(5\cdot5\cdot64 = 1600\) entradas. Parámetros: \(1600\cdot10 + 10 = \mathbf{16,010}\) (coincide con el summary de la CNN de Keras).</p></div></details>
+
+<details class="qa"><summary>E8. ¿Cuántos parámetros tienen SimpleRNN(32), LSTM(32) y GRU(32) si la entrada es un embedding de 16 dimensiones?</summary>
+<div class="ans"><p>SimpleRNN: \(32(32+16+1) = \mathbf{1,568}\). LSTM: \(4\cdot1568 = \mathbf{6,272}\). GRU (Keras): \(3\cdot32\cdot(32+16+2) = \mathbf{4,800}\). La LSTM tiene 4 bloques (f, i, c̃, o); la GRU 3.</p></div></details>
+
+<details class="qa"><summary>E9. Una capa Embedding con vocabulario de 10,000 palabras y vectores de 16 dimensiones, ¿cuántos parámetros tiene? ¿Y si los índices van de 0 a 10?</summary>
+<div class="ans"><p>\(10,000\cdot16 = \mathbf{160,000}\). Si los enteros van de 0 a 10, el vocabulario (input_dim) es <strong>11</strong>; con output_dim = 4 serían \(11\cdot4 = 44\) parámetros.</p></div></details>
+
+<details class="qa"><summary>E10. Similitud del coseno entre los one-hot de "good" y "great" en V = {Have, a, good, great, day}.</summary>
+<div class="ans"><p>good = [0,0,1,0,0], great = [0,0,0,1,0]. Producto punto = 0 → \(\cos\theta = 0\) (ángulo de 90°). Con one-hot todas las palabras son igual de distintas: esa es la motivación de los embeddings.</p></div></details>
+
+<details class="qa"><summary>E11. Con gradiente descendente sobre \(J(\theta)=\theta^2\), \(\theta_0 = 5\): ¿qué pasa con α = 0.1, α = 0.5 y α = 1.1?</summary>
+<div class="ans"><p>\(\theta \leftarrow \theta - \alpha\cdot2\theta = (1-2\alpha)\theta\). α = 0.1 → factor 0.8: converge (5, 4, 3.2, 2.56, …). α = 0.5 → factor 0: llega al mínimo <strong>en un paso</strong>. α = 1.1 → factor −1.2: |factor| &gt; 1, <strong>diverge</strong> oscilando (5, −6, 7.2, …).</p></div></details>
+
+<details class="qa"><summary>E12. Dropout con p = 0.5 en una capa de 8 neuronas: ¿cuántas quedan activas en promedio y por cuánto se escalan?</summary>
+<div class="ans"><p>En promedio \(8(1-0.5) = \mathbf{4}\) activas por iteración (pueden ser 3, 5…). Las que siguen activas se multiplican por \(1/(1-p) = \mathbf{2}\) durante el entrenamiento. En predicción se usan las 8 sin escalar.</p></div></details>
+
+<details class="qa"><summary>E13. En la convolución RGB de la clase, los canales dan 308, −498 y 164, con sesgo 1. ¿Cuál es el valor de salida? ¿Cuántos números produce?</summary>
+<div class="ans"><p>\(308 - 498 + 164 + 1 = \mathbf{-25}\). Un filtro RGB produce <strong>un solo</strong> número por posición (se suman los tres canales). Si después se aplica ReLU, ese −25 se convierte en 0.</p></div></details>
+
+<details class="qa"><summary>E14. Una red de 2 entradas, una oculta de 3 neuronas y 1 salida (todas densas). ¿Cuántos parámetros?</summary>
+<div class="ans"><p>Oculta: \(2\cdot3+3 = 9\). Salida: \(3\cdot1+1 = 4\). Total = <strong>13</strong>. (La capa de entrada no tiene pesos.)</p></div></details>
+
+<!-- ===================================================== -->
+<h2 id="cuestionario">3. Cuestionario (70 preguntas)</h2>
+<div class="quiz-bar no-toc">
+  <div><span class="score" id="qz-score">0 / 0</span> <small style="color:var(--ink-3)">correctas</small></div>
+  <div class="meter" aria-hidden="true"><div id="qz-meter"></div></div>
+  <label style="font-size:.88rem">Tema
+    <select id="qz-filter" class="inp" style="width:auto">
+      <option value="">Todos</option>
+    </select>
+  </label>
+  <button class="btn" id="qz-shuffle" type="button">Aleatorio</button>
+  <button class="btn" id="qz-wrong" type="button">Solo falladas</button>
+  <button class="btn" id="qz-reset" type="button">Reiniciar</button>
+</div>
+<div id="quiz"></div>
+
+<!-- ===================================================== -->
+<h2 id="tarjetas">4. Tarjetas de repaso</h2>
+<p>Toca una tarjeta para voltearla. Di la definición en voz alta antes de voltear.</p>
+<div class="flash-wrap" id="flash"></div>
+
+<!-- ===================================================== -->
+<h2 id="abiertas">5. Preguntas abiertas tipo examen</h2>
+<details class="qa"><summary>¿Por qué una red neuronal necesita funciones de activación no lineales?</summary><div class="ans"><p>Porque son "el elemento donde se agrega la no linealidad del modelo". Sin ellas cada neurona es una regresión lineal y la composición de funciones lineales es lineal: la red entera equivaldría a una regresión lineal y no podría aprender fronteras como XOR. Con activaciones (sigmoid, tanh, ReLU) la red puede aproximar relaciones complejas.</p></div></details>
+<details class="qa"><summary>Explica forward propagation y backpropagation y cómo se relacionan con el gradiente descendente.</summary><div class="ans"><p>En forward la entrada viaja capa por capa (suma ponderada + activación) hasta producir \(\hat y\); se calcula la pérdida. En backprop el error y su gradiente fluyen de la salida hacia las capas ocultas usando la regla de la cadena para obtener \(\partial\mathcal L/\partial w\) de cada peso. El gradiente descendente usa esas derivadas para actualizar: \(w \leftarrow w - \alpha\,\partial\mathcal L/\partial w\). Se repite por batches y épocas hasta que la pérdida deja de bajar.</p></div></details>
+<details class="qa"><summary>Describe las capas de una CNN y la función de cada una.</summary><div class="ans"><p><strong>Convolucional:</strong> desliza kernels sobre la imagen para extraer características (bordes, texturas) y genera mapas de activación; comparte pesos. <strong>Activación (ReLU):</strong> agrega no linealidad. <strong>Pooling:</strong> resume regiones (max/avg), reduce dimensiones y parámetros, ayuda contra el sobreajuste. <strong>Flatten:</strong> convierte el volumen en vector. <strong>Fully connected + softmax:</strong> clasifican usando las características extraídas.</p></div></details>
+<details class="qa"><summary>¿Qué es el desvanecimiento del gradiente, por qué afecta a las RNN y cómo se mitiga?</summary><div class="ans"><p>Es cuando el gradiente se hace tan pequeño (≈0) que los pesos dejan de actualizarse y la red no aprende. En RNN, BPTT multiplica muchas derivadas a lo largo del tiempo; si son &lt;1 el producto tiende a 0 (0.9⁵⁰ ≈ 0.005), así que la red olvida dependencias de largo plazo. Si son &gt;1 explota (NaN). Mitigaciones: menos capas (diapositiva), celdas LSTM/GRU, ReLU e inicialización adecuada, gradient clipping para la explosión.</p></div></details>
+<details class="qa"><summary>Compara LSTM y GRU.</summary><div class="ans"><p>Ambas usan puertas para controlar la memoria y combatir el vanishing gradient. LSTM: estado de celda + estado oculto; puertas de olvido, entrada/actualización y salida (+ candidato). GRU: un solo estado (\(a_t=c_t\)), puertas de reinicio y actualización; olvido y escritura se consolidan en una puerta. GRU tiene menos parámetros, entrena más rápido y suele ir mejor con pocos datos; LSTM en teoría recuerda secuencias más largas. El paper de evaluación no concluye cuál es mejor.</p></div></details>
+<details class="qa"><summary>¿Qué son los word embeddings y qué problema del one-hot resuelven?</summary><div class="ans"><p>Son vectores densos de punto flotante, de dimensión elegida (8 a 1024), cuyos valores se aprenden. Palabras con contextos similares quedan cerca (coseno ≈ 1). El one-hot produce vectores enormes, dispersos y ortogonales: "good" y "great" quedan tan distintas como "day" y "have" (coseno 0), sin capturar significado.</p></div></details>
+<details class="qa"><summary>¿Qué es transfer learning, cuándo conviene y cuáles son sus beneficios?</summary><div class="ans"><p>Reutilizar un modelo entrenado en una tarea como punto de partida de otra relacionada (transferencia inductiva). Conviene cuando hay pocos datos o poco cómputo y las características aprendidas son generales (bordes, texturas; embeddings de palabras). Beneficios: comienzo superior, pendiente más alta, asíntota superior. Proceso: seleccionar modelo de origen (VGG, Inception, ResNet; word2vec, GloVe), reutilizarlo (congelar base) y opcionalmente optimizar (fine-tuning con LR bajo).</p></div></details>
+<details class="qa"><summary>¿Qué es dropout y por qué funciona?</summary><div class="ans"><p>Regularización que, en cada iteración de entrenamiento, apaga cada neurona con probabilidad \(p\) (≈0.5). Obliga a que ninguna neurona dependa de otras específicas y equivale a entrenar un ensamble de muchas subredes que comparten pesos. Reduce el sobreajuste (p. ej. de 90 % a 92 % de accuracy). En predicción no se apaga nada.</p></div></details>
+<details class="qa"><summary>¿Qué diferencia hay entre Adagrad, RMSProp y Adam?</summary><div class="ans"><p>Los tres adaptan el learning rate por parámetro. Adagrad divide por la raíz de la suma acumulada de gradientes² (el paso solo se encoge; puede volverse demasiado pequeño). RMSProp usa una media móvil exponencial de gradientes² recientes, así no se apaga el aprendizaje. Adam combina RMSProp (2.º momento) con momentum (1.er momento: promedio de gradientes), con corrección de sesgo.</p></div></details>
+<details class="qa"><summary>Diferencia entre red recurrente y red recursiva.</summary><div class="ans"><p>Recurrente: aplica la misma celda a lo largo del tiempo (cadena); para secuencias. Recursiva: aplica los mismos pesos de forma recursiva sobre una estructura (árbol/grafo acíclico, p. ej. árbol sintáctico); captura dependencias jerárquicas y de larga distancia, pero es costosa, lenta y dependiente del dominio. La recurrente es un caso particular (un árbol que es una cadena).</p></div></details>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="modulo4.html"><small>← Volver a</small>Módulo 4 · Deep Learning</a>
+  <a class="next" href="index.html"><small>Inicio →</small>Todos los módulos</a>
+</nav>
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/quiz.js?v=7aa24da0" defer></script>
+</body>
+</html>

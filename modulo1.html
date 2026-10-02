@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 1 · Fundamentos y preparación de datos | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Proceso de ciencia de datos, TAD, ventanas de tiempo, limpieza, VarClus, estandarización, PCA, t-SNE, variables dummy, credit scoring con WoE e IV, scorecards y OLAP.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html" aria-current="page">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m4.html">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 1 · Introducción, manipulación, exploración y visualización de datos</div>
+  <h1>Del dato crudo a la Tabla Analítica de Datos (TAD) y los primeros modelos</h1>
+  <p class="lead">El módulo enseña el <strong>proceso completo</strong>: entender el problema, definir unidad muestral y variable objetivo, construir variables con ventanas de tiempo, limpiar la TAD, transformarla (estandarizar, reducir dimensiones, WoE) y ajustar los primeros modelos (regresión lineal, logística y scorecards). Cierra con OLTP vs OLAP y cubos.</p>
+  <div class="meta-row">
+    <span class="chip"><span class="dot" style="background:var(--s1)"></span>Prof. Luis Gómez Aussenac</span>
+    <span class="chip">6 presentaciones</span>
+    <span class="chip">3 notebooks (sesiones 8, 9 y 10)</span>
+    <span class="chip">11 programas verificados</span>
+  </div>
+  <details class="sources">
+    <summary>Material del curso en el que se basa esta página</summary>
+    <ul>
+      <li><code>Sesión_02_Introducción.pdf</code> — conceptos, IA, científico de datos, proceso, equipos, retos</li>
+      <li><code>Sesión_03_Conceptos para un modelo predictivo.pdf</code> — aprendizaje, TAD, unidad muestral, ventanas de tiempo</li>
+      <li><code>Sesión_04_ Algoritmos ML_.pdf</code> — algoritmos y casos de uso (ejemplo de demanda de Ecobici)</li>
+      <li><code>DCC - Estandarización de datos y reducción de dimensiones.pdf</code> — z-score, min-max, PCA</li>
+      <li><code>DCC - Clasificación Binaria - Credit Scoring_.pdf</code> — logística, WoE, IV, scorecard, PDO</li>
+      <li><code>DCC - Más transformaciones_ TSNE y Dummy.pdf</code> — t-SNE, dummies, comparativas</li>
+      <li><code>Sesión - 8 - Regresión y Clasificación.ipynb</code> — Ecobici: ventanas, variables, limpieza, VarClus, modelos</li>
+      <li><code>Sesión - 9 - Churn.ipynb</code> — fuga de clientes: integración, normalización, discretización, IV, WoE, logística</li>
+      <li><code>Sesión - 10 - OLTP y OLAP.ipynb</code> — contaminantes CDMX: dimensiones de tiempo y ubicación, cubos</li>
+      <li><code>Screenshot…png</code> — interpretación de la salida de VarClusHi (RS_Own, RS_NC, RS_Ratio)</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ===================================================== -->
+<h2 id="conceptos">1. Conceptos base</h2>
+<div class="glossary">
+  <div class="gterm"><b>Inteligencia Artificial</b><span>Sistemas computacionales que simulan comportamientos cognitivos humanos.</span></div>
+  <div class="gterm"><b>Científico de datos</b><span>Profesional que obtiene conocimiento del manejo, análisis e interpretación de datos digitales complejos para asistir la toma de decisiones del negocio.</span></div>
+  <div class="gterm"><b>Business Intelligence</b><span>Reportes y tableros sobre lo que ya pasó (descriptivo).</span></div>
+  <div class="gterm"><b>Data Mining</b><span>Descubrir patrones ocultos en grandes volúmenes de datos.</span></div>
+  <div class="gterm"><b>Analytics</b><span>Análisis cuantitativo para responder preguntas de negocio.</span></div>
+  <div class="gterm"><b>Machine Learning</b><span>Algoritmos que aprenden patrones de los datos y mejoran con más datos.</span></div>
+  <div class="gterm"><b>Big Data</b><span>Datos con volumen, velocidad y variedad que exceden las herramientas tradicionales.</span></div>
+  <div class="gterm"><b>Data Science</b><span>Une estadística, programación y negocio para extraer valor de los datos.</span></div>
+</div>
+
+<h3 id="proceso">1.1 Proceso de ciencia de datos aplicada</h3>
+<figure class="figure">
+  <svg viewBox="0 0 760 220" role="img" aria-label="Nueve pasos del proceso de ciencia de datos">
+    <defs><marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <g>
+      <rect x="10" y="30" width="140" height="44" rx="10" class="d-fill-1"/><text x="80" y="57" text-anchor="middle" class="d-text">1 · Recolección</text>
+      <rect x="160" y="30" width="140" height="44" rx="10" class="d-fill-1"/><text x="230" y="57" text-anchor="middle" class="d-text">2 · Integración</text>
+      <rect x="310" y="30" width="140" height="44" rx="10" class="d-fill-1"/><text x="380" y="57" text-anchor="middle" class="d-text">3 · Limpieza</text>
+      <rect x="460" y="30" width="140" height="44" rx="10" class="d-fill-3"/><text x="530" y="57" text-anchor="middle" class="d-text">4 · Exploración</text>
+      <rect x="610" y="30" width="140" height="44" rx="10" class="d-fill-3"/><text x="680" y="57" text-anchor="middle" class="d-text">5 · Transformación</text>
+      <rect x="610" y="140" width="140" height="44" rx="10" class="d-fill-7"/><text x="680" y="161" text-anchor="middle" class="d-text">6 · Modelación</text><text x="680" y="176" text-anchor="middle" class="d-text-3">matemática</text>
+      <rect x="460" y="140" width="140" height="44" rx="10" class="d-fill-7"/><text x="530" y="161" text-anchor="middle" class="d-text">7 · Pruebas /</text><text x="530" y="176" text-anchor="middle" class="d-text-3">validación</text>
+      <rect x="310" y="140" width="140" height="44" rx="10" class="d-fill-2"/><text x="380" y="167" text-anchor="middle" class="d-text">8 · Producción</text>
+      <rect x="160" y="140" width="140" height="44" rx="10" class="d-fill-2"/><text x="230" y="167" text-anchor="middle" class="d-text">9 · Calibración</text>
+      <g class="d-arrow"><path d="M150 52 H157" marker-end="url(#pa)"/><path d="M300 52 H307" marker-end="url(#pa)"/><path d="M450 52 H457" marker-end="url(#pa)"/><path d="M600 52 H607" marker-end="url(#pa)"/><path d="M680 76 V137" marker-end="url(#pa)"/><path d="M608 162 H603" marker-end="url(#pa)"/><path d="M458 162 H453" marker-end="url(#pa)"/><path d="M308 162 H303" marker-end="url(#pa)"/><path d="M160 162 H90 V80" marker-end="url(#pa)"/></g>
+      <text x="96" y="122" class="d-text-3">monitoreo y re-entrenamiento</text>
+    </g>
+  </svg>
+  <figcaption>Los 9 pasos de la sesión 2. Es un ciclo: tras producción, el modelo se calibra y se vuelve a empezar.</figcaption>
+</figure>
+<div class="two-col">
+  <div class="callout note"><div class="callout-title">Equipos involucrados</div><p>Arquitectura de datos · Ingeniería de datos · Ciencia de datos · Desarrollo de software · Inteligencia de negocio.</p></div>
+  <div class="callout warn"><div class="callout-title">Retos / obstáculos</div><p>Datos dispersos o inexistentes · calidad de datos · infraestructura · costo · comunicación con la dirección · "miedo al cambio" · permitir la creatividad · normas burocráticas.</p></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="modelo-predictivo">2. Conceptos para un modelo predictivo</h2>
+<p>Dentro de la IA está el <strong>Machine Learning</strong> y dentro de él el <strong>Deep Learning</strong>. El aprendizaje puede ser:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Tipo</th><th>¿Hay variable objetivo?</th><th>Tarea</th><th>Ejemplo</th></tr></thead>
+<tbody>
+<tr><td><strong>Supervisado</strong></td><td>Sí</td><td><strong>Clasificación</strong> \(\vec y \in \{+, -\}\) · <strong>Regresión</strong> \(y \in \mathbb{R}\)</td><td>fuga de clientes (sí/no) · afluencia de una estación</td></tr>
+<tr><td><strong>No supervisado</strong></td><td>No (solo \(\mathcal{X}\))</td><td>agrupar, reducir dimensiones</td><td>segmentar clientes</td></tr>
+<tr><td><strong>Reforzado</strong></td><td>Recompensa</td><td>aprender acciones por prueba y error</td><td>juegos, robótica</td></tr>
+</tbody></table></div>
+<p>¿Qué aprende el modelo? Una función \(y = h(\mathcal{X})\). Para eso se construye la <strong>TAD (Tabla Analítica de Datos)</strong>: una <strong>matriz de predictoras</strong> \(X\) (características) y un <strong>vector solución</strong> \(y\) (variable objetivo). "El modelo aprende de X".</p>
+
+<figure class="figure">
+  <svg viewBox="0 0 640 210" role="img" aria-label="Estructura de la TAD: observaciones, características y vector solución">
+    <rect x="120" y="30" width="370" height="150" rx="6" class="d-fill-1"/>
+    <rect x="510" y="30" width="70" height="150" rx="6" class="d-fill-4"/>
+    <text x="305" y="22" text-anchor="middle" class="d-text" font-weight="700">X (características)</text>
+    <text x="545" y="22" text-anchor="middle" class="d-text" font-weight="700">y</text>
+    <g class="d-mono"><text x="135" y="62">id0</text><text x="195" y="62">x0</text><text x="255" y="62">x1</text><text x="330" y="62">…</text><text x="440" y="62">xn</text><text x="530" y="62">y0</text>
+    <text x="135" y="92">id1</text><text x="195" y="92">x0</text><text x="255" y="92">x1</text><text x="330" y="92">…</text><text x="440" y="92">xn</text><text x="530" y="92">y1</text>
+    <text x="135" y="125">⋮</text><text x="330" y="125">⋮</text><text x="530" y="125">⋮</text>
+    <text x="135" y="160">idm</text><text x="195" y="160">x0</text><text x="255" y="160">x1</text><text x="330" y="160">…</text><text x="440" y="160">xn</text><text x="530" y="160">ym</text></g>
+    <text x="60" y="110" text-anchor="middle" class="d-text-2">Observaciones</text><text x="60" y="126" text-anchor="middle" class="d-text-3">(historia, eventos,</text><text x="60" y="140" text-anchor="middle" class="d-text-3">registros)</text>
+    <text x="305" y="200" text-anchor="middle" class="d-text-3">matriz de predictoras</text><text x="545" y="200" text-anchor="middle" class="d-text-3">vector solución</text>
+  </svg>
+  <figcaption>Cada renglón es una <strong>unidad muestral</strong> (la representación numérica de un objeto: un cliente, una estación…).</figcaption>
+</figure>
+
+<h3 id="unidad-muestral">2.1 Unidad muestral y variable objetivo</h3>
+<p>Antes de programar hay que contestar: <strong>¿qué información se tiene? ¿qué representan los datos? ¿qué problemática se desea resolver?</strong> En el ejemplo de <strong>Ecobici</strong> se tiene el histórico de viajes a nivel viaje, pero la pregunta es la oferta y demanda por estación. Por eso:</p>
+<ul>
+  <li><strong>Unidad muestral</strong> → representación numérica de un objeto (aquí: la estación en un periodo).</li>
+  <li><strong>Variable objetivo</strong> → resultado de una observación (aquí: la afluencia del siguiente periodo).</li>
+</ul>
+<p>En el notebook de la sesión 8 se plantean dos problemas supervisados con la misma TAD: <strong>(1) pronosticar la afluencia en t+1 → regresión</strong> y <strong>(2) clasificar si la estación será de alta afluencia (&gt; 200,000) → clasificación</strong>.</p>
+
+<h3 id="ventanas">2.2 Ventanas de tiempo</h3>
+<p>Se elige un <strong>ancla</strong> (un momento \(t\)). Todo lo anterior al ancla es la <strong>ventana de observación</strong> (de ahí salen las variables \(X\)); lo posterior es la <strong>ventana de desempeño</strong> (de ahí sale \(y\)). Preguntas clave: ¿cuánto tiempo debo analizar? ¿para predecir cuánto tiempo hacia adelante?</p>
+<div class="callout warn"><div class="callout-title">⚠️ Ojo con las variables futuras</div><p>Ninguna variable de \(X\) puede usar información posterior al ancla. Si se cuela (data leakage), el modelo se ve espectacular en entrenamiento y falla en producción.</p></div>
+
+<div class="widget" id="w-ventanas">
+  <div class="widget-title"><span class="tag">Simulador</span> Ventanas de observación y desempeño</div>
+  <p class="hint">Mueve el ancla y los tamaños de ventana. Cada ancla válida genera un renglón de la TAD por unidad muestral (así se "apilan" los periodos en el notebook).</p>
+  <div class="controls">
+    <label>Ventana de observación <input type="range" id="vt-obs" min="1" max="10" value="5"> <b id="vt-obsv">5</b></label>
+    <label>Ventana de desempeño <input type="range" id="vt-des" min="1" max="5" value="1"> <b id="vt-desv">1</b></label>
+    <label>Ancla <input type="range" id="vt-ancla" min="5" max="19" value="10"> <b id="vt-anclav">10</b></label>
+  </div>
+  <svg id="vt-svg" viewBox="0 0 700 130" role="img" aria-label="Línea de tiempo con ventanas"></svg>
+  <div class="readout" id="vt-out"></div>
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_01_ventanas_tad.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_01_ventanas_tad.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Ventanas de tiempo y construcción de la TAD (Tabla Analítica de Datos)
+# Idea de la sesión 8 (Ecobici): con lo observado en [ancla-vobs+1, ancla] predecir t = ancla + vdes
+import pandas as pd
+
+# Afluencia de 2 estaciones durante 8 periodos (datos de juguete)
+df = pd.DataFrame({
+    &quot;id_estacion&quot;: [&quot;E1&quot;] * 8 + [&quot;E2&quot;] * 8,
+    &quot;t&quot;: list(range(1, 9)) * 2,
+    &quot;afluencia&quot;: [10, 12, 15, 11, 18, 20, 19, 25,
+                  50, 48, 47, 52, 40, 38, 41, 37],
+})
+
+um = [&quot;id_estacion&quot;]          # unidad muestral
+vobs, vdes = 3, 1             # ventana de observación (3 periodos) y de desempeño (1 periodo)
+t_min, t_max = df[&quot;t&quot;].min(), df[&quot;t&quot;].max()
+anclai, anclaf = t_min + vobs - 1, t_max - vdes
+print(f&quot;Anclas posibles: de {anclai} a {anclaf}&quot;)
+
+def sum_inc(l):               # ¿cuántas veces subió la serie?
+    return sum(int(y &gt; x) for x, y in zip(l, l[1:]))
+
+lst_X, lst_y = [], []
+for ancla in range(anclai, anclaf + 1):
+    # ---- X: SOLO información del pasado (ventana de observación) ----
+    obs = df[(df[&quot;t&quot;] &gt; ancla - vobs) &amp; (df[&quot;t&quot;] &lt;= ancla)]
+    aux = obs.pivot_table(index=um, values=&quot;afluencia&quot;,
+                          aggfunc=[&quot;sum&quot;, &quot;min&quot;, &quot;max&quot;, &quot;mean&quot;, sum_inc])
+    aux.columns = [f&quot;v_{a}_{b}&quot; for a, b in aux.columns]
+    aux.insert(0, &quot;ancla&quot;, ancla)
+    lst_X.append(aux.reset_index())
+    # ---- y: el valor en el FUTURO (ventana de desempeño) ----
+    fut = df[df[&quot;t&quot;] == ancla + vdes][um + [&quot;afluencia&quot;]].rename(columns={&quot;afluencia&quot;: &quot;y&quot;})
+    fut.insert(1, &quot;ancla&quot;, ancla)
+    lst_y.append(fut)
+
+X = pd.concat(lst_X, ignore_index=True)
+y = pd.concat(lst_y, ignore_index=True)
+tad = X.merge(y, on=um + [&quot;ancla&quot;], how=&quot;inner&quot;)
+tad[&quot;y2&quot;] = (tad[&quot;y&quot;] &gt; 30).astype(int)       # versión clasificación: ¿alta afluencia?
+print(tad.to_string(index=False))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Anclas posibles: de 3 a 7
+id_estacion  ancla  v_sum_afluencia  v_min_afluencia  v_max_afluencia  v_mean_afluencia  v_sum_inc_afluencia  y  y2
+         E1      3               37               10               15         12.333333                    2 11   0
+         E2      3              145               47               50         48.333333                    0 52   1
+         E1      4               38               11               15         12.666667                    1 18   0
+         E2      4              147               47               52         49.000000                    1 40   1
+         E1      5               44               11               18         14.666667                    1 20   0
+         E2      5              139               40               52         46.333333                    1 38   1
+         E1      6               49               11               20         16.333333                    2 19   0
+         E2      6              130               38               52         43.333333                    0 41   1
+         E1      7               57               18               20         19.000000                    1 25   0
+         E2      7              119               38               41         39.666667                    1 37   1</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="algoritmos">3. Algoritmos de ML y casos de uso</h2>
+<p>Las variables y patrones "crean" los pesos de los coeficientes. Algoritmos vistos (y donde se profundizan):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Algoritmo</th><th>Tipo</th><th>Caso de uso típico</th><th>Dónde se ve</th></tr></thead>
+<tbody>
+<tr><td>Regresión lineal</td><td>Supervisado · regresión</td><td>pronosticar (demanda, ventas)</td><td><a href="modulo2.html#lineal">Módulo 2</a></td></tr>
+<tr><td>Regresión logística</td><td>Supervisado · clasificación</td><td>riesgo de crédito, fraude, fuga</td><td>abajo y <a href="modulo2.html#logistica">Módulo 2</a></td></tr>
+<tr><td>K-means</td><td>No supervisado</td><td>segmentar clientes</td><td><a href="modulo3.html#kmeans">Módulo 3</a></td></tr>
+<tr><td>Máquina de vector soporte</td><td>Supervisado</td><td>clasificación con márgenes</td><td><a href="modulo2.html#svm">Módulo 2</a></td></tr>
+<tr><td>Red neuronal</td><td>Supervisado</td><td>imágenes, texto, patrones complejos</td><td><a href="modulo4.html">Módulo 4</a></td></tr>
+</tbody></table></div>
+
+<!-- ===================================================== -->
+<h2 id="variables-series">4. Ingeniería de variables sobre series</h2>
+<p>En la sesión 8 cada estación tiene una serie de afluencias. Con la ventana de observación se calculan <strong>21 variables</strong> por estación y ancla: suma, mínimo, máximo, media y desviación, más funciones propias que describen <strong>la forma de la serie</strong>: cuántas veces sube o baja, cambios absolutos y relativos, y rachas de subidas/bajadas. Este es el "ejercicio del Excel" con la serie <code>[1065, 1068, 1266, 1492, 1051, 1009, 1340, 1485]</code>:</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_02_ingenieria_series.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_02_ingenieria_series.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Ingeniería de variables sobre una serie (funciones de la sesión 8, &quot;ejercicio del Excel&quot;)
+import numpy as np
+
+def sum_inc(l):  return sum(int(y &gt; x) for x, y in zip(l, l[1:]))          # nº de subidas
+def sum_dec(l):  return sum(int(y &lt; x) for x, y in zip(l, l[1:]))          # nº de bajadas
+def media_inc(l): return np.mean([int(y &gt; x) for x, y in zip(l, l[1:])])   # % de subidas
+def media_dec(l): return np.mean([int(y &lt; x) for x, y in zip(l, l[1:])])
+def deltas(l):    return [float(y - x) for x, y in zip(l, l[1:])]           # cambios absolutos
+def pct_deltas(l): return [float((y - x) / x) for x, y in zip(l, l[1:])]    # cambios relativos
+def rachas(l, f):  return [len(s) for s in &quot;&quot;.join(str(int(f(x, y))) for x, y in zip(l, l[1:])).split(&quot;0&quot;)]
+
+lst = [1065, 1068, 1266, 1492, 1051, 1009, 1340, 1485]
+
+print(&quot;sum_inc        :&quot;, sum_inc(lst))
+print(&quot;sum_dec        :&quot;, sum_dec(lst))
+print(&quot;media_inc      :&quot;, media_inc(lst))
+print(&quot;media_dec      :&quot;, media_dec(lst))
+print(&quot;delta_min      :&quot;, min(deltas(lst)))
+print(&quot;delta_max      :&quot;, max(deltas(lst)))
+print(&quot;delta_mean     :&quot;, np.mean(deltas(lst)))
+print(&quot;delta_desv     :&quot;, np.std(deltas(lst)))
+print(&quot;pct_delta_min  :&quot;, min(pct_deltas(lst)))
+print(&quot;pct_delta_max  :&quot;, max(pct_deltas(lst)))
+print(&quot;pct_delta_mean :&quot;, np.mean(pct_deltas(lst)))
+print(&quot;pct_delta_desv :&quot;, np.std(pct_deltas(lst)))
+print(&quot;max_racha_inc  :&quot;, max(rachas(lst, lambda x, y: y &gt; x)))
+print(&quot;max_racha_dec  :&quot;, max(rachas(lst, lambda x, y: y &lt; x)))
+print(&quot;media_racha_inc:&quot;, np.mean(rachas(lst, lambda x, y: y &gt; x)))
+print(&quot;media_racha_dec:&quot;, np.mean(rachas(lst, lambda x, y: y &lt; x)))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>sum_inc        : 5
+sum_dec        : 2
+media_inc      : 0.7142857142857143
+media_dec      : 0.2857142857142857
+delta_min      : -441.0
+delta_max      : 331.0
+delta_mean     : 60.0
+delta_desv     : 236.6190428274348
+pct_delta_min  : -0.2955764075067024
+pct_delta_max  : 0.3280475718533201
+pct_delta_mean : 0.06677762089946375
+pct_delta_desv : 0.1864396514659256
+max_racha_inc  : 3
+max_racha_dec  : 2
+media_racha_inc: 1.6666666666666667
+media_racha_dec: 0.3333333333333333</pre></div>
+  <div class="code-note">Es exactamente la salida de la celda 28 del notebook de la sesión 8.</div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Cómo leerlo</div><p>Hay 7 cambios entre 8 valores: 5 subidas y 2 bajadas (media_inc = 5/7 = 0.714). La mayor caída fue de 1492 a 1051 (−441, −29.6 %). La racha más larga de subidas fue de 3 (1065→1068→1266→1492). Las rachas se calculan escribiendo 1 si sube y 0 si no ("1110011") y partiendo por los ceros.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="limpieza">5. Limpieza y análisis exploratorio de la TAD</h2>
+<p>El orden que siguen los notebooks de las sesiones 8 y 9 (vale la pena memorizarlo):</p>
+<ol class="steps">
+  <li><strong>Valores ausentes:</strong> % de nulos por variable: <code>1 − count / len</code>.</li>
+  <li><strong>Imputación:</strong> si son pocos, eliminar registros; si no, imputar (media/mediana) con <code>SimpleImputer</code> (<code>fit</code> calcula, <code>transform</code> rellena).</li>
+  <li><strong>Distribución alterada:</strong> prueba <strong>KS</strong> entre la variable original (sin nulos) y la imputada. Si <strong>KS &gt; 0.1</strong> la variable se considera "<strong>rota</strong>" y se descarta.</li>
+  <li><strong>Varianza:</strong> <code>VarianceThreshold</code> elimina variables casi constantes (sin información).</li>
+  <li><strong>Valores extremos:</strong> se marcan registros fuera de los percentiles 1 y 99 y se eliminan (¡antes, guardar la unidad muestral!).</li>
+  <li><strong>Análisis bivariado:</strong> correlaciones (heatmap, pairplot).</li>
+  <li><strong>Multicolinealidad:</strong> <code>VarClusHi</code> agrupa variables parecidas y se queda con una por cluster.</li>
+</ol>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_03_limpieza.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_03_limpieza.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Limpieza de la TAD: ausentes, imputación, KS, varianza, extremos y correlación
+import numpy as np
+import pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import VarianceThreshold
+from scipy.stats import ks_2samp
+
+rng = np.random.default_rng(42)
+n = 1000
+df = pd.DataFrame({
+    &quot;ingreso&quot;: rng.lognormal(10, 0.5, n),
+    &quot;edad&quot;: rng.integers(18, 70, n).astype(float),
+    &quot;saldo&quot;: rng.normal(5000, 1500, n),
+    &quot;constante&quot;: np.r_[np.ones(n - 3), [2, 2, 2]],     # casi sin varianza
+})
+df[&quot;gasto&quot;] = df[&quot;ingreso&quot;] * 0.3 + rng.normal(0, 500, n)   # muy correlacionada con ingreso
+df.loc[rng.choice(n, 100, replace=False), &quot;edad&quot;] = np.nan    # 10% nulos
+df.loc[rng.choice(n, 450, replace=False), &quot;saldo&quot;] = np.nan   # 45% nulos
+
+# 1) Porcentaje de valores ausentes
+miss = (1 - df.describe().T[&quot;count&quot;] / len(df)) * 100
+print(&quot;% de ausentes:\n&quot;, miss.round(1).to_string(), &quot;\n&quot;)
+
+# 2) Imputación con la mediana (&quot;entrenar&quot; = calcular la mediana; &quot;transform&quot; = rellenar)
+X = df.copy()
+im = SimpleImputer(strategy=&quot;median&quot;)
+X[X.columns] = im.fit_transform(X)
+
+# 3) ¿La imputación alteró la distribución? KS entre original (sin nulos) e imputada
+ks = pd.DataFrame([(c, ks_2samp(df[c].dropna(), X[c]).statistic) for c in X.columns],
+                  columns=[&quot;variable&quot;, &quot;ks&quot;])
+print(ks.round(4).to_string(index=False))
+rotas = ks.loc[ks[&quot;ks&quot;] &gt; 0.1, &quot;variable&quot;].tolist()
+print(&quot;Variables &#x27;rotas&#x27; (KS &gt; 0.1) -&gt; se descartan:&quot;, rotas, &quot;\n&quot;)
+X = X.drop(columns=rotas)
+
+# 4) Varianza: quitar variables casi constantes
+vt = VarianceThreshold(threshold=0.1).fit(X)
+sin_var = [c for c, ok in zip(X.columns, vt.get_support()) if not ok]
+print(&quot;Sin varianza:&quot;, sin_var)
+X = X.drop(columns=sin_var)
+
+# 5) Extremos: marcar registros fuera de los percentiles 1 y 99
+lim = X.describe(percentiles=[.01, .99]).T[[&quot;1%&quot;, &quot;99%&quot;]]
+ext = pd.concat([(X[c] &lt; li) | (X[c] &gt; ls) for c, (li, ls) in lim.iterrows()], axis=1).any(axis=1)
+print(f&quot;Registros con algún extremo: {ext.mean() * 100:.1f}%&quot;)
+X = X[~ext]
+print(&quot;Dimensión final:&quot;, X.shape, &quot;\n&quot;)
+
+# 6) Análisis bivariado: correlación (multicolinealidad)
+print(X.corr().round(2))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>% de ausentes:
+ ingreso       0.0
+edad         10.0
+saldo        45.0
+constante     0.0
+gasto         0.0 
+
+ variable     ks
+  ingreso 0.0000
+     edad 0.0494
+    saldo 0.2250
+constante 0.0000
+    gasto 0.0000
+Variables &#x27;rotas&#x27; (KS &gt; 0.1) -&gt; se descartan: [&#x27;saldo&#x27;] 
+
+Sin varianza: [&#x27;constante&#x27;]
+Registros con algún extremo: 3.3%
+Dimensión final: (967, 3) 
+
+         ingreso  edad  gasto
+ingreso     1.00  0.06   0.99
+edad        0.06  1.00   0.06
+gasto       0.99  0.06   1.00</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Lectura</div><p><code>saldo</code> tenía 45 % de nulos: al imputar con la mediana se forma un "pico" artificial y la distribución cambia (KS = 0.225 &gt; 0.1) → variable rota. <code>edad</code> (10 % nulos) se conserva (KS = 0.049). <code>gasto</code> e <code>ingreso</code> tienen correlación 0.99: son redundantes (multicolinealidad), por eso se usa VarClus.</p></div>
+
+<h3 id="varclus">5.1 Multicolinealidad con VarClusHi</h3>
+<p>VarClus agrupa las variables en clusters de variables correlacionadas (con componentes principales). Para cada variable reporta:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Columna</th><th>Significado</th><th>¿Qué valor es bueno?</th></tr></thead>
+<tbody>
+<tr><td><code>Cluster</code></td><td>Grupo de variables estadísticamente similares.</td><td>—</td></tr>
+<tr><td><code>RS_Own</code></td><td>\(R^2\) de la variable con <strong>su propio</strong> cluster: qué tan bien la explican las demás de su grupo.</td><td>alto (≈1)</td></tr>
+<tr><td><code>RS_NC</code></td><td>\(R^2\) con el <strong>cluster más cercano</strong> que no es el suyo.</td><td>bajo</td></tr>
+<tr><td><code>RS_Ratio</code></td><td>\(\dfrac{1 - RS\_Own}{1 - RS\_NC}\): qué tan "única" es su información respecto al siguiente cluster.</td><td><strong>bajo</strong> (mejor representante)</td></tr>
+</tbody></table></div>
+<p>Se ordena por cluster y RS_Ratio y se toma el <strong>id == 1</strong> de cada cluster (la mejor representante). "Lo ideal es quedarse con el id == 1, pero si el negocio no lo permite, al menos una por cluster". Resultado real del notebook de Ecobici (18 variables → 4):</p>
+<div class="table-wrap"><table>
+<thead><tr><th class="num">Cluster</th><th>Variable</th><th class="num">RS_Own</th><th class="num">RS_NC</th><th class="num">RS_Ratio</th><th class="num">id</th></tr></thead>
+<tbody>
+<tr><td class="num">0</td><td><strong>v_max_afluencia</strong></td><td class="num">0.978</td><td class="num">0.082</td><td class="num">0.023</td><td class="num">1</td></tr>
+<tr><td class="num">0</td><td>v_mean_afluencia</td><td class="num">0.954</td><td class="num">0.075</td><td class="num">0.050</td><td class="num">2</td></tr>
+<tr><td class="num">0</td><td>v_sum_afluencia</td><td class="num">0.954</td><td class="num">0.075</td><td class="num">0.050</td><td class="num">3</td></tr>
+<tr><td class="num">1</td><td><strong>v_pct_delta_desv_afluencia</strong></td><td class="num">0.985</td><td class="num">0.158</td><td class="num">0.018</td><td class="num">1</td></tr>
+<tr><td class="num">2</td><td><strong>v_sum_inc_afluencia</strong></td><td class="num">0.931</td><td class="num">0.143</td><td class="num">0.080</td><td class="num">1</td></tr>
+<tr><td class="num">3</td><td><strong>v_sum_dec_afluencia</strong></td><td class="num">0.932</td><td class="num">0.143</td><td class="num">0.079</td><td class="num">1</td></tr>
+</tbody></table></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_11_varclus.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_11_varclus.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Multicolinealidad con VarClusHi: agrupar variables y quedarse con 1 por cluster
+# RS_Ratio = (1 - RS_Own) / (1 - RS_NC)   -&gt; entre MÁS BAJO, mejor representa a su cluster
+import numpy as np
+import pandas as pd
+from varclushi import VarClusHi
+
+rng = np.random.default_rng(0)
+n = 500
+base_a, base_b = rng.normal(size=n), rng.normal(size=n)
+X = pd.DataFrame({
+    &quot;v_sum&quot;:  base_a * 10 + rng.normal(0, 1, n),     # familia &quot;volumen&quot;
+    &quot;v_mean&quot;: base_a * 0.5 + rng.normal(0, 0.05, n),
+    &quot;v_max&quot;:  base_a * 12 + rng.normal(0, 3, n),
+    &quot;v_inc&quot;:  base_b + rng.normal(0, 0.2, n),        # familia &quot;tendencia&quot;
+    &quot;v_racha&quot;: base_b * 2 + rng.normal(0, 1, n),
+})
+
+vc = VarClusHi(df=X, feat_list=X.columns.tolist())
+vc.varclus()
+rs = vc.rsquare.sort_values(by=[&quot;Cluster&quot;, &quot;RS_Ratio&quot;]).reset_index(drop=True)
+rs[&quot;id&quot;] = rs.groupby(&quot;Cluster&quot;).cumcount() + 1
+print(rs.round(4).to_string(index=False))
+
+seleccion = rs.loc[rs[&quot;id&quot;] == 1, &quot;Variable&quot;].tolist()
+print(&quot;\nVariables seleccionadas (id == 1 de cada cluster):&quot;, seleccion)
+
+# Comprobación manual con la primera fila de la tabla del notebook de la sesión 8
+rs_own, rs_nc = 0.978437, 0.082052
+print(f&quot;\nNotebook: v_max_afluencia -&gt; (1-{rs_own})/(1-{rs_nc}) = {(1 - rs_own) / (1 - rs_nc):.6f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> Cluster Variable  RS_Own  RS_NC  RS_Ratio  id
+       0    v_sum  0.9884 0.0000    0.0116   1
+       0   v_mean  0.9883 0.0000    0.0117   2
+       0    v_max  0.9727 0.0001    0.0273   3
+       1  v_racha  0.9250 0.0000    0.0750   1
+       1    v_inc  0.9250 0.0000    0.0750   2
+
+Variables seleccionadas (id == 1 de cada cluster): [&#x27;v_sum&#x27;, &#x27;v_racha&#x27;]
+
+Notebook: v_max_afluencia -&gt; (1-0.978437)/(1-0.082052) = 0.023490</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="estandarizacion">6. Estandarización de datos</h2>
+<p>Recomendación del curso: <strong>estandarizar antes de reducir dimensiones</strong> (y antes de modelos basados en distancias o gradiente).</p>
+<div class="two-col">
+<div class="formula"><strong>Estándar (z-score)</strong>
+$$z = \frac{x - \bar{x}}{s}$$
+<div class="where">Media 0 y desviación 1. Evita que una variable domine por su escala.</div></div>
+<div class="formula"><strong>Min-Max</strong>
+$$x' = \frac{x - \min}{\max - \min}$$
+<div class="where">Valores entre 0 y 1; <strong>mantiene la proporción</strong> entre valores.</div></div>
+</div>
+<p>"Ambos son buenos, depende del modelo a utilizar y la problemática". Min-Max es sensible a extremos (un solo valor enorme comprime a todos los demás).</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_04_estandarizacion.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_04_estandarizacion.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Estandarización: z-score (StandardScaler) vs Min-Max (MinMaxScaler)
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+df = pd.DataFrame({&quot;edad&quot;: [20, 30, 40, 50, 60],
+                   &quot;ingreso&quot;: [10000, 20000, 30000, 40000, 100000]})
+
+ss = StandardScaler()            # (x - media) / desviación estándar
+mm = MinMaxScaler()              # (x - min) / (max - min)
+
+z = pd.DataFrame(ss.fit_transform(df), columns=[&quot;z_edad&quot;, &quot;z_ingreso&quot;])
+m = pd.DataFrame(mm.fit_transform(df), columns=[&quot;mm_edad&quot;, &quot;mm_ingreso&quot;])
+print(pd.concat([df, z.round(3), m.round(3)], axis=1).to_string(index=False))
+
+print(&quot;\nMedias aprendidas :&quot;, ss.mean_)
+print(&quot;Desv. aprendidas  :&quot;, ss.scale_.round(2))
+print(&quot;Media z  :&quot;, z.mean().round(6).tolist(), &quot;| Desv z:&quot;, z.std(ddof=0).round(6).tolist())
+print(&quot;Min-Max  : min =&quot;, m.min().tolist(), &quot;max =&quot;, m.max().tolist())
+# Min-Max conserva proporciones: 40,000 es el doble de 20,000 (respecto al mínimo)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> edad  ingreso  z_edad  z_ingreso  mm_edad  mm_ingreso
+   20    10000  -1.414     -0.949     0.00       0.000
+   30    20000  -0.707     -0.632     0.25       0.111
+   40    30000   0.000     -0.316     0.50       0.222
+   50    40000   0.707      0.000     0.75       0.333
+   60   100000   1.414      1.897     1.00       1.000
+
+Medias aprendidas : [   40. 40000.]
+Desv. aprendidas  : [1.414000e+01 3.162278e+04]
+Media z  : [0.0, 0.0] | Desv z: [1.0, 1.0]
+Min-Max  : min = [0.0, 0.0] max = [1.0, 1.0]</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="reduccion">7. Reducción de dimensiones: PCA y t-SNE</h2>
+<h3 id="pca">7.1 PCA (Análisis de Componentes Principales)</h3>
+<ul>
+  <li>Encuentra <strong>combinaciones lineales</strong> de las variables originales que explican la <strong>mayor variabilidad</strong>.</li>
+  <li>Se basa en la <strong>covarianza</strong>: si las variables no están en la misma escala, las de valores grandes dominan la varianza total → <strong>estandarizar primero</strong>.</li>
+  <li>Muchas variables pueden causar sobreajuste o ruido ("maldición de la dimensionalidad": imágenes, genómica); PCA da modelos más simples que generalizan mejor.</li>
+</ul>
+<div class="chart-card">
+  <h4>Varianza explicada por componente (dataset Wine, 13 variables estandarizadas)</h4>
+  <p class="sub">Barras: varianza de cada componente. Línea: acumulada. Con 5 componentes ya se supera el 80 %.</p>
+  <div class="legend"><span><i class="sq" style="background:var(--s1)"></i>individual</span><span><i style="background:var(--s2)"></i>acumulada</span></div>
+  <div class="chart-box"><canvas id="chart-pca" aria-label="Varianza explicada por PCA"></canvas></div>
+  <div class="chart-foot"><span>Mismo cálculo que el programa de abajo.</span><button class="code-btn" type="button" data-table-toggle="tbl-pca">Ver tabla de datos</button></div>
+  <div class="data-table-wrap" id="tbl-pca"></div>
+</div>
+<h3 id="tsne">7.2 t-SNE</h3>
+<p>Reducción de dimensionalidad <strong>no lineal</strong>, principalmente para <strong>visualizar</strong> datos de alta dimensión en 2D o 3D (ver clústeres). No conserva la estructura global, es costosa y depende de parámetros como el <em>perplexity</em>; por eso <strong>no se usa para modelos predictivos</strong> (ni siquiera puede transformar datos nuevos).</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_05_pca_tsne.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_05_pca_tsne.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Reducción de dimensiones: PCA (para modelar) vs t-SNE (para visualizar)
+import numpy as np
+from sklearn.datasets import load_wine
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+X, y = load_wine(return_X_y=True)                     # 178 vinos, 13 variables, 3 clases
+X_ss = StandardScaler().fit_transform(X)              # ¡PCA usa covarianza: estandarizar antes!
+
+pca = PCA().fit(X_ss)
+var = pca.explained_variance_ratio_
+print(&quot;Varianza explicada por componente:&quot;, (var * 100).round(1))
+print(&quot;Varianza acumulada               :&quot;, (np.cumsum(var) * 100).round(1))
+k = int(np.argmax(np.cumsum(var) &gt;= 0.80) + 1)
+print(f&quot;Componentes necesarios para &gt;= 80% de la varianza: {k} (de 13)&quot;)
+
+X_pca = PCA(n_components=2).fit_transform(X_ss)
+print(&quot;\nPrimeras 3 filas en 2 componentes principales:\n&quot;, X_pca[:3].round(3))
+
+tsne = TSNE(n_components=2, perplexity=30, random_state=0)
+X_tsne = tsne.fit_transform(X_ss)
+print(&quot;\nt-SNE -&gt; forma:&quot;, X_tsne.shape, &quot;| divergencia KL final:&quot;, round(tsne.kl_divergence_, 3))
+print(&quot;t-SNE NO tiene .transform() para datos nuevos:&quot;, hasattr(tsne, &quot;transform&quot;))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Varianza explicada por componente: [36.2 19.2 11.1  7.1  6.6  4.9  4.2  2.7  2.2  1.9  1.7  1.3  0.8]
+Varianza acumulada               : [ 36.2  55.4  66.5  73.6  80.2  85.1  89.3  92.   94.2  96.2  97.9  99.2
+ 100. ]
+Componentes necesarios para &gt;= 80% de la varianza: 5 (de 13)
+
+Primeras 3 filas en 2 componentes principales:
+ [[ 3.317  1.443]
+ [ 2.209 -0.333]
+ [ 2.517  1.031]]
+
+t-SNE -&gt; forma: (178, 2) | divergencia KL final: 0.382
+t-SNE NO tiene .transform() para datos nuevos: False</pre></div>
+</div>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>PCA</th><th>t-SNE</th></tr></thead>
+<tbody>
+<tr><td>Tipo</td><td>lineal</td><td>no lineal</td></tr>
+<tr><td>Ventajas</td><td>reduce dimensiones eficientemente; mejora el cómputo; conserva relaciones globales</td><td>excelente para visualizar 2D/3D; captura relaciones no lineales y agrupamientos naturales</td></tr>
+<tr><td>Desventajas</td><td>no captura relaciones no lineales; puede perder información si se reduce de más; componentes difíciles de interpretar</td><td>no apto para modelos predictivos; alto costo; depende del perplexity; no conserva estructura global</td></tr>
+<tr><td>Úsalo para…</td><td><strong>reducir variables para un modelo</strong></td><td><strong>explorar y visualizar</strong> clústeres</td></tr>
+</tbody></table></div>
+
+<!-- ===================================================== -->
+<h2 id="categoricas">8. Variables categóricas: dummies, nulos y normalización</h2>
+<ul>
+  <li><strong>Nulos como categoría:</strong> "la falta de información también es información" → <code>fillna("Sin categoría")</code>.</li>
+  <li><strong>Normalización (sesión 9):</strong> categorías con frecuencia muy baja (p. ej. &lt; 3 %) se agrupan en "Otros" para que tengan masa suficiente.</li>
+  <li><strong>Unarias:</strong> variables con una sola categoría (p. ej. <code>Quarter = Q3</code> en todo el churn) no aportan nada y se eliminan.</li>
+  <li><strong>Variables dummy:</strong> convierten cada categoría en una columna binaria (0/1). Simples e interpretables, pero <strong>explotan la dimensionalidad</strong> con muchas categorías y causan <strong>multicolinealidad</strong> si no se elimina una columna (<code>drop_first=True</code>).</li>
+</ul>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_06_categoricas_dummy.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_06_categoricas_dummy.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Variables categóricas: nulos como categoría, normalización y variables dummy
+import numpy as np
+import pandas as pd
+
+# --- Ejemplo de la diapositiva ---
+frutas = pd.DataFrame({&quot;id&quot;: [1, 2, 3, 4], &quot;fruit&quot;: [&quot;banana&quot;, &quot;apple&quot;, &quot;banana&quot;, &quot;apple&quot;]})
+print(pd.get_dummies(frutas, columns=[&quot;fruit&quot;], prefix=&quot;data&quot;, dtype=int).to_string(index=False))
+print(&quot;\nCon drop_first=True (evita multicolinealidad / trampa de la dummy):&quot;)
+print(pd.get_dummies(frutas, columns=[&quot;fruit&quot;], drop_first=True, dtype=int).to_string(index=False))
+
+# --- Nulos como categoría + normalización (agrupar categorías raras) ---
+ciudad = pd.Series([&quot;CDMX&quot;] * 50 + [&quot;Monterrey&quot;] * 30 + [&quot;Juárez&quot;] * 15
+                   + [&quot;Tijuana&quot;] * 2 + [&quot;Mérida&quot;] * 1 + [np.nan] * 2, name=&quot;ciudad&quot;)
+ciudad = ciudad.fillna(&quot;Sin categoría&quot;)              # &quot;la falta de información también es información&quot;
+
+def normalizar(s, umbral=0.03, otros=&quot;Otros&quot;):
+    freq = s.value_counts(normalize=True)
+    raras = freq[freq &lt; umbral].index                 # categorías con &lt; 3% de frecuencia
+    return s.where(~s.isin(raras), otros)
+
+tabla = pd.DataFrame({&quot;antes&quot;: ciudad.value_counts(normalize=True),
+                      &quot;después&quot;: normalizar(ciudad).value_counts(normalize=True)})
+tabla = tabla.sort_values(&quot;antes&quot;, ascending=False)
+print(&quot;\nFrecuencias relativas:\n&quot;, tabla.round(2).fillna(&quot;-&quot;).to_string())</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre> id  data_apple  data_banana
+  1           0            1
+  2           1            0
+  3           0            1
+  4           1            0
+
+Con drop_first=True (evita multicolinealidad / trampa de la dummy):
+ id  fruit_banana
+  1             1
+  2             0
+  3             1
+  4             0
+
+Frecuencias relativas:
+               antes después
+ciudad                     
+CDMX            0.5     0.5
+Monterrey       0.3     0.3
+Juárez         0.15    0.15
+Sin categoría  0.02       -
+Tijuana        0.02       -
+Mérida         0.01       -
+Otros             -    0.05</pre></div>
+</div>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>WoE (Weight of Evidence)</th><th>Dummy</th></tr></thead>
+<tbody>
+<tr><td>Ventajas</td><td>reduce dimensionalidad; maneja categorías no ordenadas; captura la relación con la variable objetivo</td><td>simple y directa; alta interpretabilidad; fácil de integrar</td></tr>
+<tr><td>Desventajas</td><td>menos interpretable; requiere discretizar/segmentar; no sirve para todos los modelos</td><td>explosión dimensional con muchas categorías; multicolinealidad si no se maneja</td></tr>
+<tr><td>Mejor cuando…</td><td>las categorías tienen relación fuerte con el objetivo (regresión logística, scoring)</td><td>pocas categorías y se busca interpretabilidad</td></tr>
+</tbody></table></div>
+
+<!-- ===================================================== -->
+<h2 id="credit-scoring">9. Clasificación binaria: Credit Scoring</h2>
+<p>El <strong>credit scoring</strong> evalúa el riesgo crediticio con una clasificación binaria (\(f: \mathbb{R}^d \to \{+,-\}\)) y lo resume en una <strong>tarjeta de puntos (scorecard)</strong> según el riesgo que el cliente representa en ciertas características. La \(f\) que se usa es la <strong>regresión logística</strong>.</p>
+
+<h3 id="logistica-m1">9.1 Regresión logística desde los momios</h3>
+<p>Sea \(P(E) = p\) la probabilidad del evento (p. ej. incumplir) y \(q = 1 - p\). Los <strong>momios</strong> son \(p/q\). Las variables aportan <strong>linealmente al logaritmo de los momios</strong>:</p>
+<div class="formula">
+$$\ln\!\Big(\frac{p}{1-p}\Big) = \beta_0 + \sum_{i=1}^{n}\beta_i x_i \;\Rightarrow\; \frac{p}{1-p} = e^{\beta_0+\sum\beta_i x_i} \;\Rightarrow\; \frac{1}{p} = 1 + e^{-\beta_0-\sum\beta_i x_i} \;\Rightarrow\; P(E) = \frac{1}{1+e^{-\beta_0-\sum\beta_i x_i}}$$
+<div class="where">El último término es la <strong>sigmoide</strong>: convierte cualquier número real en una probabilidad entre 0 y 1.</div>
+</div>
+
+<h3 id="variables-scoring">9.2 Tratamiento de variables</h3>
+<div class="two-col">
+  <div class="callout note"><div class="callout-title">Continuas</div><p>Se hacen <strong>bines (discretización)</strong>; los extremos se conglomeran con los bines extremos. En la sesión 9 se prueban de 2 a 6 cortes por cuantiles y se elige el número con mayor IV.</p></div>
+  <div class="callout note"><div class="callout-title">Discretas</div><p>Se analizan frecuencias (<strong>normalización</strong>). Los <strong>nulos se consideran una categoría</strong>. La variable (p. ej. SEXO) es la característica; sus valores (Hombre, Mujer) son los atributos.</p></div>
+</div>
+
+<h3 id="woe-iv">9.3 WoE e IV</h3>
+<div class="formula">
+$$\text{WoE}_i = \ln\!\left(\frac{\%\,\text{no evento}_i}{\%\,\text{evento}_i}\right) \qquad\qquad \text{IV} = \sum_i \big(\%\,\text{no evento}_i - \%\,\text{evento}_i\big)\cdot \text{WoE}_i$$
+<div class="where">Continuas: 1) discretizar, 2) contar eventos y no eventos por bin, 3) logaritmo natural del cociente. Discretas: se omite el paso 1. Ventaja del WoE: <strong>mide el poder predictivo</strong>.</div>
+</div>
+<div class="two-col">
+<div class="table-wrap"><table>
+<thead><tr><th>IV</th><th>Poder predictivo</th></tr></thead>
+<tbody>
+<tr><td>&lt; 0.02</td><td>No ayuda a la predicción</td></tr>
+<tr><td>0.02 – 0.1</td><td>Bajo</td></tr>
+<tr><td>0.1 – 0.3</td><td>Regular</td></tr>
+<tr><td>0.3 – 0.5</td><td>Fuerte</td></tr>
+<tr><td>≥ 0.5</td><td>Sobrepredictiva (sospechosa)</td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">📝 "No son regla dura"</div><p>En la sesión 9 se seleccionaron variables con <code>0.1 &lt; IV &lt; 0.8</code>. <code>Customer_Status</code> tuvo IV = ∞ porque <strong>"da la respuesta"</strong> (incluye "Churned"): es sobrepredictiva y no puede entrar al modelo (data leakage).</p></div>
+</div>
+<div class="chart-card">
+  <h4>WoE por rango de edad (datos simulados del programa)</h4>
+  <p class="sub">WoE negativo = más eventos (malos) que el promedio; positivo = mejores clientes. Los jóvenes concentran el riesgo.</p>
+  <div class="legend"><span><i class="sq" style="background:var(--s8)"></i>WoE &lt; 0 (más riesgo)</span><span><i class="sq" style="background:var(--s1)"></i>WoE &gt; 0 (menos riesgo)</span></div>
+  <div class="chart-box short"><canvas id="chart-woe" aria-label="WoE por rango de edad"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_07_woe_iv.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_07_woe_iv.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Credit scoring: discretización, WoE (Weight of Evidence) e IV (Information Value)
+# WoE_i = ln(%NoEvento_i / %Evento_i)      IV = Σ (%NoEvento_i - %Evento_i) * WoE_i
+import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(1)
+n = 5000
+edad = rng.integers(18, 75, n)
+ingreso = rng.lognormal(9.8, 0.6, n)
+# Probabilidad de incumplimiento (evento = 1): mayor en jóvenes y en ingresos bajos
+logit = 1.5 - 0.05 * edad - 0.00004 * ingreso
+evento = (rng.random(n) &lt; 1 / (1 + np.exp(-logit))).astype(int)
+df = pd.DataFrame({&quot;edad&quot;: edad, &quot;ingreso&quot;: ingreso, &quot;evento&quot;: evento})
+print(f&quot;Tasa de evento (malos): {df[&#x27;evento&#x27;].mean():.3f}\n&quot;)
+
+def tabla_woe(df, var, tgt=&quot;evento&quot;, bins=5):
+    d = df[[var, tgt]].copy()
+    d[&quot;bin&quot;] = pd.qcut(d[var], q=bins)                       # 1) discretizar en cuantiles
+    t = d.groupby(&quot;bin&quot;, observed=True)[tgt].agg(total=&quot;count&quot;, eventos=&quot;sum&quot;)
+    t[&quot;no_eventos&quot;] = t[&quot;total&quot;] - t[&quot;eventos&quot;]
+    t[&quot;%evento&quot;] = t[&quot;eventos&quot;] / t[&quot;eventos&quot;].sum()          # 2) distribución de eventos
+    t[&quot;%no_evento&quot;] = t[&quot;no_eventos&quot;] / t[&quot;no_eventos&quot;].sum()
+    t[&quot;WoE&quot;] = np.log(t[&quot;%no_evento&quot;] / t[&quot;%evento&quot;])         # 3) logaritmo natural
+    t[&quot;IV_i&quot;] = (t[&quot;%no_evento&quot;] - t[&quot;%evento&quot;]) * t[&quot;WoE&quot;]
+    return t, t[&quot;IV_i&quot;].sum()
+
+def poder(iv):
+    return (&quot;No ayuda&quot; if iv &lt; 0.02 else &quot;Bajo&quot; if iv &lt; 0.1 else
+            &quot;Regular&quot; if iv &lt; 0.3 else &quot;Fuerte&quot; if iv &lt; 0.5 else &quot;Sobrepredictiva (¡sospechosa!)&quot;)
+
+for var in [&quot;edad&quot;, &quot;ingreso&quot;]:
+    t, iv = tabla_woe(df, var)
+    print(f&quot;Variable: {var}&quot;)
+    print(t[[&quot;total&quot;, &quot;eventos&quot;, &quot;%evento&quot;, &quot;%no_evento&quot;, &quot;WoE&quot;, &quot;IV_i&quot;]].round(4).to_string())
+    print(f&quot;IV = {iv:.4f} -&gt; poder predictivo: {poder(iv)}\n&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Tasa de evento (malos): 0.200
+
+Variable: edad
+                total  eventos  %evento  %no_evento     WoE    IV_i
+bin                                                                
+(17.999, 29.0]   1048      391   0.3902      0.1643 -0.8648  0.1954
+(29.0, 40.0]      973      262   0.2615      0.1778 -0.3855  0.0322
+(40.0, 51.0]      980      163   0.1627      0.2044  0.2281  0.0095
+(51.0, 63.0]     1010      102   0.1018      0.2271  0.8025  0.1006
+(63.0, 74.0]      989       84   0.0838      0.2264  0.9933  0.1416
+IV = 0.4792 -&gt; poder predictivo: Fuerte
+
+Variable: ingreso
+                        total  eventos  %evento  %no_evento     WoE    IV_i
+bin                                                                        
+(2200.392, 11015.524]    1000      289   0.2884      0.1778 -0.4836  0.0535
+(11015.524, 15318.566]   1000      241   0.2405      0.1898 -0.2366  0.0120
+(15318.566, 20924.107]   1000      179   0.1786      0.2054  0.1393  0.0037
+(20924.107, 29767.458]   1000      184   0.1836      0.2041  0.1057  0.0022
+(29767.458, 190816.35]   1000      109   0.1088      0.2229  0.7172  0.0818
+IV = 0.1532 -&gt; poder predictivo: Regular</pre></div>
+</div>
+
+<h3 id="scorecard">9.4 Scorecard y puntuaciones</h3>
+<p>Ventajas de la tarjeta de puntos: fácil interpretación, explicable al usuario final, consistencia, reconocimiento de patrones, ajustable a las necesidades y útil para la toma de decisiones. Ejemplo de la clase: "Pablito, 28 años, gana $26,500, …, vive en Monterrey" suma 15 (edad) + 42 (ingreso) + … + 33 (ciudad) = <strong>350 puntos</strong>.</p>
+<p>La escala es <strong>arbitraria</strong> (depende del analista y del negocio) y se fija con base en los momios del portafolio:</p>
+<div class="formula">
+$$\text{Factor} = \frac{\text{PDO}}{\ln 2} \qquad \text{Offset} = \text{Score} - \text{Factor}\cdot\ln(\text{odds}) \qquad \text{Puntos}_{\text{atributo}} = \Big(-\text{WoE}\cdot\beta + \frac{\alpha}{n}\Big)\cdot\text{Factor} + \frac{\text{Offset}}{n}$$
+<div class="where"><strong>PDO</strong> (<em>Points to Double the Odds</em>): cuántos puntos hacen que los momios bueno:malo se dupliquen; afecta la escala. <strong>Score</strong>: punto para fijar los odds de referencia. \(n\) = número de variables. El <strong>Offset</strong> desplaza la distribución de scores y el <strong>Factor</strong> la estira o encoge.</div>
+</div>
+<div class="callout warn"><div class="callout-title">⚠️ Signo del intercepto</div><p>La diapositiva escribe \(+\alpha/n\). Si tu logística modela <strong>P(malo)</strong> (evento = 1, como en sklearn) y el score debe crecer con los momios bueno:malo, el término correcto es \(-\alpha/n\): ambos sumandos llevan el signo invertido porque \(\ln(\text{bueno}/\text{malo}) = -(\alpha + \sum\beta\,\text{WoE})\). El programa usa esa versión y comprueba que el score total = Offset + Factor·ln(momios).</p></div>
+<figure class="figure">
+  <svg viewBox="0 0 720 190" role="img" aria-label="Efecto de offset y factor sobre la distribución del score">
+    <text x="180" y="20" text-anchor="middle" class="d-text" font-weight="700">Offset: desplaza</text>
+    <path d="M20 160 H340" class="d-line"/>
+    <path d="M30 158 C80 158 90 40 130 40 C170 40 180 158 230 158" class="d-line-2" stroke-width="2"/>
+    <path d="M110 158 C160 158 170 40 210 40 C250 40 260 158 310 158" fill="none" stroke="var(--s8)" stroke-width="2"/>
+    <path d="M140 30 H200" class="d-arrow"/><path d="M196 26 L204 30 L196 34" class="d-arrow"/>
+    <text x="540" y="20" text-anchor="middle" class="d-text" font-weight="700">Factor: escala</text>
+    <path d="M380 160 H700" class="d-line"/>
+    <path d="M490 158 C520 158 520 40 540 40 C560 40 560 158 590 158" class="d-line-2" stroke-width="2"/>
+    <path d="M400 158 C470 158 500 70 540 70 C580 70 610 158 680 158" fill="none" stroke="var(--s8)" stroke-width="2"/>
+    <text x="180" y="182" text-anchor="middle" class="d-text-3">misma forma, otra posición</text>
+    <text x="540" y="182" text-anchor="middle" class="d-text-3">misma posición, más dispersión</text>
+  </svg>
+  <figcaption>Idea de la diapositiva 8 del credit scoring.</figcaption>
+</figure>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_08_scorecard.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_08_scorecard.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · De la regresión logística a la tarjeta de puntos (scorecard)
+# Factor = PDO / ln(2)        Offset = Score - Factor * ln(odds)
+# Score total = Offset + Factor * ln(momios bueno:malo)
+# Repartido entre las n variables (logística que modela P(malo) con variables WoE):
+#   Puntos = (-WoE * beta - alpha / n) * Factor + Offset / n
+import numpy as np
+
+PDO = 20            # Points to Double the Odds: cada 20 puntos los momios bueno:malo se duplican
+SCORE_REF = 600     # score de referencia...
+ODDS_REF = 50       # ...que corresponde a momios 50:1 (50 buenos por cada malo)
+
+factor = PDO / np.log(2)
+offset = SCORE_REF - factor * np.log(ODDS_REF)
+print(f&quot;Factor = {PDO}/ln(2) = {factor:.4f}&quot;)
+print(f&quot;Offset = {SCORE_REF} - {factor:.4f}*ln({ODDS_REF}) = {offset:.4f}\n&quot;)
+
+# Supongamos que la regresión logística (evento = malo, entrenada con variables WoE) dio:
+alpha = -1.39                                   # intercepto ≈ ln(20% malos / 80% buenos)
+betas = {&quot;edad&quot;: -0.95, &quot;ingreso&quot;: -0.80}       # negativos: más WoE (más &quot;bueno&quot;) -&gt; menos riesgo
+n = len(betas)
+woe = {&quot;edad&quot;:    {&quot;&lt;25&quot;: -0.60, &quot;25-30&quot;: -0.10, &quot;&gt;=30&quot;: 0.45},
+       &quot;ingreso&quot;: {&quot;&lt;10k&quot;: -0.70, &quot;10k-25k&quot;: 0.05, &quot;&gt;=25k&quot;: 0.65}}
+
+def puntos(var, atributo):
+    return (-woe[var][atributo] * betas[var] - alpha / n) * factor + offset / n
+
+print(&quot;SCORECARD&quot;)
+for var, mapa in woe.items():
+    for atributo, w in mapa.items():
+        print(f&quot;  {var:&lt;8} {atributo:&lt;8} WoE={w:&gt;5.2f}  -&gt;  {round(puntos(var, atributo)):&gt;4} puntos&quot;)
+
+# Calificar a un cliente: 28 años, ingreso 26,500
+cliente = {&quot;edad&quot;: &quot;25-30&quot;, &quot;ingreso&quot;: &quot;&gt;=25k&quot;}
+score = sum(puntos(v, a) for v, a in cliente.items())
+print(f&quot;\nCliente {cliente} -&gt; score = {score:.1f}&quot;)
+
+# Comprobación: el score es Offset + Factor * ln(momios bueno:malo del cliente)
+logit_malo = alpha + sum(betas[v] * woe[v][a] for v, a in cliente.items())
+p_malo = 1 / (1 + np.exp(-logit_malo))
+print(f&quot;P(malo) = {p_malo:.4f} | momios bueno:malo = {np.exp(-logit_malo):.2f}&quot;
+      f&quot; | Offset + Factor*ln(momios) = {offset + factor * (-logit_malo):.1f}&quot;)
+print(f&quot;+{PDO} puntos (PDO) =&gt; momios x2: {np.exp((score + PDO - offset) / factor):.2f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Factor = 20/ln(2) = 28.8539
+Offset = 600 - 28.8539*ln(50) = 487.1229
+
+SCORECARD
+  edad     &lt;25      WoE=-0.60  -&gt;   247 puntos
+  edad     25-30    WoE=-0.10  -&gt;   261 puntos
+  edad     &gt;=30     WoE= 0.45  -&gt;   276 puntos
+  ingreso  &lt;10k     WoE=-0.70  -&gt;   247 puntos
+  ingreso  10k-25k  WoE= 0.05  -&gt;   265 puntos
+  ingreso  &gt;=25k    WoE= 0.65  -&gt;   279 puntos
+
+Cliente {&#x27;edad&#x27;: &#x27;25-30&#x27;, &#x27;ingreso&#x27;: &#x27;&gt;=25k&#x27;} -&gt; score = 539.5
+P(malo) = 0.1400 | momios bueno:malo = 6.14 | Offset + Factor*ln(momios) = 539.5
++20 puntos (PDO) =&gt; momios x2: 12.28</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="modelos-notebooks">10. Los modelos de los notebooks y cómo evaluarlos</h2>
+<p>Una vez lista la TAD final (variables estandarizadas o transformadas a WoE), el flujo de modelado del curso es siempre el mismo:</p>
+<div class="code-card"><div class="code-head"><span class="fname">flujo de modelado de las sesiones 8 y 9</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button></div><pre><code class="language-python">from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import mean_absolute_error, roc_auc_score, accuracy_score, confusion_matrix
+
+# 1) Partición 70% entrenamiento / 30% validación
+Xt, Xv, yt, yv = train_test_split(tad_final[var_ss], tad_final[&quot;y&quot;], test_size=0.3, random_state=42)
+
+# 2a) Regresión: afluencia en t+1
+lr = LinearRegression(n_jobs=-1).fit(Xt, yt)
+print(lr.coef_, lr.intercept_)
+print(mean_absolute_error(yv, lr.predict(Xv)))
+
+# 2b) Clasificación: ¿estación de alta afluencia? (y2 = 1 si y &gt; 200,000)
+mcl = LogisticRegression(n_jobs=-1).fit(Xt2, yt2)
+print(roc_auc_score(yv2, mcl.predict_proba(Xv2)[:, 1]))   # usa probabilidades
+print(accuracy_score(yv2, mcl.predict(Xv2)))               # usa la clase (corte 0.5)
+print(confusion_matrix(yv2, mcl.predict(Xv2)))</code></pre></div>
+<div class="kpis">
+  <div class="kpi"><div class="k-label">Ecobici · regresión · MAE</div><div class="k-val">27,006</div></div>
+  <div class="kpi"><div class="k-label">Ecobici · logística · AUC</div><div class="k-val">0.964</div></div>
+  <div class="kpi"><div class="k-label">Ecobici · logística · Accuracy</div><div class="k-val">0.909</div></div>
+  <div class="kpi"><div class="k-label">Churn (WoE) · AUC</div><div class="k-val">0.854</div></div>
+  <div class="kpi"><div class="k-label">Churn (WoE) · Accuracy</div><div class="k-val">0.806</div></div>
+</div>
+<p>Resultados reales que salieron en los notebooks. En la regresión de Ecobici los coeficientes fueron <code>[89,927, −4,093, 2,729, 482]</code> con intercepto 121,493 (la variable dominante es <code>ss_v_max_afluencia</code>: el máximo reciente predice el siguiente valor). La matriz de confusión dice mucho más que el accuracy:</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_09_metricas_notebooks.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_09_metricas_notebooks.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · Interpretar las matrices de confusión que salieron en los notebooks del curso
+# Formato de sklearn: [[TN, FP],
+#                      [FN, TP]]   (filas = real, columnas = predicción)
+import numpy as np
+
+matrices = {
+    &quot;Sesión 8 · Ecobici (alta afluencia)&quot;: np.array([[58359, 2093], [4592, 8521]]),
+    &quot;Sesión 9 · Churn (fuga)&quot;:             np.array([[1186, 128], [223, 269]]),
+}
+
+for nombre, cm in matrices.items():
+    (tn, fp), (fn, tp) = cm
+    acc = (tp + tn) / cm.sum()
+    prec = tp / (tp + fp)
+    rec = tp / (tp + fn)                 # sensibilidad / TPR
+    esp = tn / (tn + fp)                 # especificidad / TNR
+    f1 = 2 * prec * rec / (prec + rec)
+    print(nombre)
+    print(f&quot;  TN={tn}  FP={fp}  FN={fn}  TP={tp}&quot;)
+    print(f&quot;  Accuracy={acc:.3f}  Precision={prec:.3f}  Recall={rec:.3f}  &quot;
+          f&quot;Especificidad={esp:.3f}  F1={f1:.3f}  BalancedAcc={(rec + esp) / 2:.3f}\n&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Sesión 8 · Ecobici (alta afluencia)
+  TN=58359  FP=2093  FN=4592  TP=8521
+  Accuracy=0.909  Precision=0.803  Recall=0.650  Especificidad=0.965  F1=0.718  BalancedAcc=0.808
+
+Sesión 9 · Churn (fuga)
+  TN=1186  FP=128  FN=223  TP=269
+  Accuracy=0.806  Precision=0.678  Recall=0.547  Especificidad=0.903  F1=0.605  BalancedAcc=0.725</pre></div>
+</div>
+<div class="callout exam"><div class="callout-title">📝 Interpretación</div><p>En churn, el accuracy (0.806) parece bueno, pero el <strong>recall es 0.547</strong>: el modelo solo detecta 55 % de los clientes que realmente se van. Como la clase positiva es minoritaria (27 %), un modelo que dijera "nadie se va" ya tendría 73 % de accuracy. Por eso se usan AUC, precisión, recall y F1 (más en el <a href="modulo2.html#metricas">Módulo 2</a>).</p></div>
+
+<!-- ===================================================== -->
+<h2 id="oltp-olap">11. OLTP vs OLAP y cubos de información</h2>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>OLTP (On-Line Transaction Processing)</th><th>OLAP (On-Line Analytical Processing)</th></tr></thead>
+<tbody>
+<tr><td>Propósito</td><td>registrar operaciones del día a día</td><td>analizar, resumir, apoyar decisiones</td></tr>
+<tr><td>Datos</td><td>detalle "crudo", actual (cada medición, cada venta)</td><td>agregados e históricos (promedios, máximos por periodo)</td></tr>
+<tr><td>Operaciones</td><td>muchas inserciones/actualizaciones pequeñas</td><td>consultas de lectura complejas sobre mucho volumen</td></tr>
+<tr><td>Modelo</td><td>normalizado (muchas tablas)</td><td>dimensional: <strong>hechos</strong> (medidas) + <strong>dimensiones</strong> (tiempo, ubicación…) → cubos</td></tr>
+<tr><td>Ejemplo sesión 10</td><td>contaminante medido por estación y hora</td><td>promedio de O₃ por trimestre y zona</td></tr>
+</tbody></table></div>
+<figure class="figure">
+  <svg viewBox="0 0 700 230" role="img" aria-label="Cubo OLAP con dimensiones tiempo, ubicación y contaminante">
+    <g transform="translate(70,30)">
+      <path d="M0 50 L60 0 H260 L200 50 Z" class="d-fill-3"/>
+      <path d="M200 50 L260 0 V140 L200 190 Z" class="d-fill-1"/>
+      <rect x="0" y="50" width="200" height="140" class="d-fill-4"/>
+      <g class="d-line"><path d="M50 50 V190 M100 50 V190 M150 50 V190 M0 97 H200 M0 143 H200"/><path d="M215 37 V177 M230 25 V165 M245 12 V152"/><path d="M20 33 H220 M40 17 H240"/></g>
+      <text x="100" y="215" text-anchor="middle" class="d-text-2">Tiempo (hora, mes, trimestre…)</text>
+      <text x="-12" y="125" text-anchor="end" class="d-text-2">Ubicación</text>
+      <text x="275" y="80" class="d-text-2">Contaminante</text>
+    </g>
+    <g>
+      <text x="420" y="40" class="d-text" font-weight="700">Operaciones OLAP</text>
+      <text x="420" y="68" class="d-text-2"><tspan font-weight="700">Roll-up:</tspan> subir de nivel (estación → zona)</text>
+      <text x="420" y="94" class="d-text-2"><tspan font-weight="700">Drill-down:</tspan> bajar (zona → estación → hora)</text>
+      <text x="420" y="120" class="d-text-2"><tspan font-weight="700">Slice:</tspan> fijar una dimensión (solo Q1)</text>
+      <text x="420" y="146" class="d-text-2"><tspan font-weight="700">Dice:</tspan> subcubo (Q2–Q3 y 12–16 h)</text>
+      <text x="420" y="172" class="d-text-2"><tspan font-weight="700">Pivot:</tspan> rotar filas ↔ columnas</text>
+    </g>
+  </svg>
+  <figcaption>En la sesión 10 se construyeron 3 cubos: dimensiones de tiempo, de ubicación (estación, zona por cuadrantes de lat/long) y tiempo × ubicación, con agregados sum, min, max, mean, mediana.</figcaption>
+</figure>
+<p>En pandas un cubo es un <code>groupby</code> (o <code>pivot_table</code>) por una o más dimensiones. En el notebook se derivan dimensiones de la fecha (hora, día, semana, mes, trimestre, año-mes…) y de la ubicación (la <strong>zona</strong> se define por cuadrantes respecto a la longitud y latitud promedio de las estaciones):</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo1/m1_10_olap_cubos.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo1/m1_10_olap_cubos.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 1 · OLTP -&gt; OLAP: construir &quot;cubos&quot; con pandas (idea de la sesión 10, contaminantes CDMX)
+import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(3)
+fechas = pd.date_range(&quot;2021-01-01&quot;, &quot;2021-12-31 23:00&quot;, freq=&quot;h&quot;)
+estaciones = {&quot;ACO&quot;: &quot;Zona 1&quot;, &quot;MER&quot;: &quot;Zona 3&quot;, &quot;UIZ&quot;: &quot;Zona 2&quot;}
+
+# Tabla transaccional (OLTP): una fila por estación-hora (registro &quot;crudo&quot;)
+oltp = pd.DataFrame([(e, f) for e in estaciones for f in fechas], columns=[&quot;id_station&quot;, &quot;date&quot;])
+hora, mes = oltp[&quot;date&quot;].dt.hour, oltp[&quot;date&quot;].dt.month
+diurno = 30 * np.sin((hora - 9) / 24 * 2 * np.pi).clip(0)       # pico de ozono al mediodía
+temporada = 12 * np.exp(-((mes - 4.5) ** 2) / 4)                 # temporada alta: mar-may
+por_zona = oltp[&quot;id_station&quot;].map({&quot;ACO&quot;: -4, &quot;MER&quot;: 0, &quot;UIZ&quot;: 5})
+oltp[&quot;O3&quot;] = (18 + diurno + temporada + por_zona + rng.normal(0, 5, len(oltp))).round(1)
+print(&quot;OLTP (registros):&quot;, oltp.shape)
+print(oltp.head(3).to_string(index=False), &quot;\n&quot;)
+
+# Dimensiones derivadas de la fecha y de la ubicación
+oltp[&quot;hrs&quot;] = oltp[&quot;date&quot;].dt.hour
+oltp[&quot;mes&quot;] = oltp[&quot;date&quot;].dt.month
+oltp[&quot;trimestre&quot;] = &quot;Q&quot; + oltp[&quot;date&quot;].dt.quarter.astype(str)
+oltp[&quot;zona&quot;] = oltp[&quot;id_station&quot;].map(estaciones)
+
+# --- Cubo 1: dimensión tiempo (varias granularidades apiladas) ---
+lst = []
+for d in [&quot;hrs&quot;, &quot;mes&quot;, &quot;trimestre&quot;]:
+    aux = oltp.groupby(d)[&quot;O3&quot;].agg([&quot;mean&quot;, &quot;max&quot;]).reset_index().rename(columns={d: &quot;tiempo&quot;})
+    aux.insert(0, &quot;dimension&quot;, d)
+    lst.append(aux)
+cubo_t = pd.concat(lst, ignore_index=True)
+print(&quot;Cubo tiempo (trimestres):\n&quot;, cubo_t[cubo_t[&quot;dimension&quot;] == &quot;trimestre&quot;].round(2).to_string(index=False))
+
+# --- Roll-up (subir de nivel) y drill-down (bajar de nivel) ---
+print(&quot;\nRoll-up por zona:\n&quot;, oltp.groupby(&quot;zona&quot;)[&quot;O3&quot;].mean().round(2).to_string())
+print(&quot;\nDrill-down zona -&gt; estación -&gt; trimestre:&quot;)
+print(oltp.pivot_table(index=[&quot;zona&quot;, &quot;id_station&quot;], columns=&quot;trimestre&quot;,
+                       values=&quot;O3&quot;, aggfunc=&quot;mean&quot;).round(2).to_string())
+
+# --- Slice (fijar una dimensión) y dice (subcubo con varias condiciones) ---
+slice_q1 = oltp[oltp[&quot;trimestre&quot;] == &quot;Q1&quot;]
+dice = oltp[(oltp[&quot;trimestre&quot;].isin([&quot;Q2&quot;, &quot;Q3&quot;])) &amp; (oltp[&quot;hrs&quot;].between(12, 16))]
+print(f&quot;\nSlice Q1: {len(slice_q1)} filas | Dice (Q2-Q3, 12-16 h): {len(dice)} filas, &quot;
+      f&quot;O3 medio = {dice[&#x27;O3&#x27;].mean():.2f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>OLTP (registros): (26280, 3)
+id_station                date   O3
+       ACO 2021-01-01 00:00:00 24.8
+       ACO 2021-01-01 01:00:00  1.8
+       ACO 2021-01-01 02:00:00 16.7 
+
+Cubo tiempo (trimestres):
+ dimension tiempo  mean  max
+trimestre     Q1 31.24 76.1
+trimestre     Q2 37.64 77.6
+trimestre     Q3 28.94 68.3
+trimestre     Q4 27.86 66.8
+
+Roll-up por zona:
+ zona
+Zona 1    27.05
+Zona 2    36.12
+Zona 3    31.04
+
+Drill-down zona -&gt; estación -&gt; trimestre:
+trimestre             Q1     Q2     Q3     Q4
+zona   id_station                            
+Zona 1 ACO         27.01  33.18  24.57  23.51
+Zona 2 UIZ         35.94  42.31  33.65  32.63
+Zona 3 MER         30.76  37.43  28.60  27.44
+
+Slice Q1: 6480 filas | Dice (Q2-Q3, 12-16 h): 2745 filas, O3 medio = 50.80</pre></div>
+</div>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="index.html"><small>← Inicio</small>Todos los módulos</a>
+  <a class="next" href="modulo2.html"><small>Siguiente →</small>Módulo 2 · Modelación supervisada</a>
+</nav>
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="assets/js/data.js?v=180c6754" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/m1.js?v=e5862c24" defer></script>
+</body>
+</html>

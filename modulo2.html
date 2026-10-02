@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 2 · Modelación supervisada | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Regresión lineal y sus supuestos, logística, LASSO, Ridge, ElasticNet, gradiente descendente, LDA, kernel, SVM, KNN, Bayes ingenuo, árboles, redes, ensambles, métricas y monitoreo con PSI.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html" aria-current="page">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html">Módulo 4</a><a href="examen-m4.html">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 2 · Modelación supervisada</div>
+  <h1>Modelos supervisados: de la regresión lineal a los ensambles, y cómo elegir al campeón</h1>
+  <p class="lead">Aprender una regla \(f: X \to y\) a partir de pares \((X_i, y_i)\). Aquí está cada algoritmo del módulo con su intuición, su matemática, sus supuestos y código con salida verificada; al final, las métricas para elegir el modelo campeón y cómo monitorearlo (PSI, KS, Gini, Lift).</p>
+  <div class="meta-row">
+    <span class="chip"><span class="dot" style="background:var(--s2)"></span>Lic. Rolando Oviedo Quezada</span>
+    <span class="chip">documento de 78 páginas + 6 presentaciones</span>
+    <span class="chip">10 programas verificados</span>
+  </div>
+  <details class="sources">
+    <summary>Material del curso en el que se basa esta página</summary>
+    <ul>
+      <li><code>Módulo_2__Modelación_supervisada-2.pdf</code> — documento completo (cap. 0–12)</li>
+      <li><code>2.2 Modelos Lineales.pdf</code> · <code>2.6, 2.7 KNN Naive Bayes.pdf</code> · <code>2.9 Árboles de Decisión.pdf</code></li>
+      <li><code>2.10 Redes Neuronales.pdf</code> · <code>2.11 Ensambles.pdf</code> · <code>2.12 Reportes de estabilidad y desempeño.pdf</code></li>
+    </ul>
+  </details>
+</section>
+
+<!-- ===================================================== -->
+<h2 id="definicion">1. ¿Qué es la modelación supervisada?</h2>
+<p>Establecer una <strong>regla de mapeo</strong> entre características \(X\) y una salida \(y\) para predecir \(y\) en datos nuevos que el modelo nunca vio. Se entrena con un espacio de pares:</p>
+<div class="formula">$$S_n = \big((X_1,y_1), (X_2,y_2), \dots, (X_n,y_n)\big) \in (\mathcal{X}\times\mathcal{Y})^n \qquad f: \mathcal{X} \to \mathcal{Y}$$
+<div class="where">\(X\) puede vivir en \(\mathbb{R}^m\) (continuo), \(D^m\) (discreto) o un espacio mixto. El espacio de \(y\) define la tarea. El algoritmo se evalúa cíclicamente con una <strong>función de pérdida</strong> (el costo de equivocarse) y la minimiza.</div></div>
+<div class="two-col">
+  <div class="callout note"><div class="callout-title">Regresión (\(y\) continua)</div><p>Proyecciones de ventas, precios, demanda, saldos, gastos. Algoritmos: regresión lineal, red elástica, LASSO…</p></div>
+  <div class="callout note"><div class="callout-title">Clasificación (\(y\) categórica)</div><p>Scores crediticios, fuga, fraude, campañas de marketing. Algoritmos: clasificadores lineales, SVM, árboles, KNN…</p></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="lineal">2. Regresión lineal</h2>
+<div class="formula">$$y = \beta_0 + \beta_1 x_1 + \dots + \beta_n x_n + \varepsilon \qquad\qquad \text{precio} = \beta_0 + \beta_1\cdot\text{millas} + \beta_2\cdot\text{antigüedad} + \varepsilon$$
+<div class="where">\(\varepsilon\): error con media 0 y varianza \(\sigma^2\), no correlacionado. Entonces \(E(y\mid X) = \beta_0 + \beta_1 X\) y \(\operatorname{Var}(y\mid X) = \sigma^2\). \(\beta_1\) = cambio en la media de \(y\) por un cambio unitario en \(X\); \(\beta_0\) = media de \(y\) cuando \(X = 0\).</div></div>
+
+<h3 id="mco">2.1 Estimación por mínimos cuadrados (MCO)</h3>
+<p>Se buscan los \(\beta\) que minimizan la suma de residuales al cuadrado. Derivando e igualando a cero:</p>
+<div class="formula">$$S(\beta_0,\beta_1) = \sum_{i=1}^{n}(y_i - \beta_0 - \beta_1 x_i)^2 \;\Rightarrow\; \hat\beta_1 = \frac{\operatorname{Cov}(X,y)}{\operatorname{Var}(X)},\qquad \hat\beta_0 = \bar y - \hat\beta_1 \bar x$$
+<div class="where">Los <strong>residuales</strong> \(\varepsilon_i = y_i - \hat y_i\) informan el comportamiento del error y son la base para validar los supuestos.</div></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_01_mco.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_01_mco.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Mínimos cuadrados ordinarios (MCO) &quot;a mano&quot; vs scikit-learn
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Precio de autos (miles) vs antigüedad (años)
+X = np.array([1, 2, 3, 4, 5, 6, 7, 8], dtype=float)
+y = np.array([30, 27, 25, 22, 20, 18, 15, 14], dtype=float)
+
+# Fórmulas cerradas: β1 = Cov(X, y) / Var(X),  β0 = ȳ − β1·x̄
+b1 = np.sum((X - X.mean()) * (y - y.mean())) / np.sum((X - X.mean()) ** 2)
+b0 = y.mean() - b1 * X.mean()
+print(f&quot;A mano  : β0 = {b0:.4f}, β1 = {b1:.4f}&quot;)
+
+lr = LinearRegression().fit(X.reshape(-1, 1), y)
+print(f&quot;sklearn : β0 = {lr.intercept_:.4f}, β1 = {lr.coef_[0]:.4f}&quot;)
+
+residuales = y - (b0 + b1 * X)
+print(&quot;Residuales:&quot;, residuales.round(3), &quot;| suma =&quot;, round(residuales.sum(), 10))
+print(f&quot;Interpretación: cada año extra de antigüedad, el precio baja {abs(b1):.3f} mil en promedio&quot;)
+
+# Regresión múltiple: precio = β0 + β1*millas + β2*antigüedad
+rng = np.random.default_rng(0)
+millas = rng.uniform(5, 150, 200)
+antig = rng.uniform(0, 15, 200)
+precio = 40 - 0.08 * millas - 1.2 * antig + rng.normal(0, 1.5, 200)
+m = LinearRegression().fit(np.c_[millas, antig], precio)
+print(f&quot;\nMúltiple: precio = {m.intercept_:.2f} {m.coef_[0]:+.3f}*millas {m.coef_[1]:+.3f}*antigüedad&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>A mano  : β0 = 31.8214, β1 = -2.3214
+sklearn : β0 = 31.8214, β1 = -2.3214
+Residuales: [ 0.5   -0.179  0.143 -0.536 -0.214  0.107 -0.571  0.75 ] | suma = -0.0
+Interpretación: cada año extra de antigüedad, el precio baja 2.321 mil en promedio
+
+Múltiple: precio = 39.91 -0.080*millas -1.178*antigüedad</pre></div>
+</div>
+
+<h3 id="supuestos">2.2 Los cuatro supuestos (y qué hacer si fallan)</h3>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Supuesto</th><th>Qué dice</th><th>Cómo validarlo</th><th>Si no se cumple</th></tr></thead>
+<tbody>
+<tr><td>1. Linealidad</td><td>la relación entre predictoras y \(y\) es lineal</td><td>gráfico de dispersión</td><td>transformar \(X\) y/o \(y\); agregar otra variable</td></tr>
+<tr><td>2. Homocedasticidad</td><td>la varianza de los residuales es la misma para cualquier valor de \(X\)</td><td>residuales vs ajustados (no debe haber "cono"); Breusch-Pagan</td><td>transformar \(y\) (log); redefinir \(y\) (tasas); regresión con pesos</td></tr>
+<tr><td>3. Independencia</td><td>cada residual es independiente de los demás</td><td>residuales vs \(X\)/tiempo; <strong>Durbin-Watson</strong> (≈ 2 = sin autocorrelación)</td><td>correlación positiva: desfases (lags); negativa: buscar patrones; estacionalidad: variables indicadoras</td></tr>
+<tr><td>4. Normalidad</td><td>para \(X\) fijo, los residuales se distribuyen normal (media 0)</td><td><strong>Q-Q plot</strong>; Shapiro-Wilk, KS, Jarque-Bera, D'Agostino (muy sensibles con muchos datos)</td><td>revisar outliers; transformaciones</td></tr>
+</tbody></table></div>
+<p>Si hay heterocedasticidad el modelo se vuelve <strong>inconfiable</strong>: algunas \(\beta\) parecen estadísticamente significativas cuando no lo son.</p>
+<div class="chart-card">
+  <h4>Residuales vs valores ajustados</h4>
+  <p class="sub">Izquierda: homocedástico (nube uniforme). Derecha: heterocedástico (forma de cono que se abre). Datos simulados como en el programa.</p>
+  <div class="small-multiples">
+    <div class="chart-box short"><canvas id="chart-res-ok" aria-label="Residuales homocedásticos"></canvas></div>
+    <div class="chart-box short"><canvas id="chart-res-bad" aria-label="Residuales heterocedásticos"></canvas></div>
+  </div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_02_supuestos.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_02_supuestos.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Validar los 4 supuestos de la regresión lineal
+import numpy as np
+from scipy import stats
+from statsmodels.stats.stattools import durbin_watson
+from statsmodels.stats.diagnostic import het_breuschpagan
+import statsmodels.api as sm
+
+rng = np.random.default_rng(1)
+x = rng.uniform(0, 10, 300)
+
+def diagnostico(nombre, y):
+    modelo = sm.OLS(y, sm.add_constant(x)).fit()
+    r = modelo.resid
+    _, p_bp, _, _ = het_breuschpagan(r, sm.add_constant(x))
+    _, p_sw = stats.shapiro(r)
+    print(f&quot;{nombre}&quot;)
+    print(f&quot;  R² = {modelo.rsquared:.3f}&quot;)
+    print(f&quot;  Homocedasticidad (Breusch-Pagan) p = {p_bp:.4f} -&gt; {&#x27;OK&#x27; if p_bp &gt; 0.05 else &#x27;HETEROCEDASTICIDAD&#x27;}&quot;)
+    print(f&quot;  Independencia (Durbin-Watson) = {durbin_watson(r):.3f}  (≈2 sin autocorrelación)&quot;)
+    print(f&quot;  Normalidad (Shapiro-Wilk) p = {p_sw:.4f} -&gt; {&#x27;OK&#x27; if p_sw &gt; 0.05 else &#x27;NO normal&#x27;}&quot;)
+
+# Caso 1: todo se cumple
+diagnostico(&quot;Caso 1: y = 3 + 2x + ruido constante&quot;, 3 + 2 * x + rng.normal(0, 1, 300))
+# Caso 2: varianza que crece con x (forma de cono)
+diagnostico(&quot;Caso 2: ruido proporcional a x&quot;, 3 + 2 * x + rng.normal(0, 1, 300) * x)
+# Caso 2 corregido con log(y)
+y2 = np.exp(0.5 + 0.2 * x + rng.normal(0, 0.3, 300))
+diagnostico(&quot;Caso 3: y exponencial (sin transformar)&quot;, y2)
+diagnostico(&quot;Caso 3 corregido: log(y)&quot;, np.log(y2))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Caso 1: y = 3 + 2x + ruido constante
+  R² = 0.973
+  Homocedasticidad (Breusch-Pagan) p = 0.6511 -&gt; OK
+  Independencia (Durbin-Watson) = 1.954  (≈2 sin autocorrelación)
+  Normalidad (Shapiro-Wilk) p = 0.8181 -&gt; OK
+Caso 2: ruido proporcional a x
+  R² = 0.459
+  Homocedasticidad (Breusch-Pagan) p = 0.0000 -&gt; HETEROCEDASTICIDAD
+  Independencia (Durbin-Watson) = 1.776  (≈2 sin autocorrelación)
+  Normalidad (Shapiro-Wilk) p = 0.0000 -&gt; NO normal
+Caso 3: y exponencial (sin transformar)
+  R² = 0.694
+  Homocedasticidad (Breusch-Pagan) p = 0.0000 -&gt; HETEROCEDASTICIDAD
+  Independencia (Durbin-Watson) = 2.212  (≈2 sin autocorrelación)
+  Normalidad (Shapiro-Wilk) p = 0.0000 -&gt; NO normal
+Caso 3 corregido: log(y)
+  R² = 0.793
+  Homocedasticidad (Breusch-Pagan) p = 0.7041 -&gt; OK
+  Independencia (Durbin-Watson) = 2.214  (≈2 sin autocorrelación)
+  Normalidad (Shapiro-Wilk) p = 0.7614 -&gt; OK</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="logistica">3. Regresión logística</h2>
+<p>También llamada <strong>regresión logit</strong>; estima la <strong>probabilidad de ocurrencia</strong> de un evento. Es una transformación logit aplicada a los <strong>momios</strong> (probabilidad de evento / probabilidad de no evento):</p>
+<div class="formula">$$\ln\!\Big(\frac{p}{1-p}\Big) = \beta_0 + \sum_{i=1}^{n}\beta_i X_i \qquad\Longleftrightarrow\qquad p = \frac{1}{1+e^{-(\beta_0+\sum\beta_i X_i)}}$$
+<div class="where">Las \(\beta\) se estiman por <strong>máxima verosimilitud</strong> (iterativamente se buscan los parámetros que maximizan la log-verosimilitud o minimizan su negativo). Si \(p \ge 0.5\) → evento. Ajuste: métricas y prueba de <strong>Hosmer–Lemeshow</strong>. Tipos: binaria, multinomial, ordinal.</div></div>
+<div class="chart-card">
+  <h4>Probabilidad de aprobar vs horas de estudio</h4>
+  <p class="sub">Puntos: datos reales (0 = reprueba, 1 = aprueba). Curva: modelo ajustado \(p = 1/(1+e^{-(-4.632 + 1.425\,h)})\). La frontera \(p = 0.5\) está en 3.25 h.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>curva logística</span><span><i class="sq" style="background:var(--s2)"></i>observaciones</span></div>
+  <div class="chart-box"><canvas id="chart-logit" aria-label="Curva logística"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_03_logistica.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_03_logistica.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Regresión logística: momios, logit y probabilidad
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+
+# Horas de estudio vs aprobar (1) / reprobar (0)
+horas = np.array([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]).reshape(-1, 1)
+aprueba = np.array([0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1])
+
+modelo = LogisticRegression(C=1e6).fit(horas, aprueba)     # C grande ≈ sin regularización
+b0, b1 = modelo.intercept_[0], modelo.coef_[0, 0]
+print(f&quot;ln(p/(1-p)) = {b0:.3f} + {b1:.3f}·horas&quot;)
+print(f&quot;Por cada hora extra, los momios se multiplican por e^{b1:.3f} = {np.exp(b1):.2f}&quot;)
+
+for h in [1, 3, 5]:
+    logit = b0 + b1 * h
+    p = 1 / (1 + np.exp(-logit))                            # sigmoide
+    print(f&quot;  {h} h -&gt; logit = {logit:6.3f}, momios = {np.exp(logit):6.3f}, P(aprobar) = {p:.3f}&quot;
+          f&quot; -&gt; clase {int(p &gt;= 0.5)}&quot;)
+
+print(&quot;predict_proba(3 h) de sklearn:&quot;, modelo.predict_proba([[3]]).round(3))
+print(f&quot;Frontera de decisión (p = 0.5) en horas = {-b0 / b1:.2f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>ln(p/(1-p)) = -4.632 + 1.425·horas
+Por cada hora extra, los momios se multiplican por e^1.425 = 4.16
+  1 h -&gt; logit = -3.207, momios =  0.040, P(aprobar) = 0.039 -&gt; clase 0
+  3 h -&gt; logit = -0.357, momios =  0.700, P(aprobar) = 0.412 -&gt; clase 0
+  5 h -&gt; logit =  2.494, momios = 12.105, P(aprobar) = 0.924 -&gt; clase 1
+predict_proba(3 h) de sklearn: [[0.588 0.412]]
+Frontera de decisión (p = 0.5) en horas = 3.25</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Interpretar coeficientes</div><p>En la logística \(e^{\beta}\) es el <strong>factor de momios</strong>: cada hora extra multiplica los momios de aprobar por \(e^{1.425} = 4.16\). Los coeficientes NO se leen como cambios en la probabilidad directamente.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="regularizacion">4. Regresiones penalizadas: LASSO, LARS, Ridge, Red Elástica y Bayesiana</h2>
+<p>Cuando los coeficientes son inestables (por ejemplo, con pocos datos o variables correlacionadas) se <strong>penaliza su tamaño</strong> en la función de costo:</p>
+<div class="formula">
+$$\text{LASSO (L1):}\ \ \sum_i (y_i - \hat y_i)^2 + \alpha\sum_j |\beta_j| \qquad\quad \text{Ridge (L2):}\ \ \sum_i (y_i - \hat y_i)^2 + \alpha\sum_j \beta_j^2$$
+$$\text{ElasticNet:}\ \ \text{Loss} + \lambda\big(\alpha\,L_1 + (1-\alpha)\,L_2\big),\qquad \alpha\in[0,1]$$
+<div class="where">En las diapositivas el término de error aparece como \(\sum(y_i-\hat y_i)\) sin cuadrado; es el error cuadrático (como en MCO). En sklearn \(\alpha\) controla la fuerza total y <code>l1_ratio</code> la mezcla (en la logística el parámetro es \(C = 1/\alpha\)).</div>
+</div>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Modelo</th><th>Penalización</th><th>Efecto</th></tr></thead>
+<tbody>
+<tr><td>LASSO</td><td>L1 = Σ|β|</td><td>lleva coeficientes <strong>exactamente a 0</strong> → <strong>selección de variables</strong>; favorece modelos simples</td></tr>
+<tr><td>LARS</td><td>L1 con pasos angulares</td><td>empieza en 0, agrega la variable más correlacionada, avanza en la bisectriz de las variables activas, recalcula correlaciones y repite; estima α automáticamente</td></tr>
+<tr><td>Ridge</td><td>L2 = Σβ²</td><td>encoge todos los coeficientes sin anularlos (todas las variables se consideran); <strong>reduce la varianza</strong></td></tr>
+<tr><td>Red Elástica</td><td>αL1 + (1−α)L2</td><td>α = 1 → LASSO, α = 0 → Ridge; L1 selecciona y L2 estabiliza</td></tr>
+<tr><td>Bayesiana</td><td>prior sobre β</td><td>β y y vienen de distribuciones: \(y\sim N(\beta^T X, \sigma^2 I)\); posterior ∝ verosimilitud × prior</td></tr>
+</tbody></table></div>
+<div class="chart-card">
+  <h4>Camino de LASSO: coeficientes vs α (dataset diabetes, variables estandarizadas)</h4>
+  <p class="sub">Al aumentar α los coeficientes se encogen y van llegando a 0. Destacamos las 4 variables que más sobreviven; el resto en gris.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>bmi</span><span><i style="background:var(--s2)"></i>s5</span><span><i style="background:var(--s3)"></i>bp</span><span><i style="background:var(--s7)"></i>s3</span><span><i style="background:var(--muted-series)"></i>otras</span></div>
+  <div class="chart-box tall"><canvas id="chart-lasso" aria-label="Camino de coeficientes LASSO"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_04_regularizacion.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_04_regularizacion.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Regresión lineal vs LASSO (L1) vs Ridge (L2) vs ElasticNet vs LARS
+import numpy as np
+from sklearn.datasets import load_diabetes
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, Lasso, Ridge, ElasticNet, LassoLars
+
+X, y = load_diabetes(return_X_y=True, as_frame=True)
+X = StandardScaler().fit_transform(X)
+nombres = load_diabetes().feature_names
+
+modelos = {
+    &quot;Lineal&quot;:            LinearRegression(),
+    &quot;LASSO a=5&quot;:         Lasso(alpha=5),
+    &quot;Ridge a=50&quot;:        Ridge(alpha=50),
+    &quot;ElasticNet a=5,l1=0.5&quot;: ElasticNet(alpha=5, l1_ratio=0.5),
+    &quot;LassoLars a=5&quot;:     LassoLars(alpha=5),
+}
+print(f&quot;{&#x27;variable&#x27;:&lt;8}&quot; + &quot;&quot;.join(f&quot;{k:&gt;23}&quot; for k in modelos))
+coefs = {k: m.fit(X, y).coef_ for k, m in modelos.items()}
+for i, v in enumerate(nombres):
+    print(f&quot;{v:&lt;8}&quot; + &quot;&quot;.join(f&quot;{coefs[k][i]:&gt;23.2f}&quot; for k in modelos))
+print(f&quot;{&#x27;# ceros&#x27;:&lt;8}&quot; + &quot;&quot;.join(f&quot;{int(np.sum(np.isclose(c, 0))):&gt;23}&quot; for c in coefs.values()))
+
+print(&quot;\nCamino de LASSO: coeficientes en cero conforme sube alpha&quot;)
+for a in [0.1, 1, 5, 10, 20, 40]:
+    c = Lasso(alpha=a).fit(X, y).coef_
+    print(f&quot;  alpha = {a:&gt;4}: variables que sobreviven = {int(np.sum(~np.isclose(c, 0)))}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>variable                 Lineal              LASSO a=5             Ridge a=50  ElasticNet a=5,l1=0.5          LassoLars a=5
+age                       -0.48                   0.00                   0.11                   1.04                   0.00
+sex                      -11.41                  -2.15                  -9.69                  -0.52                  -2.16
+bmi                       24.73                  24.22                  23.08                   8.97                  24.22
+bp                        15.43                  10.33                  14.24                   5.98                  10.33
+s1                       -37.68                  -0.00                  -3.62                   0.69                   0.00
+s2                        22.68                  -0.00                  -3.52                   0.00                   0.00
+s3                         4.81                  -7.03                  -9.02                  -4.65                  -7.03
+s4                         8.42                   0.00                   5.54                   4.28                   0.00
+s5                        35.73                  21.23                  20.77                   7.95                  21.23
+s6                         3.22                   0.00                   4.21                   3.99                   0.00
+# ceros                       0                      5                      0                      1                      5
+
+Camino de LASSO: coeficientes en cero conforme sube alpha
+  alpha =  0.1: variables que sobreviven = 9
+  alpha =    1: variables que sobreviven = 7
+  alpha =    5: variables que sobreviven = 5
+  alpha =   10: variables que sobreviven = 4
+  alpha =   20: variables que sobreviven = 3
+  alpha =   40: variables que sobreviven = 2</pre></div>
+</div>
+<div class="formula"><strong>Regresión bayesiana</strong>
+$$P(\beta\mid y,X) = \frac{P(y\mid\beta,X)\,P(\beta\mid X)}{P(y\mid X)} \qquad\Longleftrightarrow\qquad \text{Posterior} = \frac{\text{Verosimilitud}\times\text{Prior}}{\text{Normalización}}$$
+<div class="where"><strong>Prior:</strong> incorpora conocimiento de negocio y experiencia. <strong>Posterior:</strong> da una distribución de los parámetros, mide la incertidumbre y permite escenarios (stress testing). Con muchos datos converge a MCO.</div></div>
+
+<!-- ===================================================== -->
+<h2 id="gradiente">5. Gradiente descendente (y su versión estocástica)</h2>
+<p>"Gradiente" = pendiente o inclinación de una superficie. Descender por ella hasta el punto más bajo. Ejemplo del documento: \(y = x^2 - 2x - 3\), cuyo mínimo está en \(x = 1\) (\(y=-4\)); partiendo de \(x = 3\) se baja por la curva. Es útil cuando no podemos igualar la derivada a 0 analíticamente.</p>
+<ol class="steps">
+  <li>Calcular el gradiente \(\nabla f = (\partial f/\partial x_1, \dots, \partial f/\partial x_n)\).</li>
+  <li>Elegir un valor inicial aleatorio de los parámetros.</li>
+  <li>Evaluar la función en esos parámetros.</li>
+  <li>Tamaño del paso = gradiente × tasa de aprendizaje (\(\gamma = \nabla f\cdot\alpha\)).</li>
+  <li>Nuevos parámetros = parámetros − tamaño del paso.</li>
+  <li>Repetir 3–5 hasta que el gradiente ≈ 0 (o menor que un error aceptado).</li>
+</ol>
+<p>Recomendación: tasas pequeñas (0.05, 0.03, 0.01). El costo crece rápido: con 30,000 observaciones y 8 variables son 240,000 cálculos por iteración; × 1,000 iteraciones = <strong>240 millones</strong>. Soluciones:</p>
+<ul>
+  <li><strong>Gradiente descendente estocástico (SGD):</strong> usa observaciones elegidas al azar para estimar el gradiente.</li>
+  <li><strong>Mini-batch SGD:</strong> usa un lote de observaciones por paso: balance entre la estabilidad del GD y la velocidad del SGD.</li>
+</ul>
+<div class="chart-card">
+  <h4>Trayectoria de \(x\) por iteración en \(y=x^2-2x-3\) (inicio \(x_0 = 3\))</h4>
+  <p class="sub">α = 0.1 converge suave; α = 0.5 llega en 1 paso; α = 0.9 oscila alrededor del mínimo antes de converger.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>α = 0.1</span><span><i style="background:var(--s3)"></i>α = 0.5</span><span><i style="background:var(--s2)"></i>α = 0.9</span></div>
+  <div class="chart-box"><canvas id="chart-gd" aria-label="Iteraciones del gradiente descendente"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_05_gradiente.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_05_gradiente.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Gradiente descendente sobre y = x² − 2x − 3 (ejemplo del documento del módulo)
+# Derivada: y&#x27; = 2x − 2   -&gt;   mínimo en x = 1 (y = −4)
+f = lambda x: x ** 2 - 2 * x - 3
+df = lambda x: 2 * x - 2
+
+def gradiente_descendente(x0=3.0, lr=0.1, tol=1e-6, max_iter=1000):
+    x = x0
+    for i in range(1, max_iter + 1):
+        paso = lr * df(x)               # tamaño del paso = gradiente * tasa de aprendizaje
+        x = x - paso                    # nuevos parámetros = anteriores − paso
+        if i &lt;= 5:
+            print(f&quot;  iter {i}: x = {x:.5f}, y = {f(x):.5f}, gradiente = {df(x):.5f}&quot;)
+        if abs(df(x)) &lt; tol:            # criterio de paro: gradiente ≈ 0
+            return x, i
+    return x, max_iter
+
+for lr in [0.1, 0.5, 0.9]:
+    print(f&quot;lr = {lr}&quot;)
+    x, it = gradiente_descendente(lr=lr)
+    print(f&quot;  -&gt; converge a x = {x:.5f} en {it} iteraciones\n&quot;)
+
+# Gradiente descendente para una regresión lineal (batch, SGD y mini-batch)
+import numpy as np
+rng = np.random.default_rng(0)
+X = rng.uniform(0, 10, 1000); y = 4 + 3 * X + rng.normal(0, 1, 1000)
+
+def entrenar(tam_lote, lr=0.01, epocas=50):
+    b0 = b1 = 0.0
+    entrenar.actualizaciones = 0
+    for _ in range(epocas):
+        idx = rng.permutation(len(X))
+        for k in range(0, len(X), tam_lote):
+            j = idx[k:k + tam_lote]
+            err = (b0 + b1 * X[j]) - y[j]
+            b0 -= lr * 2 * err.mean()
+            b1 -= lr * 2 * (err * X[j]).mean()
+            entrenar.actualizaciones += 1
+    return b0, b1
+
+for nombre, lote in [(&quot;Batch (todos)&quot;, 1000), (&quot;Mini-batch (32)&quot;, 32), (&quot;SGD (1)&quot;, 1)]:
+    b0, b1 = entrenar(lote, lr=0.01 if lote &gt; 1 else 0.001)
+    print(f&quot;{nombre:&lt;16}: β0 = {b0:.3f}, β1 = {b1:.3f}  (reales: 4, 3) &quot;
+          f&quot;| {entrenar.actualizaciones:,} actualizaciones en 50 épocas&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>lr = 0.1
+  iter 1: x = 2.60000, y = -1.44000, gradiente = 3.20000
+  iter 2: x = 2.28000, y = -2.36160, gradiente = 2.56000
+  iter 3: x = 2.02400, y = -2.95142, gradiente = 2.04800
+  iter 4: x = 1.81920, y = -3.32891, gradiente = 1.63840
+  iter 5: x = 1.65536, y = -3.57050, gradiente = 1.31072
+  -&gt; converge a x = 1.00000 en 69 iteraciones
+
+lr = 0.5
+  iter 1: x = 1.00000, y = -4.00000, gradiente = 0.00000
+  -&gt; converge a x = 1.00000 en 1 iteraciones
+
+lr = 0.9
+  iter 1: x = -0.60000, y = -1.44000, gradiente = -3.20000
+  iter 2: x = 2.28000, y = -2.36160, gradiente = 2.56000
+  iter 3: x = -0.02400, y = -2.95142, gradiente = -2.04800
+  iter 4: x = 1.81920, y = -3.32891, gradiente = 1.63840
+  iter 5: x = 0.34464, y = -3.57050, gradiente = -1.31072
+  -&gt; converge a x = 1.00000 en 69 iteraciones
+
+Batch (todos)   : β0 = 1.234, β1 = 3.411  (reales: 4, 3) | 50 actualizaciones en 50 épocas
+Mini-batch (32) : β0 = 4.001, β1 = 2.999  (reales: 4, 3) | 1,600 actualizaciones en 50 épocas
+SGD (1)         : β0 = 3.999, β1 = 3.015  (reales: 4, 3) | 50,000 actualizaciones en 50 épocas</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Por qué el batch "pierde" aquí</div><p>Con 50 épocas, el GD por lote completo hace solo <strong>50 actualizaciones</strong> (una por época), mientras que mini-batch hace 1,600 y SGD 50,000. Con el mismo número de pasadas por los datos, las versiones estocásticas avanzan mucho más. (Puedes ver el efecto del learning rate de forma interactiva en el <a href="modulo4.html#optimizadores">Módulo 4</a>.)</p></div>
+
+<!-- ===================================================== -->
+<h2 id="lda">6. Análisis discriminante (LDA y QDA)</h2>
+<p>Sencillo, robusto e interpretable; se usa como <strong>modelo base</strong> antes de clasificadores más complejos, y también para reducir dimensiones. Divide el espacio en \(k\) regiones sin intersección; \(x_i\) pertenece a la región \(J\) si y solo si \(x_i \in J\). Reglas de asignación:</p>
+<ul>
+  <li><strong>Máxima verosimilitud</strong> (si las probabilidades de cada clase son iguales): \(j = \arg\max_k f_k(x_i)\).</li>
+  <li><strong>Criterio bayesiano</strong> (con probabilidades a priori \(\pi_k\)): \(j = \arg\max_k \pi_k f_k(x_i)\).</li>
+</ul>
+<div class="formula">
+$$\delta_j(x) = \log f_j(x) + \log \pi_j \qquad\text{(función discriminante)}$$
+$$\text{LDA (covarianza común):}\ \ \delta_k(X) = X^T\Sigma^{-1}\mu_k - \tfrac12\mu_k^T\Sigma^{-1}\mu_k + \log\pi_k \quad\text{(lineal en } X)$$
+$$\text{QDA (covarianza por clase):}\ \ \delta_k(X) = -\tfrac12\log|\Sigma_k| - \tfrac12(X-\mu_k)^T\Sigma_k^{-1}(X-\mu_k) + \log\pi_k$$
+</div>
+
+<!-- ===================================================== -->
+<h2 id="kernel">7. Truco del kernel y regresión de cresta kernel</h2>
+<p>Si las clases no se separan con una recta, se mapean a una <strong>dimensión mayor</strong> donde sí sean separables. Calcular ese mapeo \(\phi\) explícitamente es carísimo; el <strong>truco del kernel</strong> obtiene el producto interno en el espacio grande operando solo en el espacio original:</p>
+<div class="formula">$$k(x,y) = (x^T y)^2 = \Big(\sum_{i=1}^3 x_i y_i\Big)^2 = \sum_{i,j=1}^{3} x_i x_j\, y_i y_j = \phi(x)^T\phi(y)\quad\text{con }\phi\in\mathbb{R}^9$$
+<div class="where">Kernels comunes: polinómico y RBF. La regresión de cresta kernel resuelve \(\hat y = y(K+\lambda I_n)^{-1}k(X)\): solo necesita la matriz de kernel \(K\).</div></div>
+
+<!-- ===================================================== -->
+<h2 id="svm">8. Máquinas de vector soporte (SVM)</h2>
+<p>Buscan el <strong>hiperplano</strong> que separa las clases con el <strong>máximo margen</strong>. Hiperplano: un punto en \(\mathbb{R}\), una recta en \(\mathbb{R}^2\), un plano/hipersuperficie en \(\mathbb{R}^n,\ n\ge3\). Los <strong>vectores soporte</strong> son las observaciones más cercanas al hiperplano: determinan su posición y orientación; su distancia es el <strong>margen</strong>.</p>
+<figure class="figure">
+  <svg viewBox="0 0 560 260" role="img" aria-label="Hiperplano de margen máximo y vectores soporte">
+    <path d="M120 250 L440 10" stroke="var(--ink-1)" stroke-width="2"/>
+    <path d="M70 230 L390 -10" class="d-line-2 d-dash"/><path d="M170 270 L490 30" class="d-line-2 d-dash"/>
+    <g fill="var(--s1)"><circle cx="90" cy="80" r="7"/><circle cx="140" cy="60" r="7"/><circle cx="120" cy="130" r="7"/><circle cx="60" cy="150" r="7"/><circle cx="200" cy="40" r="7"/></g>
+    <g fill="var(--s2)"><circle cx="420" cy="180" r="7"/><circle cx="470" cy="140" r="7"/><circle cx="380" cy="230" r="7"/><circle cx="500" cy="200" r="7"/><circle cx="430" cy="110" r="7"/></g>
+    <circle cx="200" cy="130" r="7" fill="var(--s1)" stroke="var(--ink-1)" stroke-width="2.5"/><circle cx="350" cy="150" r="7" fill="var(--s2)" stroke="var(--ink-1)" stroke-width="2.5"/><circle cx="290" cy="60" r="7" fill="var(--s1)" stroke="var(--ink-1)" stroke-width="2.5"/>
+    <text x="300" y="250" class="d-text-2">hiperplano f(x) = 0</text>
+    <text x="20" y="250" class="d-text-3">f(x) = −1</text><text x="470" y="20" class="d-text-3">f(x) = +1</text>
+    <text x="215" y="150" class="d-text-3">vectores soporte (borde negro)</text>
+  </svg>
+  <figcaption>Si \(f(x) > 1\) → una clase; \(f(x) < -1\) → la otra; en \([-1, 1]\) el punto cae en el margen (lo que se quiere evitar).</figcaption>
+</figure>
+<div class="formula">$$c(x,y,f(x)) = \big(1 - y\cdot f(x)\big)_+ \qquad\qquad \min_w\ \lambda\lVert w\rVert^2 + \sum_{i=1}^{n}\big(1 - y_i\langle x_i, w\rangle\big)_+$$
+<div class="where"><strong>Hinge loss</strong> (pérdida de bisagra): 0 si el signo es correcto y \(y\cdot f(x) \ge 1\). Actualización: si clasifica bien \(w \leftarrow w - \alpha(2\lambda w)\); si se equivoca \(w \leftarrow w + \alpha(y_i x_i - 2\lambda w)\).</div></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_06_lda_kernel_svm.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_06_lda_kernel_svm.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Análisis discriminante (LDA/QDA), truco del kernel y Máquinas de Vector Soporte
+import numpy as np
+from sklearn.datasets import load_iris, make_circles
+from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.svm import SVC
+from sklearn.kernel_ridge import KernelRidge
+
+# --- LDA vs QDA ---
+X, y = load_iris(return_X_y=True)
+Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
+for m in [LinearDiscriminantAnalysis(), QuadraticDiscriminantAnalysis()]:
+    print(f&quot;{type(m).__name__:&lt;32} accuracy = {m.fit(Xt, yt).score(Xv, yv):.3f}&quot;)
+
+# --- Truco del kernel: k(x, y) = (x·y)² es igual a φ(x)·φ(y) sin calcular φ ---
+x, z = np.array([1., 2., 3.]), np.array([4., 5., 6.])
+phi = lambda v: np.array([v[i] * v[j] for i in range(3) for j in range(3)])   # 9 dimensiones
+print(f&quot;\nφ(x)·φ(z) en 9 dimensiones = {phi(x) @ phi(z):.0f}&quot;)
+print(f&quot;(x·z)² en 3 dimensiones    = {(x @ z) ** 2:.0f}   &lt;- mismo resultado, mucho menos cómputo&quot;)
+
+# --- Datos NO linealmente separables: círculos concéntricos ---
+X, y = make_circles(n_samples=400, factor=0.4, noise=0.08, random_state=0)
+Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=0)
+for kernel in [&quot;linear&quot;, &quot;poly&quot;, &quot;rbf&quot;]:
+    svm = SVC(kernel=kernel, C=1.0, degree=2).fit(Xt, yt)
+    print(f&quot;SVM kernel={kernel:&lt;6} accuracy = {svm.score(Xv, yv):.3f} | vectores soporte = {svm.n_support_.sum()}&quot;)
+
+kr = KernelRidge(kernel=&quot;rbf&quot;, alpha=1.0).fit(Xt, yt)
+print(f&quot;Kernel Ridge (rbf) accuracy = {np.mean((kr.predict(Xv) &gt; 0.5) == yv):.3f}&quot;)
+
+# --- Pérdida de bisagra (hinge): max(0, 1 − y·f(x)), con y ∈ {−1, 1} ---
+for y_real, fx in [(1, 2.0), (1, 0.5), (1, -1.0), (-1, -3.0)]:
+    print(f&quot;y = {y_real:&gt;2}, f(x) = {fx:&gt;4} -&gt; hinge = {max(0, 1 - y_real * fx):.1f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>LinearDiscriminantAnalysis       accuracy = 1.000
+QuadraticDiscriminantAnalysis    accuracy = 1.000
+
+φ(x)·φ(z) en 9 dimensiones = 1024
+(x·z)² en 3 dimensiones    = 1024   &lt;- mismo resultado, mucho menos cómputo
+SVM kernel=linear accuracy = 0.542 | vectores soporte = 274
+SVM kernel=poly   accuracy = 1.000 | vectores soporte = 15
+SVM kernel=rbf    accuracy = 1.000 | vectores soporte = 30
+Kernel Ridge (rbf) accuracy = 1.000
+y =  1, f(x) =  2.0 -&gt; hinge = 0.0
+y =  1, f(x) =  0.5 -&gt; hinge = 0.5
+y =  1, f(x) = -1.0 -&gt; hinge = 2.0
+y = -1, f(x) = -3.0 -&gt; hinge = 0.0</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Lectura</div><p>Con círculos concéntricos (no linealmente separables) la SVM lineal apenas supera el azar (0.542) y usa 274 vectores soporte; con kernel polinómico o RBF llega a 1.000 con solo 15–30 vectores soporte. Eso es el truco del kernel en acción.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="knn">9. K vecinos más cercanos (KNN)</h2>
+<p>Famoso por su <strong>sencillez</strong>, ser un <strong>algoritmo perezoso</strong> (no "entrena": guarda los datos), constar de <strong>3 pasos</strong> y tener <strong>efectividad mediana</strong>. Asigna de forma "dura" la clase mayoritaria de los \(k\) vecinos:</p>
+<ol class="steps">
+  <li>Calcular las distancias de \(x_0\) a todas las observaciones: \(d(x_0, x_i)\ \forall x_i\in X\).</li>
+  <li>Ordenarlas de menor a mayor y tomar las \(k\) más cercanas.</li>
+  <li>Asignar la clase mayoritaria entre esos \(k\).</li>
+</ol>
+<div class="formula">$$d_{\text{Manhattan}} = \sum_i |a_i-b_i| \qquad d_{\text{Euclidiana}} = \sqrt{\sum_i (a_i-b_i)^2} \qquad d_{\text{Minkowski}} = \Big(\sum_i |a_i-b_i|^p\Big)^{1/p}$$
+<div class="where">Parámetros que lo afectan: la métrica, la <strong>escala</strong> de las variables (¡estandarizar!), las características usadas y \(k\).</div></div>
+
+<!-- ===================================================== -->
+<h2 id="naive-bayes">10. Bayes ingenuo</h2>
+<p>Ejemplo del principio <strong>KIS (Keep It Simple)</strong>: más simple = más entendible y rápido. Muy usado en NLP. Se basa en el <strong>teorema de Bayes</strong>:</p>
+<div class="formula">$$P(A\mid B) = \frac{P(B\mid A)\,P(A)}{P(B)} \qquad\Rightarrow\qquad P(y\mid x_1,\dots,x_n) \propto P(y)\prod_{i=1}^{n}P(x_i\mid y),\qquad \hat y = \arg\max_y P(y)\prod_i P(x_i\mid y)$$
+<div class="where">Supuestos "ingenuos": <strong>independencia</strong> (ninguna característica depende de otra, p. ej. color y origen) y <strong>equi-impacto</strong> (todas aportan lo mismo). El denominador se omite porque es igual para todas las clases.</div></div>
+<div class="table-wrap"><table>
+<thead><tr><th class="num">Id</th><th>Color</th><th>Tipo</th><th>Origen</th><th>¿Robado?</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>Rojo</td><td>Deportivo</td><td>Nacional</td><td>Sí</td></tr>
+<tr><td class="num">2</td><td>Rojo</td><td>Deportivo</td><td>Nacional</td><td>No</td></tr>
+<tr><td class="num">3</td><td>Rojo</td><td>Deportivo</td><td>Nacional</td><td>Sí</td></tr>
+<tr><td class="num">4</td><td>Amarillo</td><td>Deportivo</td><td>Importado</td><td>No</td></tr>
+<tr><td class="num">5</td><td>Amarillo</td><td>SUV</td><td>Importado</td><td>Sí</td></tr>
+<tr><td class="num">6</td><td>Amarillo</td><td>SUV</td><td>Importado</td><td>No</td></tr>
+<tr><td class="num">7</td><td>Amarillo</td><td>SUV</td><td>Importado</td><td>Sí</td></tr>
+<tr><td class="num">8</td><td>Amarillo</td><td>SUV</td><td>Nacional</td><td>No</td></tr>
+<tr><td class="num">9</td><td>Rojo</td><td>SUV</td><td>Importado</td><td>No</td></tr>
+<tr><td class="num">10</td><td>Rojo</td><td>Deportivo</td><td>Importado</td><td>Sí</td></tr>
+</tbody></table></div>
+<p><strong>Frecuencia cero:</strong> si una combinación nunca aparece, su probabilidad es 0 y anula todo el producto. Solución: <strong>sumar 1 a todas las frecuencias</strong> (suavizado de Laplace). Ej.: accidentes por color 0 (azul), 10 (amarillo), 11 (rojo) → 1, 11, 12.</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_07_knn_naive_bayes.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_07_knn_naive_bayes.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · K-vecinos más cercanos (distancias) y Bayes ingenuo (ejemplo del coche robado)
+import numpy as np
+import pandas as pd
+from sklearn.neighbors import KNeighborsClassifier
+
+# ---------------- KNN ----------------
+a, b = np.array([1, 2]), np.array([4, 6])
+print(&quot;Manhattan  :&quot;, np.sum(np.abs(a - b)))                 # |1-4| + |2-6| = 7
+print(&quot;Euclidiana :&quot;, np.sqrt(np.sum((a - b) ** 2)))          # √(9+16) = 5
+print(&quot;Minkowski p=3:&quot;, round(np.sum(np.abs(a - b) ** 3) ** (1 / 3), 4))
+
+X = np.array([[1, 1], [1, 2], [2, 1], [6, 6], [7, 6], [6, 7]])
+y = np.array([&quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;B&quot;, &quot;B&quot;, &quot;B&quot;])
+nuevo = np.array([3, 3])
+d = np.sqrt(((X - nuevo) ** 2).sum(axis=1))                  # 1) distancias
+orden = np.argsort(d)                                         # 2) ordenar
+k = 3
+print(f&quot;\nDistancias a {nuevo}: {d.round(2)}&quot;)
+print(f&quot;{k} vecinos más cercanos: {y[orden[:k]]} -&gt; clase mayoritaria: &quot;
+      f&quot;{pd.Series(y[orden[:k]]).mode()[0]}&quot;)                   # 3) votar
+print(&quot;sklearn:&quot;, KNeighborsClassifier(n_neighbors=3).fit(X, y).predict([nuevo]))
+
+# ---------------- Bayes ingenuo ----------------
+autos = pd.DataFrame({
+    &quot;Color&quot;:  [&quot;Rojo&quot;, &quot;Rojo&quot;, &quot;Rojo&quot;, &quot;Amarillo&quot;, &quot;Amarillo&quot;, &quot;Amarillo&quot;, &quot;Amarillo&quot;, &quot;Amarillo&quot;, &quot;Rojo&quot;, &quot;Rojo&quot;],
+    &quot;Tipo&quot;:   [&quot;Deportivo&quot;, &quot;Deportivo&quot;, &quot;Deportivo&quot;, &quot;Deportivo&quot;, &quot;SUV&quot;, &quot;SUV&quot;, &quot;SUV&quot;, &quot;SUV&quot;, &quot;SUV&quot;, &quot;Deportivo&quot;],
+    &quot;Origen&quot;: [&quot;Nacional&quot;, &quot;Nacional&quot;, &quot;Nacional&quot;, &quot;Importado&quot;, &quot;Importado&quot;, &quot;Importado&quot;, &quot;Importado&quot;, &quot;Nacional&quot;, &quot;Importado&quot;, &quot;Importado&quot;],
+    &quot;Robado&quot;: [&quot;Sí&quot;, &quot;No&quot;, &quot;Sí&quot;, &quot;No&quot;, &quot;Sí&quot;, &quot;No&quot;, &quot;Sí&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Sí&quot;],
+})
+
+def naive_bayes(nuevo, laplace=0):
+    resultados = {}
+    for clase, grupo in autos.groupby(&quot;Robado&quot;):
+        prob = len(grupo) / len(autos)                        # P(y)  (a priori)
+        detalle = [f&quot;P({clase})={prob:.2f}&quot;]
+        for var, valor in nuevo.items():
+            k = autos[var].nunique()
+            p = ((grupo[var] == valor).sum() + laplace) / (len(grupo) + laplace * k)
+            prob *= p                                         # Π P(x_i | y)  (independencia)
+            detalle.append(f&quot;P({valor}|{clase})={p:.2f}&quot;)
+        resultados[clase] = prob
+        print(&quot;   &quot;, &quot; · &quot;.join(detalle), f&quot;= {prob:.4f}&quot;)
+    return max(resultados, key=resultados.get)
+
+for caso in [{&quot;Color&quot;: &quot;Rojo&quot;, &quot;Tipo&quot;: &quot;Deportivo&quot;, &quot;Origen&quot;: &quot;Importado&quot;},
+             {&quot;Color&quot;: &quot;Amarillo&quot;, &quot;Tipo&quot;: &quot;SUV&quot;, &quot;Origen&quot;: &quot;Nacional&quot;}]:
+    print(f&quot;\n{caso}&quot;)
+    print(&quot;  -&gt; ¿Robado?&quot;, naive_bayes(caso))
+
+print(&quot;\nFrecuencia cero: P(Verde|Sí) sin suavizar = 0/5 = 0  -&gt; anula todo el producto&quot;)
+print(&quot;Con suavizado de Laplace (+1):&quot;, round((0 + 1) / (5 + 1 * 3), 3), &quot;(suponiendo 3 colores posibles)&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Manhattan  : 7
+Euclidiana : 5.0
+Minkowski p=3: 4.4979
+
+Distancias a [3 3]: [2.83 2.24 2.24 4.24 5.   5.  ]
+3 vecinos más cercanos: [&#x27;A&#x27; &#x27;A&#x27; &#x27;A&#x27;] -&gt; clase mayoritaria: A
+sklearn: [&#x27;A&#x27;]
+
+{&#x27;Color&#x27;: &#x27;Rojo&#x27;, &#x27;Tipo&#x27;: &#x27;Deportivo&#x27;, &#x27;Origen&#x27;: &#x27;Importado&#x27;}
+    P(No)=0.50 · P(Rojo|No)=0.40 · P(Deportivo|No)=0.40 · P(Importado|No)=0.60 = 0.0480
+    P(Sí)=0.50 · P(Rojo|Sí)=0.60 · P(Deportivo|Sí)=0.60 · P(Importado|Sí)=0.60 = 0.1080
+  -&gt; ¿Robado? Sí
+
+{&#x27;Color&#x27;: &#x27;Amarillo&#x27;, &#x27;Tipo&#x27;: &#x27;SUV&#x27;, &#x27;Origen&#x27;: &#x27;Nacional&#x27;}
+    P(No)=0.50 · P(Amarillo|No)=0.60 · P(SUV|No)=0.60 · P(Nacional|No)=0.40 = 0.0720
+    P(Sí)=0.50 · P(Amarillo|Sí)=0.40 · P(SUV|Sí)=0.40 · P(Nacional|Sí)=0.40 = 0.0320
+  -&gt; ¿Robado? No
+
+Frecuencia cero: P(Verde|Sí) sin suavizar = 0/5 = 0  -&gt; anula todo el producto
+Con suavizado de Laplace (+1): 0.125 (suponiendo 3 colores posibles)</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="arboles">11. Árboles de decisión</h2>
+<p>Un árbol es un conjunto de <strong>reglas lógicas</strong> que parten de una raíz y llegan a conclusiones particulares (hojas). Se dibuja al revés. Ejemplo del Titanic (sexo, edad y número de familiares a bordo, <em>sibsp</em>):</p>
+<figure class="figure">
+  <svg viewBox="0 0 640 300" role="img" aria-label="Árbol de decisión del Titanic">
+    <rect x="250" y="12" width="140" height="40" rx="8" class="d-box-strong"/><text x="320" y="37" text-anchor="middle" class="d-text" font-weight="700">¿es hombre?</text>
+    <path d="M290 52 L150 100 M350 52 L480 100" class="d-line-2"/>
+    <text x="200" y="76" class="d-text-3">sí</text><text x="430" y="76" class="d-text-3">no</text>
+    <rect x="80" y="100" width="140" height="40" rx="8" class="d-box-strong"/><text x="150" y="125" text-anchor="middle" class="d-text" font-weight="700">¿edad &gt; 9.5?</text>
+    <rect x="410" y="100" width="140" height="44" rx="8" class="d-fill-3"/><text x="480" y="119" text-anchor="middle" class="d-text">sobrevive</text><text x="480" y="135" text-anchor="middle" class="d-text-3">73 % de prob.</text>
+    <path d="M120 140 L70 190 M180 140 L260 190" class="d-line-2"/>
+    <text x="80" y="168" class="d-text-3">sí</text><text x="228" y="168" class="d-text-3">no</text>
+    <rect x="10" y="190" width="120" height="44" rx="8" class="d-fill-8"/><text x="70" y="209" text-anchor="middle" class="d-text">muere</text><text x="70" y="225" text-anchor="middle" class="d-text-3">17 % sobrevive</text>
+    <rect x="190" y="190" width="140" height="40" rx="8" class="d-box-strong"/><text x="260" y="215" text-anchor="middle" class="d-text" font-weight="700">¿sibsp &gt; 2.5?</text>
+    <path d="M230 230 L190 260 M290 230 L340 260" class="d-line-2"/>
+    <rect x="130" y="256" width="120" height="40" rx="8" class="d-fill-8"/><text x="190" y="273" text-anchor="middle" class="d-text">muere</text><text x="190" y="289" text-anchor="middle" class="d-text-3">5 % sobrevive</text>
+    <rect x="280" y="256" width="120" height="40" rx="8" class="d-fill-3"/><text x="340" y="273" text-anchor="middle" class="d-text">sobrevive</text><text x="340" y="289" text-anchor="middle" class="d-text-3">89 %</text>
+    <text x="470" y="230" class="d-text-3">Recuadros con borde = nodos de decisión</text>
+    <text x="470" y="248" class="d-text-3">Rojo/verde = hojas (predicción)</text>
+  </svg>
+  <figcaption>Las ramas son los "bordes"; las hojas deciden. En regresión las hojas dan un valor numérico (la media de su grupo).</figcaption>
+</figure>
+<h3 id="cortes">11.1 Cortes binarios recursivos y costo</h3>
+<ol class="steps">
+  <li>Se proponen \(n\) candidatos de partición (uno por característica / punto de corte).</li>
+  <li>Se calcula la información ganada de cada candidato.</li>
+  <li>Se elige el que <strong>minimiza el costo</strong> y <strong>maximiza la ganancia</strong>.</li>
+  <li>Se repite recursivamente en cada rama hasta la pureza deseada (algoritmo <strong>codicioso</strong>).</li>
+</ol>
+<div class="formula">$$\text{Regresión: } \text{MSE} = \frac1n\sum(y_i-\hat y_i)^2,\ \ \text{MAE} = \frac1n\sum|y_i-\hat y_i| \qquad \text{Clasificación: } \text{Gini} = \sum_k p_k(1-p_k),\ \ \text{Entropía} = -\sum_k p_k\log p_k$$
+<div class="where">Gini = 0 → nodo puro (todas de la misma clase); Gini = 0.5 (binario 50/50) → partición inútil.</div></div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_08_arboles.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_08_arboles.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Árboles de decisión: Gini, entropía y elección del mejor corte (tabla &quot;Diabetic&quot;)
+import numpy as np
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier, export_text
+
+df = pd.DataFrame({
+    &quot;Calorias&quot;: [&quot;High&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;High&quot;, &quot;Low&quot;],
+    &quot;Azucar&quot;:   [&quot;High&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;Moderate&quot;, &quot;Moderate&quot;, &quot;High&quot;, &quot;Low&quot;],
+    &quot;Actividad&quot;: [&quot;Moderate&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;High&quot;, &quot;Low&quot;, &quot;High&quot;, &quot;Moderate&quot;, &quot;Low&quot;, &quot;High&quot;, &quot;Moderate&quot;],
+    &quot;Diabetico&quot;: [&quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;Yes&quot;, &quot;No&quot;],
+})
+
+def gini(s):
+    p = s.value_counts(normalize=True)
+    return float(np.sum(p * (1 - p)))          # Σ p_k (1 - p_k)
+
+def entropia(s):
+    p = s.value_counts(normalize=True)
+    return float(-np.sum(p * np.log2(p)))
+
+print(f&quot;Nodo raíz: Gini = {gini(df[&#x27;Diabetico&#x27;]):.3f}, Entropía = {entropia(df[&#x27;Diabetico&#x27;]):.3f}\n&quot;)
+for var in [&quot;Calorias&quot;, &quot;Azucar&quot;, &quot;Actividad&quot;]:
+    g_pond = 0
+    print(f&quot;Corte por {var}:&quot;)
+    for valor, grupo in df.groupby(var):
+        g = gini(grupo[&quot;Diabetico&quot;])
+        g_pond += len(grupo) / len(df) * g
+        print(f&quot;   {valor:&lt;9} n={len(grupo)}  { {k: int(v) for k, v in grupo[&#x27;Diabetico&#x27;].value_counts().items()} }  Gini={g:.3f}&quot;)
+    print(f&quot;   Gini ponderado = {g_pond:.3f}  |  Ganancia = {gini(df[&#x27;Diabetico&#x27;]) - g_pond:.3f}\n&quot;)
+
+X = pd.get_dummies(df.drop(columns=&quot;Diabetico&quot;), dtype=int)
+arbol = DecisionTreeClassifier(criterion=&quot;gini&quot;, max_depth=2, random_state=0)
+arbol.fit(X, df[&quot;Diabetico&quot;])
+print(export_text(arbol, feature_names=list(X.columns)))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Nodo raíz: Gini = 0.500, Entropía = 1.000
+
+Corte por Calorias:
+   High      n=5  {&#x27;Yes&#x27;: 4, &#x27;No&#x27;: 1}  Gini=0.320
+   Low       n=3  {&#x27;No&#x27;: 3}  Gini=0.000
+   Moderate  n=2  {&#x27;Yes&#x27;: 1, &#x27;No&#x27;: 1}  Gini=0.500
+   Gini ponderado = 0.260  |  Ganancia = 0.240
+
+Corte por Azucar:
+   High      n=4  {&#x27;Yes&#x27;: 4}  Gini=0.000
+   Low       n=2  {&#x27;No&#x27;: 2}  Gini=0.000
+   Moderate  n=4  {&#x27;No&#x27;: 3, &#x27;Yes&#x27;: 1}  Gini=0.375
+   Gini ponderado = 0.150  |  Ganancia = 0.350
+
+Corte por Actividad:
+   High      n=4  {&#x27;No&#x27;: 3, &#x27;Yes&#x27;: 1}  Gini=0.375
+   Low       n=3  {&#x27;Yes&#x27;: 3}  Gini=0.000
+   Moderate  n=3  {&#x27;No&#x27;: 2, &#x27;Yes&#x27;: 1}  Gini=0.444
+   Gini ponderado = 0.283  |  Ganancia = 0.217
+
+|--- Azucar_High &lt;= 0.50
+|   |--- Actividad_Low &lt;= 0.50
+|   |   |--- class: No
+|   |--- Actividad_Low &gt;  0.50
+|   |   |--- class: Yes
+|--- Azucar_High &gt;  0.50
+|   |--- class: Yes</pre></div>
+</div>
+<div class="callout tip"><div class="callout-title">💡 Lectura</div><p><strong>Azúcar</strong> es el mejor primer corte: deja dos hojas puras (High → todos diabéticos; Low → ninguno) y su Gini ponderado es el más bajo (0.150, ganancia 0.350). El árbol de sklearn elige exactamente ese corte en la raíz.</p></div>
+<h3 id="poda">11.2 ¿Cuándo detenerse? y poda</h3>
+<p>Buscar pureza total es costoso y <strong>sobreajusta</strong>. Criterios de paro: <strong>mínimo de observaciones</strong> por hoja, <strong>profundidad máxima</strong>, <strong>pureza</strong>. La <strong>poda</strong> recorre el árbol de las hojas a la raíz y elimina los nodos no significativos según el costo (poda de reducción de costo), reduciendo complejidad y sobreajuste.</p>
+
+<!-- ===================================================== -->
+<h2 id="redes-m2">12. Redes neuronales (introducción)</h2>
+<p>Inspiradas en el cerebro, con tres componentes: <strong>la neurona</strong> (cada una es un modelo simple, una función lineal), <strong>la función de activación</strong> (transforma la salida, incorpora no linealidad y decide si la neurona "se activa") y <strong>las capas</strong> (entrada, ocultas, salida). "Si podíamos crear una regresión lineal con gran efectividad, ¿qué pasaría si creamos varias?". Sin activaciones, una red de una capa equivale a una regresión lineal.</p>
+<div class="formula">$$Z_k = \sum_{i=1}^{j} x_i w_{ik} + w_{0k} \;\to\; f(Z_k) \;\to\; Z = \sum_{t=1}^{m} f(Z_t)\,v_t + v_0 \qquad J(\theta) = \frac1n\sum_{i=1}^{n}\text{Loss}\big(y^{(i)}F(x^{(i)};\theta)\big)$$
+<div class="where">Activaciones vistas: escalón (indicadora), sigmoide (salida de clasificadores), tanh (−1 a 1, preferida en ocultas), ReLU (0 a ∞, barata). Pérdidas: bisagra, log loss, MSE (+ penalización \(\tfrac12\lVert\theta\rVert^2\)). Optimizadores: GD y variantes, momentum, Adagrad, AdaDelta, Adam. Entrenamiento: forward → costo → backward → repetir (con GPU/TPU).</div></div>
+<div class="callout note"><div class="callout-title">➡️ Continúa en el Módulo 4</div><p>Todo esto se profundiza (con simuladores y Keras) en <a href="modulo4.html#ann">Módulo 4 · Redes neuronales</a>. El ejemplo XOR ("no es linealmente separable, pero… la unión hace la fuerza") está en <a href="modulo4.html#perceptron">el perceptrón</a>.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="ensambles">13. Ensambles</h2>
+<p>Combinar modelos simples en uno más fuerte: cada uno predice según sus fortalezas y los errores se complementan → <strong>mejor generalización</strong>.</p>
+<figure class="figure">
+  <svg viewBox="0 0 780 250" role="img" aria-label="Votación, bagging, boosting y stacking">
+    <defs><marker id="ea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <text x="95" y="20" text-anchor="middle" class="d-text" font-weight="700">Votación</text>
+    <rect x="45" y="32" width="100" height="26" rx="6" class="d-box"/><text x="95" y="50" text-anchor="middle" class="d-text-3">mismos datos</text>
+    <rect x="20" y="90" width="44" height="30" rx="6" class="d-fill-1"/><rect x="73" y="90" width="44" height="30" rx="6" class="d-fill-3"/><rect x="126" y="90" width="44" height="30" rx="6" class="d-fill-7"/>
+    <text x="42" y="110" text-anchor="middle" class="d-text-3">LR</text><text x="95" y="110" text-anchor="middle" class="d-text-3">KNN</text><text x="148" y="110" text-anchor="middle" class="d-text-3">Árbol</text>
+    <rect x="45" y="160" width="100" height="30" rx="6" class="d-fill-4"/><text x="95" y="180" text-anchor="middle" class="d-text-2">voto dura/suave</text>
+    <g class="d-arrow"><path d="M95 58 L42 88 M95 58 V88 M95 58 L148 88" marker-end="url(#ea)"/><path d="M42 120 L90 158 M95 120 V158 M148 120 L100 158" marker-end="url(#ea)"/></g>
+    <text x="290" y="20" text-anchor="middle" class="d-text" font-weight="700">Bagging / Random Forest</text>
+    <rect x="240" y="32" width="100" height="26" rx="6" class="d-box"/><text x="290" y="50" text-anchor="middle" class="d-text-3">datos</text>
+    <rect x="215" y="90" width="44" height="30" rx="6" class="d-fill-3"/><rect x="268" y="90" width="44" height="30" rx="6" class="d-fill-3"/><rect x="321" y="90" width="44" height="30" rx="6" class="d-fill-3"/>
+    <text x="237" y="110" text-anchor="middle" class="d-text-3">🌳</text><text x="290" y="110" text-anchor="middle" class="d-text-3">🌳</text><text x="343" y="110" text-anchor="middle" class="d-text-3">🌳</text>
+    <rect x="240" y="160" width="100" height="30" rx="6" class="d-fill-4"/><text x="290" y="180" text-anchor="middle" class="d-text-2">voto / promedio</text>
+    <g class="d-arrow"><path d="M290 58 L237 88 M290 58 V88 M290 58 L343 88" marker-end="url(#ea)"/><path d="M237 120 L285 158 M290 120 V158 M343 120 L295 158" marker-end="url(#ea)"/></g>
+    <text x="235" y="215" class="d-text-3">muestras con reemplazo,</text><text x="235" y="230" class="d-text-3">modelos en PARALELO</text>
+    <text x="490" y="20" text-anchor="middle" class="d-text" font-weight="700">Boosting</text>
+    <rect x="420" y="40" width="60" height="30" rx="6" class="d-fill-2"/><text x="450" y="60" text-anchor="middle" class="d-text-3">h₁</text>
+    <rect x="420" y="95" width="60" height="30" rx="6" class="d-fill-2"/><text x="450" y="115" text-anchor="middle" class="d-text-3">h₂</text>
+    <rect x="420" y="150" width="60" height="30" rx="6" class="d-fill-2"/><text x="450" y="170" text-anchor="middle" class="d-text-3">h₃</text>
+    <g class="d-arrow"><path d="M450 70 V93" marker-end="url(#ea)"/><path d="M450 125 V148" marker-end="url(#ea)"/></g>
+    <text x="490" y="85" class="d-text-3">aprende los errores</text><text x="490" y="140" class="d-text-3">de los errores…</text>
+    <text x="410" y="215" class="d-text-3">F_m = F_{m−1} + w_m·h_m</text><text x="410" y="230" class="d-text-3">modelos en SERIE</text>
+    <text x="690" y="20" text-anchor="middle" class="d-text" font-weight="700">Stacking</text>
+    <rect x="620" y="40" width="60" height="30" rx="6" class="d-fill-1"/><text x="650" y="60" text-anchor="middle" class="d-text-3">clima</text>
+    <rect x="700" y="40" width="70" height="30" rx="6" class="d-fill-1"/><text x="735" y="60" text-anchor="middle" class="d-text-3">precipit.</text>
+    <rect x="640" y="130" width="110" height="34" rx="6" class="d-fill-7"/><text x="695" y="145" text-anchor="middle" class="d-text-3">modelo</text><text x="695" y="158" text-anchor="middle" class="d-text-3">concentrador</text>
+    <g class="d-arrow"><path d="M650 70 L685 128" marker-end="url(#ea)"/><path d="M735 70 L705 128" marker-end="url(#ea)"/></g>
+    <text x="620" y="190" class="d-text-3">predicciones como</text><text x="620" y="205" class="d-text-3">variables → ¿lloverá?</text>
+  </svg>
+  <figcaption>Las cuatro familias de ensambles del curso.</figcaption>
+</figure>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Ensamble</th><th>Cómo funciona</th><th>Detalles del curso</th></tr></thead>
+<tbody>
+<tr><td>Clasificador votante</td><td>varios modelos con los mismos datos; cada uno vota</td><td><strong>Voto duro</strong>: gana la mayoría. <strong>Voto suave</strong>: pesa más el modelo más seguro (probabilidades). Conviene usar algoritmos distintos.</td></tr>
+<tr><td>Bagging</td><td><strong>Bootstrap Aggregating</strong>: cada modelo débil se entrena con una muestra con reemplazo; se combinan</td><td>Clasificación: voto. Regresión: promedio.</td></tr>
+<tr><td>Bosque aleatorio</td><td>bagging de árboles + cada árbol con características distintas</td><td>r muestras con reemplazo → r árboles → predicción conjunta. Minimiza el error sin sobreajustar.</td></tr>
+<tr><td>Boosting</td><td>modelos <strong>encadenados</strong>: cada uno predice los errores del anterior</td><td><strong>AdaBoost</strong> (Freund y Schapire): une "tocones" (reglas de un nivel). <strong>Gradient Boosting</strong>: árboles que estiman el error del anterior; predicción = suma. <strong>XGBoost</strong> (U. Washington; Chen y Guestrin): versión optimizada y paralela.</td></tr>
+<tr><td>Stacking</td><td>las predicciones de unos modelos son entradas de otro</td><td>Identificar indicadores de apoyo → modelarlos → un modelo concentrador predice el evento final (ej.: predecir clima y precipitación para luego predecir lluvia).</td></tr>
+</tbody></table></div>
+<div class="chart-card">
+  <h4>Accuracy en prueba por modelo (cáncer de mama, 30 % de validación)</h4>
+  <p class="sub">Todos los ensambles superan al árbol individual (0.924). Resultados del programa de abajo.</p>
+  <div class="chart-box"><canvas id="chart-ens" aria-label="Accuracy de ensambles"></canvas></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_09_ensambles.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_09_ensambles.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Ensambles: votación, bagging, bosque aleatorio, boosting y stacking
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import (VotingClassifier, BaggingClassifier, RandomForestClassifier,
+                              AdaBoostClassifier, GradientBoostingClassifier, StackingClassifier)
+from sklearn.metrics import roc_auc_score
+
+X, y = load_breast_cancer(return_X_y=True)
+Xt, Xv, yt, yv = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+
+logit = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
+knn = make_pipeline(StandardScaler(), KNeighborsClassifier(5))
+arbol = DecisionTreeClassifier(max_depth=4, random_state=0)
+
+modelos = {
+    &quot;Árbol individual&quot;:       arbol,
+    &quot;Votación dura&quot;:          VotingClassifier([(&quot;lr&quot;, logit), (&quot;knn&quot;, knn), (&quot;dt&quot;, arbol)], voting=&quot;hard&quot;),
+    &quot;Votación suave&quot;:         VotingClassifier([(&quot;lr&quot;, logit), (&quot;knn&quot;, knn), (&quot;dt&quot;, arbol)], voting=&quot;soft&quot;),
+    &quot;Bagging (100 árboles)&quot;:  BaggingClassifier(DecisionTreeClassifier(), n_estimators=100, random_state=0),
+    &quot;Bosque aleatorio&quot;:       RandomForestClassifier(n_estimators=200, random_state=0),
+    &quot;AdaBoost (tocones)&quot;:     AdaBoostClassifier(n_estimators=200, random_state=0),
+    &quot;Gradient Boosting&quot;:      GradientBoostingClassifier(random_state=0),
+    &quot;Stacking&quot;:               StackingClassifier([(&quot;knn&quot;, knn), (&quot;dt&quot;, arbol), (&quot;rf&quot;, RandomForestClassifier(100, random_state=0))],
+                                                 final_estimator=LogisticRegression(max_iter=1000)),
+}
+print(f&quot;{&#x27;Modelo&#x27;:&lt;24}{&#x27;Accuracy&#x27;:&gt;10}{&#x27;AUC&#x27;:&gt;8}&quot;)
+for nombre, m in modelos.items():
+    m.fit(Xt, yt)
+    acc = m.score(Xv, yv)
+    if getattr(m, &quot;voting&quot;, &quot;soft&quot;) == &quot;hard&quot;:          # el voto duro no da probabilidades
+        auc_txt = &quot;n/a&quot;
+    else:
+        auc_txt = f&quot;{roc_auc_score(yv, m.predict_proba(Xv)[:, 1]):.3f}&quot;
+    print(f&quot;{nombre:&lt;24}{acc:&gt;10.3f}{auc_txt:&gt;8}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Modelo                    Accuracy     AUC
+Árbol individual             0.924   0.925
+Votación dura                0.959     n/a
+Votación suave               0.959   0.992
+Bagging (100 árboles)        0.942   0.990
+Bosque aleatorio             0.936   0.992
+AdaBoost (tocones)           0.959   0.992
+Gradient Boosting            0.942   0.990
+Stacking                     0.959   0.990</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="metricas">14. Métricas y selección del modelo campeón</h2>
+<p>Se parte el conjunto en <strong>entrenamiento</strong> y <strong>prueba</strong> (la prueba no interactúa con el modelo hasta el final) para detectar <strong>overfitting</strong>: excelente en entrenamiento, pobre con datos reales. Además del desempeño, el campeón debe resolver las necesidades del negocio (p. ej. interpretabilidad).</p>
+<h3 id="metricas-regresion">14.1 Regresión</h3>
+<p>En \(\mathbb{R}\) acertar el valor exacto es casi imposible; buscamos aproximarnos. Lo ideal es que los residuales se comporten como una normal centrada en 0.</p>
+<div class="formula">$$\text{MaxError} = \max_i|y_i-\hat y_i|\quad \text{MAE} = \frac1n\sum|y_i-\hat y_i|\quad \text{MSE} = \frac1n\sum(y_i-\hat y_i)^2\quad \text{MedAE} = \operatorname{mediana}|y_i-\hat y_i|$$
+$$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{\sum(y_i-\hat y_i)^2}{\sum(y_i-\bar y)^2}$$
+<div class="where">MAE: se busca que sea menor que la desviación estándar de \(y\). MSE castiga más los errores grandes. \(R^2\): proporción de la varianza explicada.</div></div>
+
+<h3 id="metricas-clasificacion">14.2 Clasificación: matriz de confusión</h3>
+<figure class="figure">
+  <svg viewBox="0 0 520 230" role="img" aria-label="Matriz de confusión binaria">
+    <text x="300" y="20" text-anchor="middle" class="d-text" font-weight="700">Predicción</text>
+    <text x="230" y="44" text-anchor="middle" class="d-text-2">Positivo</text><text x="370" y="44" text-anchor="middle" class="d-text-2">Negativo</text>
+    <text x="40" y="140" text-anchor="middle" class="d-text" font-weight="700" transform="rotate(-90 40 140)">Real</text>
+    <text x="110" y="100" text-anchor="middle" class="d-text-2">Positivo</text><text x="110" y="180" text-anchor="middle" class="d-text-2">Negativo</text>
+    <rect x="160" y="56" width="140" height="78" rx="6" class="d-fill-3"/><text x="230" y="92" text-anchor="middle" class="d-text" font-weight="700">TP</text><text x="230" y="112" text-anchor="middle" class="d-text-3">verdadero positivo</text>
+    <rect x="300" y="56" width="140" height="78" rx="6" class="d-fill-8"/><text x="370" y="92" text-anchor="middle" class="d-text" font-weight="700">FN</text><text x="370" y="112" text-anchor="middle" class="d-text-3">falso negativo</text>
+    <rect x="160" y="134" width="140" height="78" rx="6" class="d-fill-8"/><text x="230" y="170" text-anchor="middle" class="d-text" font-weight="700">FP</text><text x="230" y="190" text-anchor="middle" class="d-text-3">falso positivo</text>
+    <rect x="300" y="134" width="140" height="78" rx="6" class="d-fill-3"/><text x="370" y="170" text-anchor="middle" class="d-text" font-weight="700">TN</text><text x="370" y="190" text-anchor="middle" class="d-text-3">verdadero negativo</text>
+  </svg>
+  <figcaption>Ojo: <code>sklearn.metrics.confusion_matrix</code> ordena las clases 0, 1, así que imprime <code>[[TN, FP], [FN, TP]]</code>.</figcaption>
+</figure>
+<div class="formula">
+$$\text{Accuracy} = \frac{TP+TN}{TP+TN+FP+FN}\qquad \text{Precision} = \frac{TP}{TP+FP}\qquad \text{Recall} = \frac{TP}{TP+FN}$$
+$$F1 = 2\,\frac{\text{precision}\cdot\text{recall}}{\text{precision}+\text{recall}}\qquad \text{Balanced acc.} = \frac1k\sum_k \text{Recall}_k \qquad \text{Especificidad} = \frac{TN}{TN+FP}$$
+</div>
+<div class="glossary">
+  <div class="gterm"><b>Precisión</b><span>De los que el modelo dijo "evento", ¿cuántos lo eran? (castiga falsos positivos).</span></div>
+  <div class="gterm"><b>Recall / sensibilidad</b><span>De los eventos reales, ¿cuántos capturó? (castiga falsos negativos).</span></div>
+  <div class="gterm"><b>F1</b><span>Balance (media armónica) entre precisión y recall.</span></div>
+  <div class="gterm"><b>Balanced accuracy</b><span>Promedio del recall de cada clase: útil con clases desbalanceadas.</span></div>
+</div>
+
+<h3 id="roc">14.3 Curva ROC, AUC, Gini, KS y Lift</h3>
+<p>La <strong>ROC</strong> grafica la tasa de verdaderos positivos (TPR = recall = sensibilidad) contra la de falsos positivos (FPR = 1 − especificidad) para <strong>todos los cortes de probabilidad</strong>. El área bajo la curva (<strong>AUC</strong> o C-statistic) resume el desempeño: 0.5 = azar, 1 = perfecto. El <strong>Gini</strong> = 2·AUC − 1. El <strong>KS</strong> es la máxima separación entre las distribuciones acumuladas de eventos y no eventos. El <strong>Lift</strong> compara la tasa de evento que logra el modelo en un corte contra la tasa natural (si los 10 mejores tienen 0.8 de evento y la tasa natural es 0.2, lift = 0.8/0.2 = <strong>4</strong>).</p>
+<div class="two-col">
+<div class="chart-card">
+  <h4>Curva ROC del ejemplo (AUC = 0.854)</h4>
+  <p class="sub">10 observaciones del programa. Cada escalón es un corte de probabilidad.</p>
+  <div class="chart-box short"><canvas id="chart-roc" aria-label="Curva ROC"></canvas></div>
+</div>
+<div class="chart-card">
+  <h4>Lift por decil</h4>
+  <p class="sub">Decil 1 = 10 % con mayor score: 2.68 veces la tasa natural. La línea 1 = azar.</p>
+  <div class="chart-box short"><canvas id="chart-lift" aria-label="Lift por decil"></canvas></div>
+</div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo2/m2_10_metricas.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo2/m2_10_metricas.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 2 · Métricas para elegir el modelo campeón y monitorearlo (KS, Gini, Lift, PSI)
+import numpy as np
+import pandas as pd
+from sklearn.metrics import (max_error, mean_absolute_error, mean_squared_error, r2_score,
+                             median_absolute_error, confusion_matrix, accuracy_score,
+                             precision_score, recall_score, f1_score, balanced_accuracy_score,
+                             roc_auc_score)
+from scipy.stats import ks_2samp
+
+# ---------------- Regresión ----------------
+y_real = np.array([3.0, 5.0, 2.5, 7.0, 4.0])
+y_pred = np.array([2.5, 5.0, 3.0, 8.0, 3.5])
+print(&quot;REGRESIÓN&quot;)
+print(f&quot;  Max Error = {max_error(y_real, y_pred):.3f}&quot;)
+print(f&quot;  MAE       = {mean_absolute_error(y_real, y_pred):.3f}&quot;)
+print(f&quot;  MSE       = {mean_squared_error(y_real, y_pred):.3f}&quot;)
+print(f&quot;  RMSE      = {np.sqrt(mean_squared_error(y_real, y_pred)):.3f}&quot;)
+print(f&quot;  MedAE     = {median_absolute_error(y_real, y_pred):.3f}&quot;)
+print(f&quot;  R²        = {r2_score(y_real, y_pred):.3f}&quot;)
+
+# ---------------- Clasificación ----------------
+y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+p = np.array([0.9, 0.8, 0.6, 0.3, 0.7, 0.4, 0.3, 0.2, 0.1, 0.05])
+yhat = (p &gt;= 0.5).astype(int)
+print(&quot;\nCLASIFICACIÓN (corte 0.5)&quot;)
+print(&quot;  Matriz [[TN, FP], [FN, TP]] =&quot;, confusion_matrix(y, yhat).tolist())
+print(f&quot;  Accuracy={accuracy_score(y, yhat):.3f}  Precision={precision_score(y, yhat):.3f}  &quot;
+      f&quot;Recall={recall_score(y, yhat):.3f}  F1={f1_score(y, yhat):.3f}  &quot;
+      f&quot;BalancedAcc={balanced_accuracy_score(y, yhat):.3f}&quot;)
+auc = roc_auc_score(y, p)
+print(f&quot;  AUC (C-statistic) = {auc:.3f}  -&gt;  Gini = 2·AUC − 1 = {2 * auc - 1:.3f}&quot;)
+print(f&quot;  KS = máx. separación entre distribuciones de eventos y no eventos = &quot;
+      f&quot;{ks_2samp(p[y == 1], p[y == 0]).statistic:.3f}&quot;)
+
+# ---------------- Lift ----------------
+rng = np.random.default_rng(0)
+n = 10000
+score = rng.random(n)
+evento = (rng.random(n) &lt; 0.05 + 0.4 * score ** 3).astype(int)
+d = pd.DataFrame({&quot;score&quot;: score, &quot;evento&quot;: evento}).sort_values(&quot;score&quot;, ascending=False)
+d[&quot;decil&quot;] = np.repeat(np.arange(1, 11), n // 10)
+lift = d.groupby(&quot;decil&quot;)[&quot;evento&quot;].mean() / d[&quot;evento&quot;].mean()
+print(&quot;\nLIFT por decil (1 = 10% con mayor score):&quot;, lift.round(2).tolist())
+
+# ---------------- PSI / Índice de desviación ----------------
+esperado = np.array([0.10, 0.20, 0.30, 0.25, 0.15])   # % por bin cuando se construyó el modelo
+actual = np.array([0.08, 0.18, 0.28, 0.28, 0.18])     # % por bin en el mes actual
+psi = np.sum((actual - esperado) * np.log(actual / esperado))
+estado = &quot;estable&quot; if psi &lt; 0.1 else &quot;cambio menor&quot; if psi &lt;= 0.25 else &quot;cambio MAYOR: recalibrar&quot;
+print(f&quot;\nPSI = {psi:.4f} -&gt; {estado}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>REGRESIÓN
+  Max Error = 1.000
+  MAE       = 0.500
+  MSE       = 0.350
+  RMSE      = 0.592
+  MedAE     = 0.500
+  R²        = 0.863
+
+CLASIFICACIÓN (corte 0.5)
+  Matriz [[TN, FP], [FN, TP]] = [[5, 1], [1, 3]]
+  Accuracy=0.800  Precision=0.750  Recall=0.750  F1=0.750  BalancedAcc=0.792
+  AUC (C-statistic) = 0.854  -&gt;  Gini = 2·AUC − 1 = 0.708
+  KS = máx. separación entre distribuciones de eventos y no eventos = 0.583
+
+LIFT por decil (1 = 10% con mayor score): [2.68, 1.91, 1.38, 1.12, 0.73, 0.69, 0.4, 0.45, 0.27, 0.37]
+
+PSI = 0.0168 -&gt; estable</pre></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="estabilidad">15. Monitoreo: reportes de estabilidad y desempeño</h2>
+<p>El tiempo cambia a las poblaciones, y además <strong>introducir un modelo cambia el comportamiento de la población</strong>. Hay que monitorear dos cosas: la <strong>estabilidad poblacional</strong> (las variables del modelo) y el <strong>desempeño</strong> (su poder predictivo).</p>
+<ul>
+  <li><strong>Distribución de las características:</strong> comparar histogramas de dos periodos (y contrastes de hipótesis).</li>
+  <li><strong>Reporte de características:</strong> para categóricas (o continuas discretizadas), comparar frecuencias esperadas vs actuales con el <strong>índice de desviación / PSI</strong>.</li>
+</ul>
+<div class="formula">$$\text{PSI} = \sum_{k\,\in\,\text{categorías}} (\%\text{Actual}_k - \%\text{Esperado}_k)\times\ln\!\Big(\frac{\%\text{Actual}_k}{\%\text{Esperado}_k}\Big)$$
+<div class="where"><strong>&lt; 0.1</strong>: cambio insignificante · <strong>0.1 – 0.25</strong>: cambio menor · <strong>&gt; 0.25</strong>: cambio mayor → considerar reparametrizar/recalibrar el modelo.</div></div>
+<div class="chart-card">
+  <h4>PSI a través del tiempo con sus líneas de control</h4>
+  <p class="sub">Valores ilustrativos con la forma de la gráfica de la clase 2.12. Arriba de 0.25 (2014–2016) la población cambió: hay que revisar el modelo.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>PSI</span><span><i style="background:var(--warn)"></i>0.10 (cambio menor)</span><span><i style="background:var(--crit)"></i>0.25 (cambio mayor)</span></div>
+  <div class="chart-box"><canvas id="chart-psi" aria-label="PSI en el tiempo"></canvas></div>
+</div>
+<p>Para el <strong>desempeño</strong> se grafican en el tiempo: la curva ROC por periodo, el Gini, el KS (estático y acumulado), el reporte de Lift, la función de costo y métricas continuas (MAE, MAPE, MSE, MedAE). Una caída sostenida indica que el modelo perdió poder predictivo.</p>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="modulo1.html"><small>← Anterior</small>Módulo 1 · Fundamentos</a>
+  <a class="next" href="modulo3.html"><small>Siguiente →</small>Módulo 3 · No supervisado</a>
+</nav>
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="assets/js/data.js?v=180c6754" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/m2.js?v=e50a4702" defer></script>
+</body>
+</html>

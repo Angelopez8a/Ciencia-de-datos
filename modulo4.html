@@ -1,0 +1,1968 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 4 · Deep Learning | Apuntes Ciencia de Datos</title>
+<meta name="description" content="Redes neuronales profundas, CNN, RNN, LSTM, GRU, word embeddings y transfer learning con explicaciones, diagramas, simuladores y código verificado.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Ccircle cx='9' cy='11' r='3' fill='white'/%3E%3Ccircle cx='9' cy='21' r='3' fill='white'/%3E%3Ccircle cx='23' cy='16' r='3' fill='white'/%3E%3Cpath d='M11.5 11.8 20.5 15M11.5 20.2 20.5 17' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('apuntes-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=10789574">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn toc-toggle" id="toc-btn" type="button" aria-label="Abrir índice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">DS</span><span class="brand-text">Apuntes <small>· Diplomado en Ciencia de Datos</small></span></a>
+  <nav class="topnav" aria-label="Módulos"><a href="index.html">Inicio</a><a href="modulo1.html">Módulo 1</a><a href="modulo2.html">Módulo 2</a><a href="modulo3.html">Módulo 3</a><a href="modulo4.html" aria-current="page">Módulo 4</a><a href="examen-m4.html">Examen M4</a></nav>
+  <button class="icon-btn" id="theme-btn" type="button" aria-label="Cambiar tema"></button>
+</header>
+<div class="progress" aria-hidden="true"></div>
+<div class="layout">
+<aside class="sidebar" aria-label="Índice"><h2>En esta página</h2><ul class="toc" id="toc"></ul></aside>
+<main class="content">
+<section class="hero">
+  <div class="eyebrow">Módulo 4 · Técnicas cognitivas e introducción a Big Data</div>
+  <h1>Deep Learning: de la neurona a las redes convolucionales, recurrentes y el transfer learning</h1>
+  <p class="lead">Guía completa para estudiar el segundo examen. Cada tema trae la explicación con intuición, las fórmulas, un diagrama o gráfica, código que puedes ejecutar y <strong>la salida exacta que te debe salir</strong>.</p>
+  <div class="meta-row">
+    <span class="chip"><span class="dot"></span>Prof. Oscar Daniel Acosta González</span>
+    <span class="chip">8 presentaciones</span>
+    <span class="chip">14 programas verificados</span>
+    <span class="chip">10 simuladores interactivos</span>
+  </div>
+  <details class="sources">
+    <summary>Material del curso en el que se basa esta página</summary>
+    <ul>
+      <li><code>01_ Introducción - Módulo 4.pdf</code> — redes neuronales, MLP, pérdida, gradiente, conceptos clave</li>
+      <li><code>02_ Redes profundas alimentadas hacia adelante</code> — feedforward, perceptrón, funciones de activación</li>
+      <li><code>03_ Redes neurales convolucionales</code> — tensores, convolución, pooling, flattening, ventajas</li>
+      <li><code>04_ Redes neurales convolucionales</code> — dropout, arquitecturas, optimizadores</li>
+      <li><code>05_ Redes neurales recurrentes</code> — modelado secuencial, BPTT, tipos de RNN, BRNN, LSTM, GRU</li>
+      <li><code>06_ Word embeddings</code> — representación vectorial, one-hot, capa Embedding de Keras</li>
+      <li><code>07_ RNN</code> — LSTM vs GRU (ecuaciones), redes neuronales recursivas</li>
+      <li><code>08_ Transfer learning</code> — transferencia inductiva, beneficios, VGG/Inception/ResNet, word2vec/GloVe</li>
+    </ul>
+  </details>
+  <div class="callout exam">
+    <div class="callout-title">📝 Para el examen</div>
+    <p>Lee esta página en orden (sigue la misma secuencia que las clases). Cuando termines, ve a <a href="examen-m4.html">Examen M4</a>: ahí hay hoja de fórmulas, ejercicios numéricos resueltos, un cuestionario con 70 preguntas y tarjetas de repaso. Las cajas amarillas como esta resumen lo que más probablemente te pregunten.</p>
+  </div>
+</section>
+
+<figure class="figure">
+  <svg viewBox="0 0 800 250" role="img" aria-label="Mapa del módulo 4: ocho clases en secuencia">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <g>
+      <rect x="10" y="20" width="175" height="80" rx="12" class="d-fill-1"/>
+      <text x="97" y="50" text-anchor="middle" class="d-text" font-weight="700">01 · Introducción</text>
+      <text x="97" y="70" text-anchor="middle" class="d-text-3">ANN, MLP, pérdida,</text>
+      <text x="97" y="86" text-anchor="middle" class="d-text-3">gradiente, conceptos</text>
+      <rect x="210" y="20" width="175" height="80" rx="12" class="d-fill-1"/>
+      <text x="297" y="50" text-anchor="middle" class="d-text" font-weight="700">02 · Feedforward</text>
+      <text x="297" y="70" text-anchor="middle" class="d-text-3">perceptrón, regla delta,</text>
+      <text x="297" y="86" text-anchor="middle" class="d-text-3">funciones de activación</text>
+      <rect x="410" y="20" width="175" height="80" rx="12" class="d-fill-3"/>
+      <text x="497" y="50" text-anchor="middle" class="d-text" font-weight="700">03 · CNN (I)</text>
+      <text x="497" y="70" text-anchor="middle" class="d-text-3">tensores, convolución,</text>
+      <text x="497" y="86" text-anchor="middle" class="d-text-3">pooling, flattening</text>
+      <rect x="610" y="20" width="175" height="80" rx="12" class="d-fill-3"/>
+      <text x="697" y="50" text-anchor="middle" class="d-text" font-weight="700">04 · CNN (II)</text>
+      <text x="697" y="70" text-anchor="middle" class="d-text-3">dropout, arquitecturas,</text>
+      <text x="697" y="86" text-anchor="middle" class="d-text-3">optimizadores</text>
+      <rect x="610" y="150" width="175" height="80" rx="12" class="d-fill-2"/>
+      <text x="697" y="180" text-anchor="middle" class="d-text" font-weight="700">05 · RNN</text>
+      <text x="697" y="200" text-anchor="middle" class="d-text-3">secuencias, BPTT, tipos,</text>
+      <text x="697" y="216" text-anchor="middle" class="d-text-3">BRNN, LSTM, GRU</text>
+      <rect x="410" y="150" width="175" height="80" rx="12" class="d-fill-2"/>
+      <text x="497" y="180" text-anchor="middle" class="d-text" font-weight="700">06 · Word embeddings</text>
+      <text x="497" y="200" text-anchor="middle" class="d-text-3">one-hot vs denso,</text>
+      <text x="497" y="216" text-anchor="middle" class="d-text-3">coseno, capa Embedding</text>
+      <rect x="210" y="150" width="175" height="80" rx="12" class="d-fill-2"/>
+      <text x="297" y="180" text-anchor="middle" class="d-text" font-weight="700">07 · LSTM vs GRU</text>
+      <text x="297" y="200" text-anchor="middle" class="d-text-3">ecuaciones de puertas,</text>
+      <text x="297" y="216" text-anchor="middle" class="d-text-3">redes recursivas</text>
+      <rect x="10" y="150" width="175" height="80" rx="12" class="d-fill-7"/>
+      <text x="97" y="180" text-anchor="middle" class="d-text" font-weight="700">08 · Transfer learning</text>
+      <text x="97" y="200" text-anchor="middle" class="d-text-3">reutilizar modelos</text>
+      <text x="97" y="216" text-anchor="middle" class="d-text-3">VGG, ResNet, word2vec</text>
+      <path d="M187 60 H206" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M387 60 H406" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M587 60 H606" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M697 102 V146" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M608 190 H589" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M408 190 H389" class="d-arrow" marker-end="url(#ar)"/>
+      <path d="M208 190 H189" class="d-arrow" marker-end="url(#ar)"/>
+    </g>
+  </svg>
+  <figcaption>Ruta del módulo. Azul: fundamentos · Verde: visión por computadora · Naranja: secuencias y lenguaje · Morado: reutilización de modelos.</figcaption>
+</figure>
+
+<!-- ===================================================== -->
+<h2 id="recontexto">1. Recontexto: de Machine Learning a Deep Learning</h2>
+
+<p>Todo el diplomado gira alrededor de una idea: <strong>aprender una función</strong> \(\hat{y} = f(\vec{X})\) a partir de datos. En el Módulo 2 (supervisado) esa función era una regresión, un árbol o un ensamble; en el Módulo 3 (no supervisado) no había \(y\) y buscábamos estructura (clusters). En el Módulo 4 la función será una <strong>red neuronal profunda</strong>, pero se entrena con la misma receta que ya conoces: la regla del gradiente descendente.</p>
+
+<div class="formula">
+$$\theta_i \;\leftarrow\; \theta_i - \alpha\,\frac{\partial\,\text{loss function}}{\partial \theta_i}$$
+<div class="where">Cada parámetro \(\theta_i\) (peso o sesgo) se mueve un paso de tamaño \(\alpha\) (learning rate) en la dirección contraria al gradiente de la pérdida. Esta es la fórmula del "Recontexto" de casi todas las presentaciones.</div>
+</div>
+
+<div class="two-col">
+<figure class="figure">
+  <svg viewBox="0 0 360 250" role="img" aria-label="Inteligencia artificial contiene a machine learning que contiene a deep learning">
+    <ellipse cx="180" cy="128" rx="170" ry="115" class="d-fill-7"/>
+    <ellipse cx="180" cy="150" rx="120" ry="85" class="d-fill-1"/>
+    <ellipse cx="180" cy="172" rx="70" ry="50" class="d-fill-3"/>
+    <text x="180" y="40" text-anchor="middle" class="d-text" font-weight="700">Inteligencia Artificial</text>
+    <text x="180" y="57" text-anchor="middle" class="d-text-3">programas que perciben, razonan y actúan</text>
+    <text x="180" y="88" text-anchor="middle" class="d-text" font-weight="700">Machine Learning</text>
+    <text x="180" y="104" text-anchor="middle" class="d-text-3">mejoran con más datos</text>
+    <text x="180" y="168" text-anchor="middle" class="d-text" font-weight="700">Deep Learning</text>
+    <text x="180" y="185" text-anchor="middle" class="d-text-3">redes de muchas capas</text>
+  </svg>
+  <figcaption>IA ⊃ ML ⊃ DL (diapositiva "Introducción" de la clase 02).</figcaption>
+</figure>
+<figure class="figure">
+  <svg viewBox="0 0 360 250" role="img" aria-label="En machine learning la extracción de características la hace un humano; en deep learning la red la aprende">
+    <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <text x="10" y="24" class="d-text" font-weight="700">Machine Learning</text>
+    <rect x="10" y="36" width="62" height="44" rx="8" class="d-box"/><text x="41" y="63" text-anchor="middle" class="d-text-2">Datos</text>
+    <rect x="96" y="36" width="122" height="44" rx="8" class="d-fill-4"/><text x="157" y="55" text-anchor="middle" class="d-text-2">Extracción de</text><text x="157" y="71" text-anchor="middle" class="d-text-2">variables (humano)</text>
+    <rect x="242" y="36" width="104" height="44" rx="8" class="d-fill-1"/><text x="294" y="63" text-anchor="middle" class="d-text-2">Clasificador</text>
+    <path d="M74 58 H92" class="d-arrow" marker-end="url(#ar2)"/><path d="M220 58 H238" class="d-arrow" marker-end="url(#ar2)"/>
+    <text x="10" y="140" class="d-text" font-weight="700">Deep Learning</text>
+    <rect x="10" y="152" width="62" height="44" rx="8" class="d-box"/><text x="41" y="179" text-anchor="middle" class="d-text-2">Datos</text>
+    <rect x="96" y="152" width="250" height="44" rx="8" class="d-fill-3"/><text x="221" y="171" text-anchor="middle" class="d-text-2">Red profunda: extracción de</text><text x="221" y="187" text-anchor="middle" class="d-text-2">características + clasificación</text>
+    <path d="M74 174 H92" class="d-arrow" marker-end="url(#ar2)"/>
+    <text x="10" y="232" class="d-text-3">La red aprende sola las variables (bordes → formas → objetos).</text>
+  </svg>
+  <figcaption>La diferencia clave: en DL el "feature engineering" lo hace la propia red.</figcaption>
+</figure>
+</div>
+
+<div class="callout exam">
+  <div class="callout-title">📝 Para el examen</div>
+  <ul>
+    <li><strong>Deep learning</strong> es un tipo de machine learning inspirado en el cerebro: entrena a la computadora para tareas "humanas" (reconocer voz, imágenes, predecir) <strong>aprendiendo patrones con muchas capas</strong> en lugar de ecuaciones predefinidas.</li>
+    <li>Se usa en: reconocimiento de imágenes, de audio, NLP y sistemas de recomendación.</li>
+    <li>"El aprendizaje se vuelve más profundo cuando las tareas son más difíciles": las capas derivan funciones de alto nivel (más abstractas) a partir de la entrada.</li>
+  </ul>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="ann">2. Redes neuronales artificiales (ANN) y el perceptrón multicapa</h2>
+
+<p>La arquitectura más utilizada en la práctica es el <strong>perceptrón multicapa</strong> (MLP, <em>Multilayer Perceptron</em>). El MLP más simple tiene <strong>tres capas</strong>:</p>
+<ul>
+  <li><strong>Entrada:</strong> una neurona por cada variable de entrada. <strong>No tiene pesos</strong>: solo pasa los valores.</li>
+  <li><strong>Oculta:</strong> neuronas intermedias que (por defecto) aplican una transformación sigmoidal a la suma ponderada de lo que les llega.</li>
+  <li><strong>Salida:</strong> combina los valores no lineales de la capa oculta para dar la predicción.</li>
+</ul>
+
+<h3 id="neurona">2.1 ¿Qué calcula cada neurona?</h3>
+<p>Las diapositivas 7–9 de la clase 01 construyen la red en tres pasos: primero cada neurona oculta es "una función \(f(x_1,x_2)\)"; luego se ve que esa función es una <strong>suma ponderada</strong> \(w_{11}x_1 + w_{12}x_2\) (¡una regresión lineal!); y al final se le aplica una <strong>función de activación</strong> \(z(\cdot)\). Sin la activación, la red completa sería solo una combinación de regresiones lineales — es decir, otra regresión lineal.</p>
+
+<div class="formula">
+$$z_k = \sum_{i=1}^{j} w_{ki}\,x_i + b_k \qquad\qquad a_k = g(z_k) \qquad\qquad \hat{y} = g\Big(\sum_{t} w'_t\, a_t + b'\Big)$$
+<div class="where">\(w\) = pesos, \(b\) = sesgo (bias), \(g\) = función de activación. Cada neurona es un "estimador débil"; juntas forman algo parecido a un ensamble.</div>
+</div>
+
+<figure class="figure">
+  <svg viewBox="0 0 760 360" role="img" aria-label="Red 2-3-1 con los valores calculados en el ejemplo">
+    <g class="d-line">
+      <line x1="140" y1="130" x2="380" y2="80"/><line x1="140" y1="130" x2="380" y2="180"/><line x1="140" y1="130" x2="380" y2="280"/>
+      <line x1="140" y1="230" x2="380" y2="80"/><line x1="140" y1="230" x2="380" y2="180"/><line x1="140" y1="230" x2="380" y2="280"/>
+      <line x1="380" y1="80" x2="630" y2="180"/><line x1="380" y1="180" x2="630" y2="180"/><line x1="380" y1="280" x2="630" y2="180"/>
+    </g>
+    <circle cx="140" cy="130" r="32" class="d-node d-in"/><text x="140" y="126" text-anchor="middle" class="d-text" fill="#fff" style="fill:#fff" font-weight="700">x₁</text><text x="140" y="143" text-anchor="middle" style="fill:#fff" class="d-text-3">1.0</text>
+    <circle cx="140" cy="230" r="32" class="d-node d-in"/><text x="140" y="226" text-anchor="middle" style="fill:#fff" class="d-text" font-weight="700">x₂</text><text x="140" y="243" text-anchor="middle" style="fill:#fff" class="d-text-3">0.5</text>
+    <circle cx="380" cy="80" r="34" class="d-node d-hid"/><text x="380" y="76" text-anchor="middle" style="fill:#fff" class="d-text-3">z=0.00</text><text x="380" y="93" text-anchor="middle" style="fill:#fff" class="d-mono">a=0.500</text>
+    <circle cx="380" cy="180" r="34" class="d-node d-hid"/><text x="380" y="176" text-anchor="middle" style="fill:#fff" class="d-text-3">z=0.75</text><text x="380" y="193" text-anchor="middle" style="fill:#fff" class="d-mono">a=0.679</text>
+    <circle cx="380" cy="280" r="34" class="d-node d-hid"/><text x="380" y="276" text-anchor="middle" style="fill:#fff" class="d-text-3">z=−0.05</text><text x="380" y="293" text-anchor="middle" style="fill:#fff" class="d-mono">a=0.488</text>
+    <circle cx="630" cy="180" r="34" class="d-node d-out"/><text x="630" y="176" text-anchor="middle" style="fill:#fff" class="d-text" font-weight="700">ŷ</text><text x="630" y="194" text-anchor="middle" style="fill:#fff" class="d-mono">0.605</text>
+    <text x="20" y="28" class="d-text-2">W₁ = [[0.2, −0.4], [0.7, 0.1], [−0.3, 0.5]]   x = [1.0, 0.5]</text>
+    <text x="500" y="112" class="d-text-2">w′₁=0.6</text><text x="500" y="172" class="d-text-2">w′₂=−0.1</text><text x="500" y="248" class="d-text-2">w′₃=0.4</text>
+    <text x="140" y="332" text-anchor="middle" class="d-text-2">Capa de entrada</text><text x="140" y="348" text-anchor="middle" class="d-text-3">(sin pesos)</text>
+    <text x="380" y="332" text-anchor="middle" class="d-text-2">Capa oculta</text><text x="380" y="348" text-anchor="middle" class="d-text-3">a = sigmoid(z)</text>
+    <text x="630" y="332" text-anchor="middle" class="d-text-2">Capa de salida</text><text x="630" y="348" text-anchor="middle" class="d-text-3">ŷ = sigmoid(0.427)</text>
+  </svg>
+  <figcaption>La red 2-3-1 de las diapositivas con números reales. z₁ = 0.2·1 − 0.4·0.5 = 0 · z₂ = 0.7·1 + 0.1·0.5 = 0.75 · z₃ = −0.3·1 + 0.5·0.5 = −0.05; luego a = sigmoid(z). Son exactamente los valores del programa de abajo.</figcaption>
+</figure>
+
+<h3 id="perdida">2.2 Función de pérdida (loss)</h3>
+<p>Para saber qué tan mal está la red, se estima el error una y otra vez con una <strong>función de pérdida</strong>. Su elección debe coincidir con el tipo de problema, y la capa de salida debe ser coherente con ella:</p>
+<div class="two-col">
+<div class="formula">
+<strong>Entropía cruzada (clasificación)</strong>
+$$\mathcal{L}(\theta) = -\sum_{i=0}^{N} y_i \cdot \log(\hat{y}_i)$$
+</div>
+<div class="formula">
+<strong>Error cuadrático medio (regresión)</strong>
+$$\mathcal{L}(\theta) = \frac{1}{N}\sum_{i=0}^{N} (y_i - \hat{y}_i)^2$$
+</div>
+</div>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Problema</th><th>Neuronas de salida</th><th>Activación de salida</th><th>Pérdida (Keras)</th></tr></thead>
+<tbody>
+<tr><td>Regresión (un número)</td><td>1</td><td>lineal (ninguna)</td><td><code>mse</code> / <code>mae</code></td></tr>
+<tr><td>Clasificación binaria</td><td>1</td><td>sigmoid</td><td><code>binary_crossentropy</code></td></tr>
+<tr><td>Multiclase (una sola clase por ejemplo)</td><td>K (una por clase)</td><td>softmax</td><td><code>categorical_crossentropy</code> (one-hot) o <code>sparse_categorical_crossentropy</code> (enteros)</td></tr>
+<tr><td>Multietiqueta (varias clases a la vez)</td><td>K</td><td>sigmoid en cada una</td><td><code>binary_crossentropy</code></td></tr>
+</tbody></table></div>
+
+<h3 id="gradiente-backprop">2.3 Gradiente descendente, inicialización y backpropagation</h3>
+<p>Para encontrar los pesos que minimizan el error recurrimos a "un viejo conocido": el <strong>gradiente descendente</strong>. Se calculan las derivadas parciales de la pérdida respecto a cada peso y se da un "salto" del tamaño del learning rate. Iteración tras iteración los \(w_i\) se actualizan hasta que el algoritmo se detiene (por número de iteraciones o porque ya no hay cambios significativos).</p>
+<ul>
+  <li><strong>Pesos iniciales aleatorios:</strong> para que cada neurona se oriente a resultados distintos. Si todas empezaran iguales, recibirían el mismo gradiente y aprenderían lo mismo (problema de simetría).</li>
+  <li><strong>Forward propagation:</strong> la información viaja en una sola dirección, de la entrada a la salida, para producir \(\hat{y}\).</li>
+  <li><strong>Backpropagation:</strong> el error y su gradiente fluyen <em>hacia atrás</em> (de la salida a las ocultas) usando la regla de la cadena, y se actualizan los pesos.</li>
+</ul>
+<div class="formula">
+$$\frac{\partial \mathcal{L}}{\partial w_{ki}} = \underbrace{\frac{\partial \mathcal{L}}{\partial \hat{y}}\frac{\partial \hat{y}}{\partial z^{(2)}}}_{\text{error en la salida}}\cdot\underbrace{w'_k}_{\text{viaja hacia atrás}}\cdot\underbrace{g'(z_k)}_{\text{derivada de la activación}}\cdot\, x_i$$
+<div class="where">Con sigmoide + entropía cruzada binaria, el error en la salida se simplifica a \(\hat{y} - y\) y la derivada de la sigmoide es \(\sigma(z)(1-\sigma(z))\).</div>
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_01_forward_backprop.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_01_forward_backprop.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Red 2-3-1: propagación hacia adelante, pérdida y UN paso de backpropagation
+# Todo con NumPy para ver exactamente qué pasa dentro de la red.
+import numpy as np
+
+np.set_printoptions(precision=4, suppress=True)
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+# Entrada (2 variables) y etiqueta real (clase 1)
+x = np.array([1.0, 0.5])
+y = 1.0
+
+# Pesos &quot;aleatorios&quot; fijos para que el resultado sea reproducible
+W1 = np.array([[ 0.2, -0.4],    # neurona oculta 1: w11, w12
+               [ 0.7,  0.1],    # neurona oculta 2: w21, w22
+               [-0.3,  0.5]])   # neurona oculta 3: w31, w32
+b1 = np.array([0.0, 0.0, 0.0])
+W2 = np.array([0.6, -0.1, 0.4])  # w&#x27;1, w&#x27;2, w&#x27;3
+b2 = 0.0
+
+# ---------- 1) FORWARD ----------
+z1 = W1 @ x + b1          # suma ponderada de cada neurona oculta
+a1 = sigmoid(z1)          # activación (aquí entra la NO linealidad)
+z2 = W2 @ a1 + b2         # neurona de salida
+y_hat = sigmoid(z2)       # probabilidad de clase 1
+print(&quot;z1 (sumas ponderadas ocultas):&quot;, z1)
+print(&quot;a1 (activaciones ocultas):    &quot;, a1)
+print(f&quot;z2 = {z2:.4f}  -&gt;  y_hat = {y_hat:.4f}&quot;)
+
+# ---------- 2) PÉRDIDA (entropía cruzada binaria) ----------
+loss = -(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat))
+print(f&quot;Pérdida (binary cross-entropy) = {loss:.4f}&quot;)
+
+# ---------- 3) BACKPROPAGATION (regla de la cadena) ----------
+dz2 = y_hat - y                    # dL/dz2 para sigmoide + BCE
+dW2 = dz2 * a1                     # dL/dW2
+db2 = dz2
+da1 = dz2 * W2                     # el error &quot;viaja hacia atrás&quot;
+dz1 = da1 * a1 * (1 - a1)          # derivada de la sigmoide: s(1-s)
+dW1 = np.outer(dz1, x)
+db1 = dz1
+print(&quot;dL/dW2:&quot;, dW2)
+print(&quot;dL/dW1:\n&quot;, dW1)
+
+# ---------- 4) ACTUALIZACIÓN con gradiente descendente ----------
+lr = 0.5                           # learning rate (tamaño del &quot;salto&quot;)
+W2 -= lr * dW2;  b2 -= lr * db2
+W1 -= lr * dW1;  b1 -= lr * db1
+
+y_hat_nuevo = sigmoid(W2 @ sigmoid(W1 @ x + b1) + b2)
+loss_nuevo = -np.log(y_hat_nuevo)
+print(f&quot;Después de 1 paso: y_hat = {y_hat_nuevo:.4f}, pérdida = {loss_nuevo:.4f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>z1 (sumas ponderadas ocultas): [ 0.    0.75 -0.05]
+a1 (activaciones ocultas):     [0.5    0.6792 0.4875]
+z2 = 0.4271  -&gt;  y_hat = 0.6052
+Pérdida (binary cross-entropy) = 0.5022
+dL/dW2: [-0.1974 -0.2682 -0.1925]
+dL/dW1:
+ [[-0.0592 -0.0296]
+ [ 0.0086  0.0043]
+ [-0.0395 -0.0197]]
+Después de 1 paso: y_hat = 0.6961, pérdida = 0.3622</pre></div>
+</div>
+
+<div class="callout tip">
+  <div class="callout-title">💡 Cómo leer la salida</div>
+  <p>La red empezó prediciendo \(\hat{y}=0.6052\) para un ejemplo cuya clase real es 1 (pérdida 0.5022). Después de <strong>un solo paso</strong> de backprop con \(\alpha=0.5\), predice 0.6961 y la pérdida bajó a 0.3622. Eso es "aprender". Observa que <code>dL/dW1</code> de la neurona 2 es positivo: como su peso de salida \(w'_2=-0.1\) es negativo, el gradiente le pide moverse al revés que a las otras dos.</p>
+</div>
+
+<h3 id="profunda">2.4 ¿Cuándo una red es "profunda"?</h3>
+<p>Según el curso, una red se considera <strong>profunda a partir de 5 capas ocultas</strong>; con menos es una red <strong>superficial</strong> (<em>shallow neural network</em>). Pero ojo con la pregunta trampa:</p>
+<div class="callout warn">
+  <div class="callout-title">⚠️ ¿Más neuronas = mejor desempeño? No necesariamente.</div>
+  <p>Más capas y neuronas significan más parámetros: más riesgo de sobreajuste, más tiempo de cómputo y problemas de gradiente (que se desvanece o explota). <strong>La gran disrupción del deep learning no es el número de capas</strong>, sino que las capas ocultas pueden ser algo más que funciones de activación: por ejemplo, las primeras capas de una CNN son convoluciones que "resumen" la información de una imagen en valores más sencillos antes de pasarla a capas ocultas "comunes".</p>
+</div>
+<p>Aplicaciones conocidas de las redes profundas: <strong>computer vision, NLP, redes GAN (Generative Adversarial Networks), LSTM</strong> "y un muy largo etcétera".</p>
+
+<h3 id="conceptos-clave">2.5 Conceptos clave ("destrivializando")</h3>
+<p>Esta lista viene literal de la diapositiva 18–19 de la clase 01. Es material típico de preguntas de definición.</p>
+<div class="glossary">
+  <div class="gterm"><b>Neurona</b><span>Estructura básica de la red; en nuestro argot, un <em>estimador débil</em>.</span></div>
+  <div class="gterm"><b>Pesos</b><span>Valor por el cual se multiplican las entradas.</span></div>
+  <div class="gterm"><b>Activation function</b><span>Traduce los valores de entrada (suma ponderada) en los de salida; agrega la no linealidad.</span></div>
+  <div class="gterm"><b>ReLU</b><span>Rectified Linear Unit, max(0, x). Derivada constante (1 si x&gt;0) → agiliza entrenamientos.</span></div>
+  <div class="gterm"><b>Forward propagation</b><span>La entrada viaja por las capas ocultas hacia la salida en una sola dirección: ADELANTE.</span></div>
+  <div class="gterm"><b>Backpropagation</b><span>El error junto con el gradiente fluye hacia atrás, de la capa de salida a las ocultas, y se actualizan los pesos.</span></div>
+  <div class="gterm"><b>Learning rate</b><span>Cantidad de minimización de la función de costo en cada iteración (tamaño del paso).</span></div>
+  <div class="gterm"><b>Batches (lotes)</b><span>La entrada se divide al azar en fragmentos de igual tamaño; entrenar por lotes generaliza mejor que meter todo de golpe.</span></div>
+  <div class="gterm"><b>Epochs (épocas)</b><span>Una pasada hacia adelante y hacia atrás de <em>todos</em> los lotes (todos los datos) por la red.</span></div>
+  <div class="gterm"><b>Dropout</b><span>Regularización: se "apagan" neuronas al azar durante el entrenamiento; equivale a entrenar un ensamble de redes.</span></div>
+  <div class="gterm"><b>Padding</b><span>Agregar una orilla de ceros a la imagen para que la salida tenga el mismo tamaño que la entrada ("same padding").</span></div>
+  <div class="gterm"><b>Data augmentation</b><span>Agregar datos nuevos derivados de los existentes (rotar, voltear, recortar imágenes…).</span></div>
+  <div class="gterm"><b>Vanishing gradient</b><span>El gradiente de la activación es muy pequeño → los pesos casi no se actualizan.</span></div>
+  <div class="gterm"><b>Exploding gradient</b><span>Lo contrario: gradiente demasiado grande → un peso se vuelve enorme frente a los demás (y hasta NaN).</span></div>
+  <div class="gterm"><b>Transfer learning</b><span>Reutilizar un modelo entrenado en una tarea como punto de partida para otra.</span></div>
+  <div class="gterm"><b>CNN</b><span>Red convolucional para imágenes. Una entrada 28×28×3 en una red normal implicaría 2,352 entradas por neurona.</span></div>
+  <div class="gterm"><b>Pooling</b><span>Capas de agrupación entre convoluciones para reducir parámetros y evitar sobreajuste.</span></div>
+</div>
+
+<div class="widget" id="w-batch">
+  <div class="widget-title"><span class="tag">Calculadora</span> Lotes, iteraciones y épocas</div>
+  <p class="hint">Pregunta clásica: "si tengo N ejemplos, un batch de tamaño B y E épocas, ¿cuántas actualizaciones de pesos ocurren?"</p>
+  <div class="controls">
+    <label>N (ejemplos) <input type="number" id="bc-n" value="1000" min="1"></label>
+    <label>Batch size <input type="number" id="bc-b" value="32" min="1"></label>
+    <label>Épocas <input type="number" id="bc-e" value="10" min="1"></label>
+  </div>
+  <div class="readout" id="bc-out"></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="feedforward">3. Redes profundas alimentadas hacia adelante (Feedforward)</h2>
+
+<p>Una red <strong>feedforward</strong> es una red neuronal en la que <strong>las conexiones entre nodos no forman ciclos</strong>. La información se procesa en una sola dirección: aunque pase por muchas capas ocultas, siempre avanza y nunca regresa. Es la forma más simple de red neuronal. Lo opuesto es una <strong>red recurrente</strong>, donde ciertas vías forman ciclos (tema 6).</p>
+
+<figure class="figure">
+  <svg viewBox="0 0 520 150" role="img" aria-label="Las redes neuronales profundas se dividen en feedforward y recurrentes">
+    <rect x="185" y="10" width="150" height="44" rx="22" class="d-fill-1"/><text x="260" y="37" text-anchor="middle" class="d-text" font-weight="700">Deep neural networks</text>
+    <path d="M260 54 V78 M110 78 H410 M110 78 V96 M410 78 V96" class="d-line-2"/>
+    <rect x="35" y="96" width="150" height="44" rx="22" class="d-fill-3"/><text x="110" y="117" text-anchor="middle" class="d-text" font-weight="700">Feedforward</text><text x="110" y="132" text-anchor="middle" class="d-text-3">sin ciclos · CNN, MLP</text>
+    <rect x="335" y="96" width="150" height="44" rx="22" class="d-fill-2"/><text x="410" y="117" text-anchor="middle" class="d-text" font-weight="700">Recurrent</text><text x="410" y="132" text-anchor="middle" class="d-text-3">con ciclos · RNN, LSTM</text>
+  </svg>
+  <figcaption>Clasificación de las redes profundas usada en todo el módulo.</figcaption>
+</figure>
+
+<h3 id="perceptron">3.1 El perceptrón de una sola capa y la regla delta</h3>
+<p>En su forma más simple, una red feedforward es un <strong>perceptrón de una sola capa</strong>: las entradas se multiplican por los pesos, se suman y, si la suma supera un <strong>umbral</strong> (normalmente 0), la salida es <strong>1</strong>; si no, es <strong>−1</strong>. Se usa a menudo para clasificación.</p>
+<div class="formula">
+$$\hat{y} = \begin{cases} 1 & \text{si } \sum_i w_i x_i + b > 0\\ -1 & \text{en otro caso}\end{cases} \qquad\qquad w_i \leftarrow w_i + \eta\,(y - \hat{y})\,x_i$$
+<div class="where">La <strong>regla delta</strong> compara la salida con el valor esperado y ajusta los pesos en proporción al error: es una forma de descenso en gradiente. En perceptrones multicapa el proceso análogo se llama <strong>retropropagación</strong>: cada capa oculta se ajusta según los valores de salida producidos por la capa final.</div>
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_03_perceptron.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_03_perceptron.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Perceptrón de una sola capa con la REGLA DELTA (compuerta lógica AND)
+# Salida: 1 si la suma ponderada &gt; 0 (umbral), -1 en otro caso.
+import numpy as np
+
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([-1, -1, -1, 1])          # AND con etiquetas {-1, 1}
+
+w = np.zeros(2)
+b = 0.0
+lr = 0.1
+
+def predecir(x):
+    return 1 if (w @ x + b) &gt; 0 else -1
+
+for epoca in range(1, 11):
+    errores = 0
+    for xi, yi in zip(X, y):
+        y_pred = predecir(xi)
+        if y_pred != yi:
+            # Regla delta: ajusta los pesos en proporción al error
+            w += lr * (yi - y_pred) * xi
+            b += lr * (yi - y_pred)
+            errores += 1
+    print(f&quot;Época {epoca}: errores = {errores}, w = {w.round(2)}, b = {round(b, 2)}&quot;)
+    if errores == 0:
+        break
+
+print(&quot;Predicciones finales:&quot;, [predecir(xi) for xi in X])</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Época 1: errores = 1, w = [0.2 0.2], b = 0.2
+Época 2: errores = 3, w = [0.4 0.2], b = 0.0
+Época 3: errores = 3, w = [0.4 0.2], b = -0.2
+Época 4: errores = 2, w = [0.4 0.4], b = -0.2
+Época 5: errores = 1, w = [0.4 0.2], b = -0.4
+Época 6: errores = 0, w = [0.4 0.2], b = -0.4
+Predicciones finales: [-1, -1, -1, 1]</pre></div>
+</div>
+
+<div class="callout note">
+  <div class="callout-title">ℹ️ Limitación famosa</div>
+  <p>Un perceptrón de una capa solo traza <strong>una recta</strong> (hiperplano): resuelve AND u OR, pero <strong>no XOR</strong>, que no es linealmente separable. Por eso necesitamos capas ocultas con activaciones no lineales ("la unión hace la fuerza", como decía el Módulo 2).</p>
+</div>
+
+<h3 id="activaciones">3.2 Funciones de activación</h3>
+<p>Una función de activación define cómo la suma ponderada de la entrada se transforma en la salida del nodo. También se le llama <strong>función de transferencia</strong>; si su rango es limitado, <strong>función de aplastamiento</strong> (<em>squashing</em>); y como casi todas son no lineales, también "la no linealidad" de la capa. Normalmente todos los nodos de una misma capa usan la misma activación, pero distintas capas pueden usar distintas.</p>
+
+<div class="chart-card">
+  <h4>Funciones de activación y sus derivadas</h4>
+  <p class="sub">La derivada es lo que multiplica al gradiente en backprop: si es pequeña, el gradiente se desvanece.</p>
+  <div class="controls">
+    <button class="btn primary" id="activ-fn" type="button">Ver funciones</button>
+    <button class="btn" id="activ-deriv" type="button">Ver derivadas</button>
+  </div>
+  <div class="legend"><span><i style="background:var(--s1)"></i>Sigmoid</span><span><i style="background:var(--s2)"></i>Tanh</span><span><i style="background:var(--s3)"></i>ReLU</span></div>
+  <div class="chart-box"><canvas id="chart-activ" aria-label="Gráfica de sigmoid, tanh y ReLU"></canvas></div>
+</div>
+
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Función</th><th>Fórmula</th><th>Rango</th><th>Derivada máx.</th><th>Uso típico</th><th>Problema</th></tr></thead>
+<tbody>
+<tr><td>Sigmoid (logística)</td><td>\(\sigma(x)=\frac{1}{1+e^{-x}}\)</td><td>(0, 1)</td><td>0.25</td><td>salida binaria (probabilidad); la misma de la regresión logística</td><td>saturación → vanishing gradient</td></tr>
+<tr><td>Tanh</td><td>\(\frac{e^{x}-e^{-x}}{e^{x}+e^{-x}}\)</td><td>(−1, 1)</td><td>1</td><td>capas ocultas (centrada en 0); forma de S</td><td>también se satura</td></tr>
+<tr><td>ReLU</td><td>\(\max(0, x)\)</td><td>[0, ∞)</td><td>1 (constante)</td><td>la más común en capas ocultas; simple y barata</td><td>neuronas "muertas" (siempre 0)</td></tr>
+<tr><td>Softmax</td><td>\(\sigma(\vec z)_i=\frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}\)</td><td>(0,1), suman 1</td><td>—</td><td>salida multiclase (una clase por ejemplo)</td><td>no sirve si un ejemplo tiene varias clases</td></tr>
+<tr><td>Lineal</td><td>\(f(x)=x\)</td><td>(−∞, ∞)</td><td>1</td><td>salida de regresión</td><td>sin no linealidad</td></tr>
+</tbody></table></div>
+
+<h3 id="softmax">3.3 Softmax a detalle</h3>
+<p>La regresión logística da un valor entre 0 y 1: un 0.8 en un clasificador de spam significa 80 % spam y 20 % no spam (suman 1). <strong>Softmax extiende esa idea a varias clases</strong>: asigna una probabilidad a cada clase y todas suman 1.0, una restricción que además ayuda a que el entrenamiento converja más rápido. Se implementa en la capa justo antes de la salida y debe tener <strong>el mismo número de nodos que la capa de salida</strong>.</p>
+<div class="callout warn">
+  <div class="callout-title">⚠️ Softmax asume una sola clase por ejemplo</div>
+  <p>Si cada imagen tiene exactamente una fruta (pera, naranja, manzana…), softmax es ideal. Si las imágenes son tazones con varias frutas a la vez, hay que usar <strong>múltiples regresiones logísticas</strong> (una sigmoide por clase).</p>
+</div>
+
+<div class="widget" id="w-softmax">
+  <div class="widget-title"><span class="tag">Simulador</span> Softmax en vivo</div>
+  <p class="hint">Mueve los logits (salidas antes de la activación). Observa que solo importan las <em>diferencias</em> entre ellos y que las probabilidades siempre suman 1.</p>
+  <div class="controls">
+    <label>z₁ (manzana) <input type="range" id="sm-z1" min="-3" max="6" step="0.1" value="2"></label>
+    <label>z₂ (pera) <input type="range" id="sm-z2" min="-3" max="6" step="0.1" value="1"></label>
+    <label>z₃ (naranja) <input type="range" id="sm-z3" min="-3" max="6" step="0.1" value="0.1"></label>
+  </div>
+  <div class="bars" id="sm-bars"></div>
+  <div class="readout" id="sm-readout"></div>
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_02_activaciones.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_02_activaciones.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Funciones de activación y sus derivadas
+import numpy as np
+
+np.set_printoptions(precision=4, suppress=True)
+
+def sigmoid(z):  return 1 / (1 + np.exp(-z))
+def tanh(z):     return np.tanh(z)
+def relu(z):     return np.maximum(0, z)
+def softmax(z):
+    e = np.exp(z - np.max(z))      # restar el máximo evita desbordamiento
+    return e / e.sum()
+
+z = np.array([-5.0, -1.0, 0.0, 1.0, 5.0])
+print(&quot;z       :&quot;, z)
+print(&quot;sigmoid :&quot;, sigmoid(z), &quot;-&gt; rango (0, 1)&quot;)
+print(&quot;tanh    :&quot;, tanh(z),    &quot;-&gt; rango (-1, 1)&quot;)
+print(&quot;ReLU    :&quot;, relu(z),    &quot;-&gt; rango [0, inf)&quot;)
+
+# Derivadas: clave para entender el gradiente que se desvanece
+d_sig  = sigmoid(z) * (1 - sigmoid(z))
+d_tanh = 1 - np.tanh(z) ** 2
+d_relu = (z &gt; 0).astype(float)
+print(&quot;\nderivada sigmoid:&quot;, d_sig, &quot; (máx 0.25 en z=0)&quot;)
+print(&quot;derivada tanh   :&quot;, d_tanh, &quot; (máx 1 en z=0)&quot;)
+print(&quot;derivada ReLU   :&quot;, d_relu, &quot; (constante = 1 si z&gt;0)&quot;)
+
+# Softmax: convierte &quot;logits&quot; en probabilidades que suman 1
+logits = np.array([2.0, 1.0, 0.1])
+p = softmax(logits)
+print(&quot;\nlogits :&quot;, logits)
+print(&quot;softmax:&quot;, p, &quot; suma =&quot;, p.sum().round(4))
+print(&quot;clase predicha:&quot;, np.argmax(p))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>z       : [-5. -1.  0.  1.  5.]
+sigmoid : [0.0067 0.2689 0.5    0.7311 0.9933] -&gt; rango (0, 1)
+tanh    : [-0.9999 -0.7616  0.      0.7616  0.9999] -&gt; rango (-1, 1)
+ReLU    : [0. 0. 0. 1. 5.] -&gt; rango [0, inf)
+
+derivada sigmoid: [0.0066 0.1966 0.25   0.1966 0.0066]  (máx 0.25 en z=0)
+derivada tanh   : [0.0002 0.42   1.     0.42   0.0002]  (máx 1 en z=0)
+derivada ReLU   : [0. 0. 0. 1. 1.]  (constante = 1 si z&gt;0)
+
+logits : [2.  1.  0.1]
+softmax: [0.659  0.2424 0.0986]  suma = 1.0
+clase predicha: 0</pre></div>
+</div>
+
+<div class="callout exam">
+  <div class="callout-title">📝 Para el examen</div>
+  <ul>
+    <li>La activación es "el elemento donde se agrega la no linealidad del modelo". Sin ella la red es equivalente a una regresión lineal.</li>
+    <li>Sigmoid: (0,1), "función logística", más positiva la entrada → más cerca de 1. Tanh: (−1,1), misma forma de S. ReLU: la más común en ocultas porque es simple y <strong>menos susceptible al desvanecimiento del gradiente</strong>, pero puede tener unidades "muertas".</li>
+    <li>Softmax: probabilidades para varias clases que suman 1; misma cantidad de nodos que la salida; una clase por ejemplo.</li>
+    <li>Ejemplo numérico: softmax([2, 1, 0.1]) = [0.659, 0.242, 0.099].</li>
+  </ul>
+</div>
+
+<h3 id="ffnn-aplicaciones">3.4 Aplicaciones y un MLP en Keras</h3>
+<p>Aunque las feedforward son sencillas, su arquitectura simple es una ventaja: se pueden montar varias redes que trabajan <strong>de forma independiente</strong> con un "intermediario" que modera y combina sus resultados en una salida cohesiva (como muchas neuronas del cerebro trabajando en una tarea más grande).</p>
+<p>Así se ve un MLP real en Keras. Fíjate en cómo se calcula cada número de la columna <code>Param #</code>: <code>64·32 + 32 = 2,080</code> (64 entradas por 32 neuronas + 32 sesgos) y <code>32·10 + 10 = 330</code>. Dropout no tiene parámetros.</p>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_k1_mlp_keras.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k1_mlp_keras.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Red feedforward (MLP) con Keras para clasificar dígitos 8x8 (10 clases)
+import os
+os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;          # oculta avisos de TensorFlow
+import math
+import keras
+from keras import layers
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+
+keras.utils.set_random_seed(42)                    # reproducibilidad
+
+X, y = load_digits(return_X_y=True)                # 1797 imágenes de 8x8 = 64 píxeles
+X = X / 16.0                                       # escalar píxeles a [0, 1]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+modelo = keras.Sequential([
+    keras.Input(shape=(64,)),                      # capa de entrada: 64 variables (sin pesos)
+    layers.Dense(32, activation=&quot;relu&quot;),           # capa oculta
+    layers.Dropout(0.2),                           # regularización
+    layers.Dense(10, activation=&quot;softmax&quot;),        # salida: 10 probabilidades que suman 1
+])
+modelo.compile(optimizer=&quot;adam&quot;,
+               loss=&quot;sparse_categorical_crossentropy&quot;,   # etiquetas enteras 0..9
+               metrics=[&quot;accuracy&quot;])
+modelo.summary()
+
+hist = modelo.fit(X_train, y_train, epochs=30, batch_size=32,
+                  validation_split=0.1, verbose=0)
+n_ent = int(len(X_train) * 0.9)                    # 90% para entrenar, 10% validación
+print(f&quot;Muestras de entrenamiento: {n_ent} -&gt; batches por época = ceil({n_ent}/32) = {math.ceil(n_ent / 32)}&quot;)
+print(f&quot;Accuracy entrenamiento (última época): {hist.history[&#x27;accuracy&#x27;][-1]:.3f}&quot;)
+print(f&quot;Accuracy validación   (última época): {hist.history[&#x27;val_accuracy&#x27;][-1]:.3f}&quot;)
+loss, acc = modelo.evaluate(X_test, y_test, verbose=0)
+print(f&quot;Accuracy en prueba: {acc:.3f}&quot;)
+
+probs = modelo.predict(X_test[:1], verbose=0)[0]
+print(&quot;Probabilidades del 1er dígito de prueba:&quot;, probs.round(3))
+print(&quot;Predicción:&quot;, probs.argmax(), &quot;| Real:&quot;, y_test[0])</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Model: &quot;sequential&quot;
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 32)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 10)             │           330 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 2,410 (9.41 KB)
+ Trainable params: 2,410 (9.41 KB)
+ Non-trainable params: 0 (0.00 B)
+Muestras de entrenamiento: 1293 -&gt; batches por época = ceil(1293/32) = 41
+Accuracy entrenamiento (última época): 0.930
+Accuracy validación   (última época): 0.958
+Accuracy en prueba: 0.953
+Probabilidades del 1er dígito de prueba: [0.002 0.001 0.    0.    0.003 0.    0.989 0.    0.005 0.   ]
+Predicción: 6 | Real: 6</pre></div>
+  <div class="code-note">El entrenamiento usa una semilla fija; en otra computadora o versión los accuracies pueden variar ±1–2 %. El summary (capas, formas y número de parámetros) siempre sale idéntico.</div>
+</div>
+
+<div class="widget" id="w-params">
+  <div class="widget-title"><span class="tag">Calculadora</span> ¿Cuántos parámetros tiene esta capa?</div>
+  <p class="hint">Útil para verificar un <code>model.summary()</code> o resolver ejercicios del examen.</p>
+  <div class="controls">
+    <label>Tipo de capa
+      <select id="pc-type">
+        <option value="dense">Dense</option>
+        <option value="conv">Conv2D</option>
+        <option value="rnn">SimpleRNN</option>
+        <option value="lstm">LSTM</option>
+        <option value="gru">GRU (Keras)</option>
+        <option value="emb">Embedding</option>
+      </select>
+    </label>
+    <label><span id="pc-la">Entradas</span> <input type="number" id="pc-a" value="784" min="1"></label>
+    <label><span id="pc-lb">Neuronas</span> <input type="number" id="pc-b" value="128" min="1"></label>
+    <label id="pc-wc"><span id="pc-lc">Kernel k</span> <input type="number" id="pc-c" value="3" min="1"></label>
+  </div>
+  <div class="readout" id="pc-out"></div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="cnn">4. Redes neuronales convolucionales (CNN) · parte I</h2>
+
+<h3 id="cnn-intuicion">4.1 Intuición: ver como lo hace el cerebro</h3>
+<p>El deep learning intenta imitar (en procesamiento, no completamente) cómo aprende el cerebro. La visión es jerárquica: la luz llega a la retina, viaja por el nervio óptico hasta la corteza visual, y el cerebro primero detecta patrones simples (<strong>líneas, curvas</strong>), luego patrones complejos (<strong>textos, objetos, caras</strong>). Una CNN hace lo mismo con sus capas: las primeras detectan bordes, las siguientes formas, las últimas objetos.</p>
+<p>La restricción: <strong>una computadora solo entiende números</strong>. Una imagen en escala de grises es una matriz de intensidades (0 = negro … 255 = blanco); una imagen a color tiene 3 matrices (canales R, G, B).</p>
+
+<h3 id="tensores">4.2 Tensores</h3>
+<p>Los <strong>tensores</strong> son la estructura de datos del deep learning: una generalización de los vectores y matrices representada como un <strong>arreglo n-dimensional</strong>. Matemáticamente son más que un contenedor: incluyen las transformaciones lineales válidas entre tensores (producto punto, producto cruz…), por eso conviene pensarlos como "objetos" y no solo como datos.</p>
+
+<figure class="figure">
+  <svg viewBox="0 0 760 210" role="img" aria-label="Escalar, vector, matriz y tensor con sus formas">
+    <text x="70" y="24" text-anchor="middle" class="d-text" font-weight="700">Escalar (0D)</text>
+    <rect x="50" y="70" width="40" height="40" rx="6" class="d-fill-1"/><text x="70" y="96" text-anchor="middle" class="d-mono">7</text>
+    <text x="70" y="150" text-anchor="middle" class="d-text-3">shape: ()</text>
+    <text x="220" y="24" text-anchor="middle" class="d-text" font-weight="700">Vector (1D)</text>
+    <g class="d-fill-1"><rect x="200" y="40" width="40" height="32" rx="5"/><rect x="200" y="74" width="40" height="32" rx="5"/><rect x="200" y="108" width="40" height="32" rx="5"/></g>
+    <text x="220" y="61" text-anchor="middle" class="d-mono">1</text><text x="220" y="95" text-anchor="middle" class="d-mono">2</text><text x="220" y="129" text-anchor="middle" class="d-mono">3</text>
+    <text x="220" y="165" text-anchor="middle" class="d-text-3">shape: (3,)</text>
+    <text x="390" y="24" text-anchor="middle" class="d-text" font-weight="700">Matriz (2D)</text>
+    <g class="d-fill-3"><rect x="350" y="50" width="38" height="38" rx="5"/><rect x="390" y="50" width="38" height="38" rx="5"/><rect x="350" y="90" width="38" height="38" rx="5"/><rect x="390" y="90" width="38" height="38" rx="5"/></g>
+    <text x="369" y="74" text-anchor="middle" class="d-mono">1</text><text x="409" y="74" text-anchor="middle" class="d-mono">2</text><text x="369" y="114" text-anchor="middle" class="d-mono">3</text><text x="409" y="114" text-anchor="middle" class="d-mono">4</text>
+    <text x="390" y="155" text-anchor="middle" class="d-text-3">shape: (2, 2) · imagen gris</text>
+    <text x="600" y="24" text-anchor="middle" class="d-text" font-weight="700">Tensor (3D, 4D…)</text>
+    <g class="d-fill-4"><rect x="590" y="40" width="78" height="78" rx="6"/></g>
+    <g class="d-fill-3"><rect x="575" y="55" width="78" height="78" rx="6"/></g>
+    <g class="d-fill-8"><rect x="560" y="70" width="78" height="78" rx="6"/></g>
+    <text x="599" y="114" text-anchor="middle" class="d-text-2">R</text><text x="660" y="62" class="d-text-3">G</text><text x="676" y="50" class="d-text-3">B</text>
+    <text x="610" y="172" text-anchor="middle" class="d-text-3">shape: (alto, ancho, 3) · imagen RGB</text>
+    <text x="610" y="190" text-anchor="middle" class="d-text-3">lote: (N, alto, ancho, canales)</text>
+  </svg>
+  <figcaption>Ejemplos de formas (shapes): MNIST = (28, 28, 1); una foto para VGG16 = (224, 224, 3); un lote de 32 fotos = (32, 224, 224, 3).</figcaption>
+</figure>
+
+<h3 id="convolucion">4.3 La capa convolucional</h3>
+<p>Es la parte más importante de una CNN. Matemáticamente, la convolución es una integración de dos funciones (\(f\) y \(g\)). En imágenes tenemos dos términos: la <strong>entrada</strong> (la matriz de píxeles) y el <strong>detector de características</strong>, también llamado <strong>kernel o filtro</strong> (3×3, 5×5 o 7×7 según la arquitectura). El kernel es mucho más pequeño que la imagen, pero de él se obtiene un conocimiento más profundo de cada región.</p>
+<div class="formula">
+$$(f * g)(t) = \int_{-\infty}^{\infty} f(\tau)\, g(t-\tau)\, d\tau \qquad\longrightarrow\qquad S(i,j) = \sum_{m}\sum_{n} I(i+m,\, j+n)\; K(m,n)$$
+<div class="where">Versión discreta en 2D (la que usan las CNN): el kernel \(K\) se desliza sobre la imagen \(I\); en cada posición se multiplican elemento a elemento los valores que se traslapan y se suman. Cada número del resultado es sensible <strong>solo a una región</strong> de la imagen.</div>
+</div>
+<p>El objetivo de la capa convolucional es la <strong>extracción de características</strong> ("feature engineering" automático): resaltar lo importante y atenuar lo inútil. La salida se llama <strong>mapa de activación</strong> o <strong>mapa de características</strong>: las regiones donde se detectó lo que busca ese kernel. La elección del kernel determina a qué le "presta atención" la red (en la práctica, los valores del kernel <strong>se aprenden</strong> durante el entrenamiento).</p>
+
+<div class="widget" id="w-conv">
+  <div class="widget-title"><span class="tag">Simulador</span> Convolución paso a paso</div>
+  <p class="hint">Ejemplo de la diapositiva 12 (imagen 5×5, kernel 3×3, stride 1). Avanza paso a paso y comprueba la multiplicación elemento a elemento. Prueba otros kernels y el padding.</p>
+  <div class="controls">
+    <label>Kernel
+      <select id="conv-preset">
+        <option value="slide">Diapositiva [1 0 1 / 0 1 0 / 1 0 1]</option>
+        <option value="edgeh">Bordes horizontales</option>
+        <option value="edgev">Bordes verticales</option>
+        <option value="sharpen">Enfocar (sharpen)</option>
+        <option value="ident">Identidad</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="conv-pad"> Padding = 1 ("same")</label>
+    <button class="btn primary" id="conv-step" type="button">Siguiente paso ▶</button>
+    <button class="btn" id="conv-play" type="button">Reproducir</button>
+    <button class="btn" id="conv-reset" type="button">Reiniciar</button>
+  </div>
+  <div class="conv-row">
+    <div><div class="lbl">Entrada</div><div class="mgrid" id="conv-input"></div></div>
+    <div class="op">∗</div>
+    <div><div class="lbl">Kernel</div><div class="mgrid" id="conv-kernel"></div></div>
+    <div class="op">=</div>
+    <div><div class="lbl">Mapa de características</div><div class="mgrid" id="conv-output"></div></div>
+  </div>
+  <div class="readout" id="conv-readout"></div>
+</div>
+
+<h4>Tamaño de la salida</h4>
+<div class="formula">
+$$O = \frac{W - K + 2P}{S} + 1$$
+<div class="where">\(W\) = tamaño de entrada, \(K\) = tamaño del kernel, \(P\) = padding, \(S\) = stride (paso). Ejemplos: 5×5 con kernel 3, P=0, S=1 → 3×3. 28×28 con kernel 3 → 26×26. Con P=1 → 28×28 ("same"). La <strong>profundidad</strong> de la salida es igual al <strong>número de filtros</strong>.</div>
+</div>
+
+<div class="widget" id="w-outsize">
+  <div class="widget-title"><span class="tag">Calculadora</span> Forma de salida y parámetros de una Conv2D</div>
+  <div class="controls">
+    <label>W (entrada) <input type="number" id="os-w" value="28" min="1"></label>
+    <label>K (kernel) <input type="number" id="os-k" value="3" min="1"></label>
+    <label>P (padding) <input type="number" id="os-p" value="0" min="0"></label>
+    <label>S (stride) <input type="number" id="os-s" value="1" min="1"></label>
+    <label>Canales entrada <input type="number" id="os-c" value="1" min="1"></label>
+    <label>Filtros <input type="number" id="os-f" value="32" min="1"></label>
+  </div>
+  <div class="readout" id="os-out"></div>
+</div>
+
+<h4>Convolución sobre una imagen a color (3 canales)</h4>
+<p>Con RGB el kernel también tiene 3 "rebanadas" (una por canal). Se convoluciona cada canal con su rebanada, <strong>se suman los tres resultados y se suma el sesgo</strong>: el resultado es <strong>un solo número</strong> del mapa de salida. Ejemplo de la diapositiva 14 (esquina superior izquierda, con padding de ceros):</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Canal</th><th>Región 3×3 de la imagen</th><th>Kernel del canal</th><th class="num">Suma</th></tr></thead>
+<tbody>
+<tr><td>R</td><td><code>[0 0 0 / 0 156 155 / 0 153 154]</code></td><td><code>[−1 −1 1 / 0 1 −1 / 0 1 1]</code></td><td class="num">308</td></tr>
+<tr><td>G</td><td><code>[0 0 0 / 0 167 166 / 0 164 165]</code></td><td><code>[1 0 0 / 1 −1 −1 / 1 0 −1]</code></td><td class="num">−498</td></tr>
+<tr><td>B</td><td><code>[0 0 0 / 0 163 162 / 0 160 161]</code></td><td><code>[0 1 1 / 0 1 0 / 1 −1 1]</code></td><td class="num">164</td></tr>
+<tr><td colspan="3"><strong>Salida = 308 + (−498) + 164 + sesgo 1</strong></td><td class="num"><strong>−25</strong></td></tr>
+</tbody></table></div>
+<p>Por ejemplo, el canal R (multiplicar cada píxel por el valor del kernel en la misma posición y sumar):</p>
+<div class="formula">$$\underbrace{0(-1)+0(-1)+0(1)}_{\text{fila 1} \,=\, 0}+\underbrace{0(0)+156(1)+155(-1)}_{\text{fila 2} \,=\, 1}+\underbrace{0(0)+153(1)+154(1)}_{\text{fila 3} \,=\, 307} = 308$$</div>
+
+<h3 id="cnn-relu">4.4 Función de activación después de convolucionar</h3>
+<p>Terminado el "proceso deslizante", se aplica una activación (casi siempre ReLU) a cada valor del mapa. Es la que "decide qué se dispara a la siguiente neurona": toma la señal de la celda anterior y la transforma en algo usable por la siguiente. Con ReLU, los valores negativos (regiones donde <em>no</em> está la característica) se vuelven 0.</p>
+
+<h3 id="pooling">4.5 Pooling (agrupación)</h3>
+<p>El pooling "filtra el mapa de características": resume cada región en un solo valor. Ayuda a detectar bordes, esquinas y rasgos (nariz, ojos) de forma robusta y, sobre todo, <strong>reduce el tamaño</strong> (menos parámetros y menos sobreajuste). Lo más común es un filtro de <strong>2×2 con stride 2</strong>: cada dimensión se reduce a la mitad, así que el mapa queda con <strong>una cuarta parte</strong> de los valores.</p>
+<ul>
+  <li><strong>Tamaño de filtro:</strong> 2×2, 3×3…</li>
+  <li><strong>Stride:</strong> cuántos pasos avanza el filtro.</li>
+  <li><strong>Padding (relleno):</strong> rellenar las orillas para evitar el efecto de borde.</li>
+</ul>
+
+<div class="widget" id="w-pool">
+  <div class="widget-title"><span class="tag">Simulador</span> Max pooling vs average pooling (2×2, stride 2)</div>
+  <p class="hint">Matriz de la diapositiva 16. Pasa el cursor (o toca) sobre una celda de la salida para ver de qué bloque viene.</p>
+  <div class="controls">
+    <label>Tipo <select id="pool-mode"><option value="max">Max pooling</option><option value="avg">Average pooling</option></select></label>
+  </div>
+  <div class="conv-row">
+    <div><div class="lbl">Mapa 4×4</div><div class="mgrid" id="pool-input"></div></div>
+    <div class="op">→</div>
+    <div><div class="lbl">Salida 2×2</div><div class="mgrid" id="pool-output"></div></div>
+  </div>
+  <div class="readout" id="pool-readout"></div>
+</div>
+
+<h3 id="flatten">4.6 Flattening y la red totalmente conectada</h3>
+<p>Después del pooling, el <strong>aplanamiento</strong> convierte la matriz (o volumen) en <strong>una sola columna/vector</strong>, tomando los números fila por fila. Así podemos alimentar una red feedforward "normal" (capas <em>fully connected</em>), que se entrena con backpropagation época tras época hasta distinguir las características dominantes y clasificar (normalmente con softmax).</p>
+
+<figure class="figure">
+  <svg viewBox="0 0 780 230" role="img" aria-label="Arquitectura típica de una CNN">
+    <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <rect x="10" y="60" width="70" height="70" rx="6" class="d-box-strong"/><text x="45" y="100" text-anchor="middle" class="d-text-2">imagen</text>
+    <g class="d-fill-3"><rect x="120" y="55" width="60" height="60" rx="4"/><rect x="128" y="63" width="60" height="60" rx="4"/><rect x="136" y="71" width="60" height="60" rx="4"/></g>
+    <g class="d-fill-1"><rect x="236" y="74" width="40" height="40" rx="4"/><rect x="242" y="80" width="40" height="40" rx="4"/><rect x="248" y="86" width="40" height="40" rx="4"/></g>
+    <g class="d-fill-3"><rect x="326" y="70" width="36" height="36" rx="4"/><rect x="331" y="75" width="36" height="36" rx="4"/><rect x="336" y="80" width="36" height="36" rx="4"/><rect x="341" y="85" width="36" height="36" rx="4"/></g>
+    <g class="d-fill-1"><rect x="420" y="84" width="22" height="22" rx="3"/><rect x="424" y="88" width="22" height="22" rx="3"/><rect x="428" y="92" width="22" height="22" rx="3"/><rect x="432" y="96" width="22" height="22" rx="3"/></g>
+    <rect x="492" y="40" width="16" height="130" rx="4" class="d-fill-4"/>
+    <g><circle cx="560" cy="60" r="10" class="d-hid"/><circle cx="560" cy="90" r="10" class="d-hid"/><circle cx="560" cy="120" r="10" class="d-hid"/><circle cx="560" cy="150" r="10" class="d-hid"/></g>
+    <g><circle cx="640" cy="75" r="10" class="d-out"/><circle cx="640" cy="105" r="10" class="d-out"/><circle cx="640" cy="135" r="10" class="d-out"/></g>
+    <text x="662" y="79" class="d-text-2">auto</text><text x="662" y="109" class="d-text-2">camión</text><text x="662" y="139" class="d-text-2">bici</text>
+    <g class="d-arrow"><path d="M82 95 H112" marker-end="url(#ar3)"/><path d="M200 100 H230" marker-end="url(#ar3)"/><path d="M292 100 H320" marker-end="url(#ar3)"/><path d="M380 100 H414" marker-end="url(#ar3)"/><path d="M458 105 H486" marker-end="url(#ar3)"/><path d="M510 105 H544" marker-end="url(#ar3)"/><path d="M572 105 H624" marker-end="url(#ar3)"/></g>
+    <text x="158" y="150" text-anchor="middle" class="d-text-2">Conv + ReLU</text>
+    <text x="262" y="150" text-anchor="middle" class="d-text-2">Pooling</text>
+    <text x="351" y="150" text-anchor="middle" class="d-text-2">Conv + ReLU</text>
+    <text x="437" y="150" text-anchor="middle" class="d-text-2">Pooling</text>
+    <text x="500" y="190" text-anchor="middle" class="d-text-2">Flatten</text>
+    <text x="560" y="182" text-anchor="middle" class="d-text-2">Fully</text><text x="560" y="196" text-anchor="middle" class="d-text-2">connected</text>
+    <text x="640" y="170" text-anchor="middle" class="d-text-2">Softmax</text>
+    <path d="M110 212 H460" class="d-line-2"/><text x="285" y="226" text-anchor="middle" class="d-text" font-weight="700">FEATURE LEARNING</text>
+    <path d="M480 212 H720" class="d-line-2"/><text x="600" y="226" text-anchor="middle" class="d-text" font-weight="700">CLASIFICACIÓN</text>
+  </svg>
+  <figcaption>La figura del "Recontexto" de la clase 04: extracción de características (convolución + pooling) y clasificación (flatten + capas densas + softmax).</figcaption>
+</figure>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_04_convolucion_pooling.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_04_convolucion_pooling.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Convolución 2D, convolución RGB, ReLU, pooling y flattening (NumPy)
+import numpy as np
+
+def conv2d(imagen, kernel, stride=1, padding=0):
+    &quot;&quot;&quot;Convolución &#x27;válida&#x27; como la usan las CNN (técnicamente correlación cruzada).&quot;&quot;&quot;
+    if padding &gt; 0:
+        imagen = np.pad(imagen, padding)          # agrega orilla de ceros
+    k = kernel.shape[0]
+    salida_n = (imagen.shape[0] - k) // stride + 1
+    salida = np.zeros((salida_n, salida_n))
+    for i in range(salida_n):
+        for j in range(salida_n):
+            region = imagen[i*stride:i*stride+k, j*stride:j*stride+k]
+            salida[i, j] = np.sum(region * kernel)   # multiplicar elemento a elemento y sumar
+    return salida
+
+# --- Ejemplo de la diapositiva: imagen 5x5 y kernel 3x3 ---
+imagen = np.array([[1, 1, 1, 0, 0],
+                   [0, 1, 1, 1, 0],
+                   [0, 0, 1, 1, 1],
+                   [0, 0, 1, 1, 0],
+                   [0, 1, 1, 0, 0]])
+kernel = np.array([[1, 0, 1],
+                   [0, 1, 0],
+                   [1, 0, 1]])
+mapa = conv2d(imagen, kernel)
+print(&quot;Mapa de características (5x5 * 3x3, stride 1, sin padding):&quot;)
+print(mapa.astype(int))
+
+print(&quot;\nCon padding=1 (&#x27;same&#x27;), la salida conserva el tamaño 5x5:&quot;)
+print(conv2d(imagen, kernel, padding=1).astype(int))
+
+# --- Convolución sobre imagen RGB (3 canales): se suma cada canal + el sesgo ---
+R = np.array([[0, 0, 0], [0, 156, 155], [0, 153, 154]])
+G = np.array([[0, 0, 0], [0, 167, 166], [0, 164, 165]])
+B = np.array([[0, 0, 0], [0, 163, 162], [0, 160, 161]])
+kR = np.array([[-1, -1, 1], [0, 1, -1], [0, 1, 1]])
+kG = np.array([[1, 0, 0], [1, -1, -1], [1, 0, -1]])
+kB = np.array([[0, 1, 1], [0, 1, 0], [1, -1, 1]])
+sR, sG, sB = np.sum(R*kR), np.sum(G*kG), np.sum(B*kB)
+sesgo = 1
+print(f&quot;\nRGB: canal R = {sR}, canal G = {sG}, canal B = {sB}, sesgo = {sesgo}&quot;)
+print(f&quot;Valor de salida = {sR} + ({sG}) + {sB} + {sesgo} = {sR + sG + sB + sesgo}&quot;)
+
+# --- ReLU sobre un mapa con negativos ---
+fm = np.array([[ 3, -2], [-1, 5]])
+print(&quot;\nReLU([[3,-2],[-1,5]]) =&quot;, np.maximum(0, fm).tolist())
+
+# --- Pooling 2x2 con stride 2 (ejemplo de la diapositiva) ---
+X = np.array([[2, 2, 7, 3],
+              [9, 4, 6, 1],
+              [8, 5, 2, 4],
+              [3, 1, 2, 6]])
+bloques = X.reshape(2, 2, 2, 2).swapaxes(1, 2)   # 4 bloques de 2x2
+print(&quot;\nMax pooling 2x2:\n&quot;, bloques.max(axis=(2, 3)))
+print(&quot;Average pooling 2x2:\n&quot;, bloques.mean(axis=(2, 3)))
+
+# --- Flattening: la matriz se vuelve un vector (fila por fila) ---
+print(&quot;\nFlatten del max pooling:&quot;, bloques.max(axis=(2, 3)).flatten())
+
+# --- Tamaño de salida: O = (W - K + 2P) / S + 1 ---
+def tam_salida(W, K, P=0, S=1):
+    return (W - K + 2 * P) // S + 1
+print(&quot;\nTamaños de salida:&quot;)
+print(&quot; 28x28, kernel 3, P=0, S=1 -&gt;&quot;, tam_salida(28, 3))
+print(&quot; 28x28, kernel 3, P=1, S=1 -&gt;&quot;, tam_salida(28, 3, P=1))
+print(&quot; 32x32, kernel 5, P=0, S=1 -&gt;&quot;, tam_salida(32, 5))
+print(&quot; 224x224, kernel 7, P=3, S=2 -&gt;&quot;, tam_salida(224, 7, P=3, S=2))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Mapa de características (5x5 * 3x3, stride 1, sin padding):
+[[4 3 4]
+ [2 4 3]
+ [2 3 4]]
+
+Con padding=1 (&#x27;same&#x27;), la salida conserva el tamaño 5x5:
+[[2 2 3 1 1]
+ [1 4 3 4 1]
+ [1 2 4 3 3]
+ [1 2 3 4 1]
+ [0 2 2 1 1]]
+
+RGB: canal R = 308, canal G = -498, canal B = 164, sesgo = 1
+Valor de salida = 308 + (-498) + 164 + 1 = -25
+
+ReLU([[3,-2],[-1,5]]) = [[3, 0], [0, 5]]
+
+Max pooling 2x2:
+ [[9 7]
+ [8 6]]
+Average pooling 2x2:
+ [[4.25 4.25]
+ [4.25 3.5 ]]
+
+Flatten del max pooling: [9 7 8 6]
+
+Tamaños de salida:
+ 28x28, kernel 3, P=0, S=1 -&gt; 26
+ 28x28, kernel 3, P=1, S=1 -&gt; 28
+ 32x32, kernel 5, P=0, S=1 -&gt; 28
+ 224x224, kernel 7, P=3, S=2 -&gt; 112</pre></div>
+</div>
+
+<h3 id="cnn-params">4.7 ¿Por qué convolucionar? Menos parámetros</h3>
+<p>Con una red normal, una imagen de 28×28×3 tendría <strong>2,352 entradas por neurona</strong> (la cuenta de la diapositiva), y a medida que crece la imagen los parámetros explotan. Una capa convolucional <strong>comparte los pesos</strong>: el mismo kernel 3×3 se usa en toda la imagen. Al deslizar el filtro a lo ancho y alto se produce un mapa de activación 2D por filtro; esos mapas se apilan en la dimensión de profundidad para formar el volumen de salida.</p>
+<div class="formula">
+$$\text{params}_{\text{Conv2D}} = (K \cdot K \cdot C_{\text{entrada}} + 1)\cdot F \qquad\qquad \text{params}_{\text{Dense}} = n_{\text{entrada}}\cdot n_{\text{neuronas}} + n_{\text{neuronas}}$$
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_05_parametros.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_05_parametros.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · ¿Cuántos parámetros (pesos + sesgos) tiene cada tipo de capa?
+# Estas fórmulas son las que usa Keras en model.summary().
+
+def dense(n_entrada, n_neuronas):
+    return n_entrada * n_neuronas + n_neuronas            # pesos + 1 sesgo por neurona
+
+def conv2d(k, canales_entrada, filtros):
+    return (k * k * canales_entrada + 1) * filtros          # cada filtro: k*k*C pesos + 1 sesgo
+
+def simple_rnn(n_entrada, unidades):
+    return unidades * (unidades + n_entrada + 1)            # W_xh + W_hh + b
+
+def lstm(n_entrada, unidades):
+    return 4 * unidades * (unidades + n_entrada + 1)        # 4 bloques: f, i, c~, o
+
+def gru(n_entrada, unidades):
+    return 3 * unidades * (unidades + n_entrada + 2)        # 3 bloques (Keras reset_after=True: 2 sesgos)
+
+def embedding(vocabulario, dimension):
+    return vocabulario * dimension                          # una fila (vector) por palabra
+
+print(&quot;Dense 784 -&gt; 128              :&quot;, dense(784, 128))
+print(&quot;Dense 128 -&gt; 10               :&quot;, dense(128, 10))
+print(&quot;Dense 28*28*3=2352 -&gt; 100     :&quot;, dense(28 * 28 * 3, 100))
+print(&quot;Conv2D 3x3, 1 canal, 32 filtros :&quot;, conv2d(3, 1, 32))
+print(&quot;Conv2D 3x3, 3 canales, 32 filtros:&quot;, conv2d(3, 3, 32))
+print(&quot;Conv2D 3x3, 32 -&gt; 64 filtros   :&quot;, conv2d(3, 32, 64))
+print(&quot;SimpleRNN entrada 8, 16 unidades:&quot;, simple_rnn(8, 16))
+print(&quot;LSTM entrada 8, 16 unidades     :&quot;, lstm(8, 16))
+print(&quot;GRU entrada 8, 16 unidades      :&quot;, gru(8, 16))
+print(&quot;Embedding vocab 10000, dim 16   :&quot;, embedding(10000, 16))
+print(&quot;\nRelación LSTM / SimpleRNN (mismas dims):&quot;, lstm(8, 16) / simple_rnn(8, 16))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Dense 784 -&gt; 128              : 100480
+Dense 128 -&gt; 10               : 1290
+Dense 28*28*3=2352 -&gt; 100     : 235300
+Conv2D 3x3, 1 canal, 32 filtros : 320
+Conv2D 3x3, 3 canales, 32 filtros: 896
+Conv2D 3x3, 32 -&gt; 64 filtros   : 18496
+SimpleRNN entrada 8, 16 unidades: 400
+LSTM entrada 8, 16 unidades     : 1600
+GRU entrada 8, 16 unidades      : 1248
+Embedding vocab 10000, dim 16   : 160000
+
+Relación LSTM / SimpleRNN (mismas dims): 4.0</pre></div>
+</div>
+<div class="callout tip">
+  <div class="callout-title">💡 Compara</div>
+  <p>Una capa densa de 100 neuronas sobre una imagen 28×28×3 usa <strong>235,300</strong> parámetros. Una Conv2D con 32 filtros 3×3 sobre la misma imagen usa solo <strong>896</strong>, y además funciona para cualquier tamaño de imagen. Eso es la "eficiencia computacional" y el "peso compartido" de las ventajas.</p>
+</div>
+
+<h3 id="cnn-ventajas">4.8 Ventajas, desventajas y aplicaciones</h3>
+<div class="two-col">
+<div class="callout tip">
+  <div class="callout-title">✅ Ventajas</div>
+  <ol>
+    <li>Detecta automáticamente características importantes <strong>sin supervisión humana</strong>.</li>
+    <li>Computacionalmente eficiente (convolución y pooling comparten parámetros).</li>
+    <li><strong>Peso compartido</strong>.</li>
+    <li>Alta eficiencia estadística.</li>
+    <li><strong>Invarianza traslacional</strong> (reconoce el objeto aunque se mueva de lugar).</li>
+  </ol>
+</div>
+<div class="callout warn">
+  <div class="callout-title">❌ Desventajas</div>
+  <ol>
+    <li>Le cuesta clasificar con distintas posiciones: ángulos, fondos, iluminación.</li>
+    <li><strong>Ejemplos adversarios</strong>: con un poco de ruido la CNN ve otra cosa, mientras un humano ve la misma imagen.</li>
+    <li><strong>Marco de coordenadas</strong>: no lleva un "modelo mental" de orientación y partes del objeto.</li>
+    <li>Más lenta por operaciones como maxpool.</li>
+    <li>Entrenamiento muy largo sin una buena GPU.</li>
+  </ol>
+</div>
+</div>
+<p><strong>Aplicaciones:</strong> reconocimiento facial, análisis de documentos, clasificación de imágenes, <strong>segmentación</strong> (órganos o estructuras anatómicas en imágenes médicas) y <strong>detección</strong> (anomalías que busca un radiólogo).</p>
+
+<h3 id="cnn-keras">4.9 Una CNN en Keras, capa por capa</h3>
+<p>Lee el <code>summary</code> con la fórmula de tamaño de salida: 28→26 (conv 3×3), 26→13 (pool 2×2), 13→11 (conv), 11→5 (pool, se redondea hacia abajo), flatten = 5·5·64 = 1,600. Parámetros: conv1 = (3·3·1+1)·32 = 320; conv2 = (3·3·32+1)·64 = 18,496; densa = 1,600·10+10 = 16,010.</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_k2_cnn_keras.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k2_cnn_keras.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Red convolucional (CNN) con Keras
+# Parte A: arquitectura clásica tipo MNIST (28x28x1) solo para estudiar el summary.
+# Parte B: la misma idea entrenada con los dígitos 8x8 de scikit-learn.
+import os
+os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;
+import keras
+from keras import layers
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+
+keras.utils.set_random_seed(42)
+
+# ---------- Parte A: summary de una CNN para MNIST ----------
+cnn_mnist = keras.Sequential([
+    keras.Input(shape=(28, 28, 1)),                       # alto, ancho, canales
+    layers.Conv2D(32, (3, 3), activation=&quot;relu&quot;),         # 28-3+1 = 26 -&gt; (26, 26, 32)
+    layers.MaxPooling2D((2, 2)),                          # 26/2 = 13   -&gt; (13, 13, 32)
+    layers.Conv2D(64, (3, 3), activation=&quot;relu&quot;),         # 13-3+1 = 11 -&gt; (11, 11, 64)
+    layers.MaxPooling2D((2, 2)),                          # 11//2 = 5   -&gt; (5, 5, 64)
+    layers.Flatten(),                                     # 5*5*64 = 1600
+    layers.Dropout(0.5),
+    layers.Dense(10, activation=&quot;softmax&quot;),
+], name=&quot;cnn_mnist&quot;)
+cnn_mnist.summary()
+
+# ---------- Parte B: entrenar con dígitos 8x8 ----------
+X, y = load_digits(return_X_y=True)
+X = (X / 16.0).reshape(-1, 8, 8, 1)                       # tensor (N, alto, ancho, canales)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+cnn = keras.Sequential([
+    keras.Input(shape=(8, 8, 1)),
+    layers.Conv2D(16, (3, 3), padding=&quot;same&quot;, activation=&quot;relu&quot;),   # padding same -&gt; 8x8
+    layers.MaxPooling2D((2, 2)),                                     # -&gt; 4x4
+    layers.Conv2D(32, (3, 3), padding=&quot;same&quot;, activation=&quot;relu&quot;),
+    layers.MaxPooling2D((2, 2)),                                     # -&gt; 2x2
+    layers.Flatten(),
+    layers.Dropout(0.3),
+    layers.Dense(10, activation=&quot;softmax&quot;),
+])
+cnn.compile(optimizer=&quot;adam&quot;, loss=&quot;sparse_categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+print(&quot;Tensor de entrada:&quot;, X_train.shape)
+cnn.fit(X_train, y_train, epochs=25, batch_size=32, verbose=0)
+loss, acc = cnn.evaluate(X_test, y_test, verbose=0)
+print(f&quot;CNN dígitos 8x8 -&gt; accuracy en prueba: {acc:.3f}  (parámetros: {cnn.count_params()})&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Model: &quot;cnn_mnist&quot;
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ conv2d (Conv2D)                 │ (None, 26, 26, 32)     │           320 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d (MaxPooling2D)    │ (None, 13, 13, 32)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_1 (Conv2D)               │ (None, 11, 11, 64)     │        18,496 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_1 (MaxPooling2D)  │ (None, 5, 5, 64)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ flatten (Flatten)               │ (None, 1600)           │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 1600)           │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 10)             │        16,010 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 34,826 (136.04 KB)
+ Trainable params: 34,826 (136.04 KB)
+ Non-trainable params: 0 (0.00 B)
+Tensor de entrada: (1437, 8, 8, 1)
+CNN dígitos 8x8 -&gt; accuracy en prueba: 0.986  (parámetros: 6090)</pre></div>
+  <div class="code-note">El summary es determinista. El accuracy final usa semilla fija y puede variar ligeramente según tu equipo.</div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="cnn2">5. CNN · parte II: dropout, arquitecturas y optimizadores</h2>
+
+<h3 id="dropout">5.1 Dropout ("¡Adiós!")</h3>
+<p>La idea es simple: <strong>evitar el sobreajuste</strong>. Es el método de regularización más popular en redes neuronales; incluso si un modelo llega a ~90 % de accuracy, con dropout es posible alcanzar ~92 %.</p>
+<ul>
+  <li>En cada iteración del <strong>entrenamiento</strong>, cada neurona se "deja caer" (se desactiva temporalmente) con probabilidad \(p\): todas sus entradas y salidas se apagan en esa iteración.</li>
+  <li>Las neuronas se vuelven a muestrear en cada paso: una neurona apagada ahora puede estar activa en el siguiente.</li>
+  <li>El hiperparámetro \(p\) es la <strong>tasa de abandono</strong>; normalmente ≈ <strong>0.5</strong> (50 % de las neuronas apagadas).</li>
+  <li>Equivale a entrenar muchas arquitecturas distintas (combinaciones de neuronas) y promediar: una técnica tipo <strong>ensamble</strong>.</li>
+  <li>En <strong>predicción</strong> no se apaga nada. Keras usa "inverted dropout": durante el entrenamiento multiplica las neuronas vivas por \(1/(1-p)\) para que la escala esperada no cambie.</li>
+</ul>
+
+<div class="widget" id="w-dropout">
+  <div class="widget-title"><span class="tag">Simulador</span> Dropout en una red 4-6-6-2</div>
+  <p class="hint">Cada clic en "Siguiente iteración" muestrea una nueva máscara: las neuronas tachadas no participan en esa iteración.</p>
+  <div class="controls">
+    <label>p (tasa de abandono) <input type="range" id="do-p" min="0" max="0.9" step="0.1" value="0.5"> <b id="do-pv">0.5</b></label>
+    <button class="btn primary" id="do-step" type="button">Siguiente iteración ▶</button>
+  </div>
+  <svg id="do-svg" viewBox="0 0 560 260" role="img" aria-label="Red con neuronas apagadas por dropout"></svg>
+  <div class="readout" id="do-readout"></div>
+</div>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_06_dropout.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_06_dropout.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Dropout (&quot;inverted dropout&quot;, el que usa Keras)
+import numpy as np
+
+rng = np.random.default_rng(seed=7)
+p = 0.5                                  # tasa de abandono (probabilidad de APAGAR)
+activaciones = np.array([0.8, 0.1, 0.5, 0.9, 0.3, 0.6, 0.2, 0.7])
+
+for paso in range(1, 4):
+    mascara = (rng.random(activaciones.shape) &gt;= p).astype(float)   # 1 = sigue viva
+    salida = activaciones * mascara / (1 - p)                        # se re-escala por 1/(1-p)
+    print(f&quot;Paso {paso}: máscara = {mascara.astype(int)}  -&gt; neuronas activas: {int(mascara.sum())}/8&quot;)
+    print(f&quot;         salida  = {salida.round(2)}&quot;)
+
+print(&quot;\nEn PREDICCIÓN (model.predict) dropout se desactiva: se usan TODAS las neuronas.&quot;)
+print(&quot;Neuronas esperadas activas por paso en una capa de 8 con p=0.5:&quot;, 8 * (1 - p))</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Paso 1: máscara = [1 1 1 0 0 1 0 1]  -&gt; neuronas activas: 5/8
+         salida  = [1.6 0.2 1.  0.  0.  1.2 0.  1.4]
+Paso 2: máscara = [1 0 0 0 0 0 1 1]  -&gt; neuronas activas: 3/8
+         salida  = [1.6 0.  0.  0.  0.  0.  0.4 1.4]
+Paso 3: máscara = [1 1 1 1 0 0 1 0]  -&gt; neuronas activas: 5/8
+         salida  = [1.6 0.2 1.  1.8 0.  0.  0.4 0. ]
+
+En PREDICCIÓN (model.predict) dropout se desactiva: se usan TODAS las neuronas.
+Neuronas esperadas activas por paso en una capa de 8 con p=0.5: 4.0</pre></div>
+</div>
+
+<h3 id="arquitecturas">5.2 Arquitecturas convolucionales</h3>
+<p>Terminología para comparar arquitecturas (figura de "scaling" de la clase 04):</p>
+<ul>
+  <li><strong>Más ancha (wider):</strong> más mapas de características (filtros) por capa convolucional.</li>
+  <li><strong>Más profunda (deeper):</strong> más capas convolucionales.</li>
+  <li><strong>Mayor resolución:</strong> imágenes de entrada más grandes → mapas con mayor dimensión espacial.</li>
+</ul>
+<figure class="figure">
+  <svg viewBox="0 0 760 260" role="img" aria-label="Escalamiento de una red: base, más ancha, más profunda, mayor resolución">
+    <g>
+      <text x="95" y="250" text-anchor="middle" class="d-text-2">(a) base</text>
+      <rect x="70" y="180" width="50" height="40" rx="4" class="d-fill-7"/><rect x="70" y="140" width="50" height="28" rx="4" class="d-fill-1"/><rect x="60" y="100" width="70" height="28" rx="4" class="d-fill-3"/><rect x="55" y="70" width="80" height="18" rx="4" class="d-fill-4"/><rect x="50" y="44" width="90" height="14" rx="4" class="d-fill-8"/>
+      <text x="290" y="250" text-anchor="middle" class="d-text-2">(b) más ancha</text>
+      <rect x="260" y="180" width="60" height="40" rx="4" class="d-fill-7"/><rect x="235" y="140" width="110" height="28" rx="4" class="d-fill-1"/><rect x="220" y="100" width="140" height="28" rx="4" class="d-fill-3"/><rect x="215" y="70" width="150" height="18" rx="4" class="d-fill-4"/><rect x="205" y="44" width="170" height="14" rx="4" class="d-fill-8"/>
+      <text x="480" y="250" text-anchor="middle" class="d-text-2">(c) más profunda</text>
+      <rect x="460" y="208" width="40" height="22" rx="4" class="d-fill-7"/><rect x="460" y="180" width="40" height="22" rx="4" class="d-fill-7"/><rect x="460" y="152" width="40" height="22" rx="4" class="d-fill-1"/><rect x="460" y="124" width="40" height="22" rx="4" class="d-fill-1"/><rect x="452" y="96" width="56" height="22" rx="4" class="d-fill-3"/><rect x="452" y="68" width="56" height="22" rx="4" class="d-fill-3"/><rect x="448" y="46" width="64" height="14" rx="4" class="d-fill-4"/><rect x="444" y="24" width="72" height="14" rx="4" class="d-fill-8"/>
+      <text x="665" y="250" text-anchor="middle" class="d-text-2">(d) mayor resolución</text>
+      <rect x="640" y="160" width="50" height="70" rx="4" class="d-fill-7"/><rect x="640" y="114" width="50" height="38" rx="4" class="d-fill-1"/><rect x="630" y="76" width="70" height="30" rx="4" class="d-fill-3"/><rect x="625" y="52" width="80" height="16" rx="4" class="d-fill-4"/><rect x="620" y="28" width="90" height="14" rx="4" class="d-fill-8"/>
+    </g>
+  </svg>
+  <figcaption>Tres formas de escalar una red (idea de EfficientNet): ancho, profundidad y resolución.</figcaption>
+</figure>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Arquitectura</th><th>Capas convolucionales</th><th>Capas totalmente conectadas</th><th class="num">Total de capas</th></tr></thead>
+<tbody>
+<tr><td>LeNet-5</td><td>2</td><td>3</td><td class="num">5</td></tr>
+<tr><td>AlexNet</td><td>5</td><td>3</td><td class="num">8</td></tr>
+<tr><td>VGG-16</td><td>13</td><td>3</td><td class="num">16</td></tr>
+</tbody></table></div>
+
+<div class="chart-card">
+  <h4>Más parámetros ≠ mejor accuracy</h4>
+  <p class="sub">Precisión Top-1 en ImageNet vs. número de parámetros (escala logarítmica). Datos de la tabla de la clase 04.</p>
+  <div class="chart-box tall"><canvas id="chart-arch" aria-label="Dispersión de arquitecturas CNN"></canvas></div>
+  <div class="chart-foot"><span>Pasa el cursor sobre un punto para ver modelo, año y parámetros.</span><button class="code-btn data-table-toggle" type="button" data-table-toggle="tbl-arch">Ver tabla de datos</button></div>
+  <div class="data-table-wrap" id="tbl-arch"></div>
+</div>
+<div class="callout exam">
+  <div class="callout-title">📝 Lectura de la gráfica</div>
+  <p>Inception V1 (5 M de parámetros) supera a AlexNet (60 M); DenseNet-121 (8 M) empata con VGG-16 (138 M). <strong>La arquitectura importa más que el tamaño.</strong> Los mejores (BiT-L, NoisyStudent, Meta Pseudo Labels) combinan muchos parámetros con técnicas de entrenamiento con datos masivos.</p>
+</div>
+
+<h3 id="optimizadores">5.3 Optimizadores</h3>
+<p>Los optimizadores son algoritmos para <strong>minimizar la función de pérdida</strong> (o maximizar la eficiencia). Dependen de los parámetros aprendibles (pesos y sesgos) y dicen <strong>cómo cambiar los pesos y la tasa de aprendizaje</strong> para reducir la pérdida.</p>
+
+<h4>Learning rate: muy bajo, adecuado, muy alto</h4>
+<div class="chart-card">
+  <h4>Gradiente descendente sobre \(J(\theta)=\theta^2\)</h4>
+  <p class="sub">Mueve el learning rate. Bajo: muchos pasos pequeños. Adecuado: llega rápido. Alto: rebota y diverge.</p>
+  <div class="controls">
+    <label>α = <input type="range" id="lr-range" min="0.02" max="1.08" step="0.02" value="0.1"> <b id="lr-val">0.10</b></label>
+    <button class="btn" type="button" data-lr="0.04">Muy bajo</button>
+    <button class="btn" type="button" data-lr="0.3">Adecuado</button>
+    <button class="btn" type="button" data-lr="1.04">Muy alto</button>
+  </div>
+  <div class="chart-box"><canvas id="chart-lr" aria-label="Trayectoria del gradiente descendente"></canvas></div>
+  <div class="readout" id="lr-readout"></div>
+</div>
+
+<div class="table-wrap"><table class="compare">
+<thead><tr><th>Optimizador</th><th>Regla de actualización</th><th>Idea clave (según la clase)</th></tr></thead>
+<tbody>
+<tr><td>SGD</td><td>\(\theta \leftarrow \theta - \alpha\,\nabla J(\theta)\)</td><td>Se mueve en dirección <strong>opuesta al ascenso más empinado</strong>; depende de las derivadas. Pensado para funciones convexas (mínimo local o global). Calcular el gradiente con todo el conjunto de entrenamiento requiere mucha memoria y es lento.</td></tr>
+<tr><td>SGD + Momentum</td><td>\(v \leftarrow \beta v + \nabla J;\;\; \theta \leftarrow \theta - \alpha v\)</td><td>Simula la <strong>inercia</strong>: conserva parte de la dirección anterior. Más estable, aprende más rápido y puede <strong>escapar de mínimos locales</strong>.</td></tr>
+<tr><td>Adagrad</td><td>\(G \leftarrow G + g^2;\;\; \theta \leftarrow \theta - \frac{\alpha}{\sqrt{G}+\epsilon}\,g\)</td><td>Learning rate <strong>adaptativo por parámetro</strong> según sus gradientes históricos. Bueno con <strong>datos dispersos</strong> y escalas distintas. Problema: \(G\) solo crece → el paso se vuelve diminuto.</td></tr>
+<tr><td>Adadelta</td><td>\(\Delta\theta = -\frac{\sqrt{E[\Delta\theta^2]+\epsilon}}{\sqrt{E[g^2]+\epsilon}}\,g\)</td><td>Variante de Adagrad (Zeiler, 2012). Reduce la adaptabilidad por coordenada y se describe como <strong>sin tasa de aprendizaje</strong>: usa la magnitud de los cambios pasados como calibración.</td></tr>
+<tr><td>RMSProp</td><td>\(E[g^2] \leftarrow \rho E[g^2] + (1-\rho) g^2;\;\; \theta \leftarrow \theta - \frac{\alpha}{\sqrt{E[g^2]}+\epsilon}\,g\)</td><td>Divide el gradiente por una <strong>media móvil exponencial</strong> de gradientes² recientes. A diferencia de Adagrad, no deja que el LR se vuelva demasiado pequeño; estabiliza y acelera en problemas no convexos.</td></tr>
+<tr><td>Adam</td><td>\(m \leftarrow \beta_1 m + (1-\beta_1) g;\;\; v \leftarrow \beta_2 v + (1-\beta_2) g^2;\;\; \theta \leftarrow \theta - \alpha\frac{\hat m}{\sqrt{\hat v}+\epsilon}\)</td><td>Guarda el promedio decreciente de gradientes (como <strong>momentum</strong>) y de gradientes² (como <strong>RMSProp/Adadelta</strong>): combina las ventajas de ambos. El más popular. Valores típicos \(\beta_1=0.9,\ \beta_2=0.999\).</td></tr>
+</tbody></table></div>
+
+<div class="widget" id="w-opt">
+  <div class="widget-title"><span class="tag">Simulador</span> Carrera de optimizadores en un "valle alargado"</div>
+  <p class="hint">Función \(f(x,y)=0.5x^2+10y^2\): curvatura 20 veces mayor en \(y\) que en \(x\), como pasa en redes reales. Todos parten de (−4.5, 1.2). Observa cómo SGD zigzaguea en \(y\) y avanza lento en \(x\); momentum acumula inercia (y se pasa un poco del mínimo); RMSProp y Adam normalizan el paso por dimensión y van más directo.</p>
+  <div class="controls">
+    <label>Pasos <input type="range" id="opt-steps" min="5" max="120" step="5" value="40"> <b id="opt-stepsv">40</b></label>
+    <label>α de SGD <input type="range" id="opt-lr" min="0.02" max="0.11" step="0.01" value="0.09"> <b id="opt-lrv">0.09</b></label>
+  </div>
+  <div class="legend"><span><i style="background:var(--s1)"></i>SGD</span><span><i style="background:var(--s2)"></i>Momentum</span><span><i style="background:var(--s3)"></i>RMSProp</span><span><i style="background:var(--s7)"></i>Adam</span></div>
+  <svg id="opt-svg" viewBox="0 0 640 300" role="img" aria-label="Trayectorias de los optimizadores sobre curvas de nivel"></svg>
+  <div class="readout" id="opt-readout"></div>
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_07_optimizadores.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_07_optimizadores.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Optimizadores implementados desde cero sobre f(θ) = θ²  (mínimo en θ = 0)
+# Gradiente: f&#x27;(θ) = 2θ.  Todos empiezan en θ0 = 5.
+import numpy as np
+
+grad = lambda t: 2 * t
+theta0 = 5.0
+
+def sgd(pasos, lr=0.1):
+    t = theta0
+    for _ in range(pasos):
+        t -= lr * grad(t)                 # θ ← θ − α·∇f
+    return t
+
+def momentum(pasos, lr=0.1, beta=0.9):
+    t, v = theta0, 0.0
+    for _ in range(pasos):
+        v = beta * v + grad(t)            # &quot;inercia&quot;: recuerda la dirección anterior
+        t -= lr * v
+    return t
+
+def adagrad(pasos, lr=0.5, eps=1e-8):
+    t, G = theta0, 0.0
+    for _ in range(pasos):
+        g = grad(t)
+        G += g ** 2                       # acumula TODOS los gradientes al cuadrado
+        t -= lr * g / (np.sqrt(G) + eps)  # el paso efectivo solo puede encogerse
+    return t
+
+def rmsprop(pasos, lr=0.1, rho=0.9, eps=1e-8):
+    t, Eg2 = theta0, 0.0
+    for _ in range(pasos):
+        g = grad(t)
+        Eg2 = rho * Eg2 + (1 - rho) * g ** 2   # media móvil EXPONENCIAL (olvida lo viejo)
+        t -= lr * g / (np.sqrt(Eg2) + eps)
+    return t
+
+def adadelta(pasos, rho=0.95, eps=1e-6):
+    t, Eg2, Edx2 = theta0, 0.0, 0.0
+    for _ in range(pasos):
+        g = grad(t)
+        Eg2 = rho * Eg2 + (1 - rho) * g ** 2
+        dx = -np.sqrt(Edx2 + eps) / np.sqrt(Eg2 + eps) * g   # ¡sin learning rate!
+        Edx2 = rho * Edx2 + (1 - rho) * dx ** 2
+        t += dx
+    return t
+
+def adam(pasos, lr=0.1, b1=0.9, b2=0.999, eps=1e-8):
+    t, m, v = theta0, 0.0, 0.0
+    for k in range(1, pasos + 1):
+        g = grad(t)
+        m = b1 * m + (1 - b1) * g         # 1er momento: promedio de gradientes (≈ momentum)
+        v = b2 * v + (1 - b2) * g ** 2    # 2º momento: promedio de gradientes² (≈ RMSProp)
+        m_hat = m / (1 - b1 ** k)         # corrección de sesgo (al inicio m y v valen ~0)
+        v_hat = v / (1 - b2 ** k)
+        t -= lr * m_hat / (np.sqrt(v_hat) + eps)
+    return t
+
+optimizadores = [(&quot;SGD (lr=0.1)&quot;, sgd), (&quot;Momentum (lr=0.1, β=0.9)&quot;, momentum),
+                 (&quot;Adagrad (lr=0.5)&quot;, adagrad), (&quot;RMSProp (lr=0.1)&quot;, rmsprop),
+                 (&quot;Adadelta (sin lr)&quot;, adadelta), (&quot;Adam (lr=0.1)&quot;, adam)]
+
+print(f&quot;θ después de N pasos (inicio θ0 = {theta0}, mínimo θ* = 0)&quot;)
+print(f&quot;{&#x27;Optimizador&#x27;:&lt;26}{&#x27;N=10&#x27;:&gt;11}{&#x27;N=50&#x27;:&gt;11}{&#x27;N=200&#x27;:&gt;11}&quot;)
+for nombre, f in optimizadores:
+    print(f&quot;{nombre:&lt;26}&quot; + &quot;&quot;.join(f&quot;{f(n):&gt;11.4f}&quot; for n in (10, 50, 200)))
+
+print(&quot;\nEfecto del learning rate en SGD (50 pasos):&quot;)
+for lr in [0.01, 0.1, 0.5, 0.9, 1.1]:
+    print(f&quot;  lr = {lr:&lt;4} -&gt; θ final = {sgd(50, lr): .4e}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>θ después de N pasos (inicio θ0 = 5.0, mínimo θ* = 0)
+Optimizador                      N=10       N=50      N=200
+SGD (lr=0.1)                   0.5369     0.0001     0.0000
+Momentum (lr=0.1, β=0.9)       0.0220    -0.1525    -0.0001
+Adagrad (lr=0.5)               2.7687     0.6854     0.0055
+RMSProp (lr=0.1)               3.3808     0.4965     0.0435
+Adadelta (sin lr)              4.9540     4.7639     4.0429
+Adam (lr=0.1)                  4.0076     0.9011    -0.0001
+
+Efecto del learning rate en SGD (50 pasos):
+  lr = 0.01 -&gt; θ final =  1.8208e+00
+  lr = 0.1  -&gt; θ final =  7.1362e-05
+  lr = 0.5  -&gt; θ final =  0.0000e+00
+  lr = 0.9  -&gt; θ final =  7.1362e-05
+  lr = 1.1  -&gt; θ final =  4.5502e+04</pre></div>
+</div>
+<div class="callout tip">
+  <div class="callout-title">💡 Cómo interpretar la tabla</div>
+  <p>En una parábola perfecta y sin ruido, SGD con un buen α gana. Adagrad se frena porque su acumulador solo crece; Adadelta arranca muy lento porque no tiene α y su "memoria" de pasos empieza en casi cero. Adam y RMSProp avanzan con pasos ≈ α constantes (normalizan por la magnitud del gradiente): su ventaja aparece en problemas reales con ruido, gradientes dispersos y escalas distintas por parámetro — exactamente el caso de las redes profundas. Con α = 0.5 SGD llega en un paso (\(\theta - 0.5\cdot2\theta = 0\)); con α = 1.1 diverge.</p>
+</div>
+
+<div class="code-card"><div class="code-head"><span class="fname">compilar con distintos optimizadores (Keras)</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button></div><pre><code class="language-python">from keras import optimizers
+
+modelo.compile(optimizer=optimizers.SGD(learning_rate=0.01), loss=&quot;mse&quot;)
+modelo.compile(optimizer=optimizers.SGD(learning_rate=0.01, momentum=0.9), loss=&quot;mse&quot;)
+modelo.compile(optimizer=optimizers.Adagrad(learning_rate=0.01), loss=&quot;mse&quot;)
+modelo.compile(optimizer=optimizers.Adadelta(learning_rate=1.0), loss=&quot;mse&quot;)   # Keras sí expone un factor
+modelo.compile(optimizer=optimizers.RMSprop(learning_rate=0.001, rho=0.9), loss=&quot;mse&quot;)
+modelo.compile(optimizer=optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999), loss=&quot;mse&quot;)</code></pre></div>
+
+<!-- ===================================================== -->
+<h2 id="rnn">6. Modelado secuencial y redes neuronales recurrentes (RNN)</h2>
+
+<h3 id="secuencial">6.1 Modelado secuencial</h3>
+<p>Los <strong>modelos secuenciales</strong> reciben o generan <strong>secuencias</strong>: texto, clips de audio, video, series de tiempo. Consisten en predecir "qué sigue". A diferencia de las feedforward y las CNN:</p>
+<ul>
+  <li>la <strong>salida actual depende de las entradas anteriores</strong>, y</li>
+  <li>la <strong>entrada no tiene un tamaño fijo</strong> (una oración puede tener 3 o 30 palabras).</li>
+</ul>
+<p><strong>Ejemplo del autocompletado:</strong> escribes "d" y la red predice la siguiente letra entre las 26 del alfabeto. Entonces la salida es un <strong>softmax de tamaño 26</strong> (probabilidad de cada letra) y cada letra de entrada se codifica como un <strong>vector one-hot de tamaño 26</strong> (1 en el índice de la letra, 0 en lo demás).</p>
+
+<figure class="figure">
+  <svg viewBox="0 0 700 200" role="img" aria-label="Autocompletado: la red predice la siguiente letra">
+    <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <g>
+      <g transform="translate(70,0)"><rect x="-30" y="140" width="60" height="30" rx="8" class="d-fill-2"/><text x="0" y="160" text-anchor="middle" class="d-mono">"d"</text><rect x="-30" y="80" width="60" height="34" rx="17" class="d-fill-1"/><text x="0" y="102" text-anchor="middle" class="d-mono">h₁</text><rect x="-30" y="20" width="60" height="30" rx="8" class="d-fill-3"/><text x="0" y="40" text-anchor="middle" class="d-mono">"e"</text></g>
+      <g transform="translate(240,0)"><rect x="-30" y="140" width="60" height="30" rx="8" class="d-fill-2"/><text x="0" y="160" text-anchor="middle" class="d-mono">"e"</text><rect x="-30" y="80" width="60" height="34" rx="17" class="d-fill-1"/><text x="0" y="102" text-anchor="middle" class="d-mono">h₂</text><rect x="-30" y="20" width="60" height="30" rx="8" class="d-fill-3"/><text x="0" y="40" text-anchor="middle" class="d-mono">"e"</text></g>
+      <g transform="translate(410,0)"><rect x="-30" y="140" width="60" height="30" rx="8" class="d-fill-2"/><text x="0" y="160" text-anchor="middle" class="d-mono">"e"</text><rect x="-30" y="80" width="60" height="34" rx="17" class="d-fill-1"/><text x="0" y="102" text-anchor="middle" class="d-mono">h₃</text><rect x="-30" y="20" width="60" height="30" rx="8" class="d-fill-3"/><text x="0" y="40" text-anchor="middle" class="d-mono">"p"</text></g>
+      <g transform="translate(580,0)"><rect x="-30" y="140" width="60" height="30" rx="8" class="d-fill-2"/><text x="0" y="160" text-anchor="middle" class="d-mono">"p"</text><rect x="-30" y="80" width="60" height="34" rx="17" class="d-fill-1"/><text x="0" y="102" text-anchor="middle" class="d-mono">h₄</text><rect x="-30" y="20" width="60" height="30" rx="8" class="d-fill-3"/><text x="0" y="40" text-anchor="middle" class="d-mono">&lt;eos&gt;</text></g>
+      <g class="d-arrow"><path d="M70 138 V118" marker-end="url(#ar4)"/><path d="M70 78 V54" marker-end="url(#ar4)"/><path d="M240 138 V118" marker-end="url(#ar4)"/><path d="M240 78 V54" marker-end="url(#ar4)"/><path d="M410 138 V118" marker-end="url(#ar4)"/><path d="M410 78 V54" marker-end="url(#ar4)"/><path d="M580 138 V118" marker-end="url(#ar4)"/><path d="M580 78 V54" marker-end="url(#ar4)"/>
+      <path d="M102 97 H206" marker-end="url(#ar4)"/><path d="M272 97 H376" marker-end="url(#ar4)"/><path d="M442 97 H546" marker-end="url(#ar4)"/></g>
+      <text x="154" y="90" text-anchor="middle" class="d-text-3">memoria</text>
+      <text x="640" y="160" class="d-text-3">one-hot 26</text><text x="640" y="40" class="d-text-3">softmax 26</text>
+    </g>
+  </svg>
+  <figcaption>Predicción de "deep" letra por letra: la misma celda (mismos pesos) se aplica en cada paso y pasa su estado oculto \(h_t\) al siguiente.</figcaption>
+</figure>
+
+<p>En aprendizaje secuencial, la salida real en el tiempo \(t\) depende de <strong>todas</strong> las entradas vistas hasta \(t\). La tarea no cambia de un paso a otro (predecir el siguiente carácter, etiquetar la palabra), pero la entrada sí crece. Necesitamos una función que:</p>
+<ol class="steps">
+  <li>haga que la salida \(Y_t\) <strong>dependa de las entradas anteriores</strong>,</li>
+  <li>pueda manejar un <strong>número variable de entradas</strong>, y</li>
+  <li>sea <strong>la misma función en cada paso de tiempo</strong>.</li>
+</ol>
+
+<h3 id="rnn-def">6.2 La red recurrente</h3>
+<p>Una <strong>RNN</strong> usa datos secuenciales o series de tiempo; se aplica en traducción, NLP, reconocimiento de voz y subtítulos de imágenes (Siri, búsqueda por voz, Google Translate). Lo que la distingue es su <strong>"memoria"</strong>: toma información de entradas anteriores para influir en la entrada y salida actuales. Las redes tradicionales asumen entradas y salidas independientes; en una RNN la salida depende de los elementos previos de la secuencia. Las RNN <strong>unidireccionales no pueden usar eventos futuros</strong> aunque serían útiles.</p>
+
+<div class="formula">
+$$h_t = \tanh\!\big(W_{hh}\,h_{t-1} + W_{xh}\,x_t + b_h\big) \qquad\qquad \hat{y}_t = g\big(W_{hy}\,h_t + b_y\big)$$
+<div class="where">En la diapositiva: \(x\) (entrada) →\(B\)→ \(h\) (oculta) →\(A\)→ \(y\) (salida), con un lazo \(C\) de \(h\) a sí misma. <strong>A, B y C son los parámetros</strong> y son los mismos en todos los pasos de tiempo.</div>
+</div>
+
+<figure class="figure">
+  <svg viewBox="0 0 720 220" role="img" aria-label="RNN plegada y desplegada en el tiempo">
+    <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <circle cx="70" cy="40" r="20" class="d-y"/><text x="70" y="45" text-anchor="middle" style="fill:#fff" class="d-text" font-weight="700">y</text>
+    <circle cx="70" cy="110" r="22" class="d-acc"/><text x="70" y="115" text-anchor="middle" style="fill:#fff" class="d-text" font-weight="700">h</text>
+    <circle cx="70" cy="180" r="20" class="d-in"/><text x="70" y="185" text-anchor="middle" style="fill:#fff" class="d-text" font-weight="700">x</text>
+    <g class="d-arrow"><path d="M70 158 V134" marker-end="url(#ar5)"/><path d="M70 88 V62" marker-end="url(#ar5)"/><path d="M92 104 C130 80 130 140 93 118" marker-end="url(#ar5)"/></g>
+    <text x="58" y="148" class="d-text-3">B</text><text x="58" y="78" class="d-text-3">A</text><text x="126" y="112" class="d-text-3">C</text>
+    <text x="175" y="115" text-anchor="middle" class="d-text" font-size="22">=</text>
+    <g>
+      <g transform="translate(250,0)"><circle cx="0" cy="40" r="18" class="d-y"/><circle cx="0" cy="110" r="20" class="d-acc"/><circle cx="0" cy="180" r="18" class="d-in"/><text x="0" y="45" text-anchor="middle" style="fill:#fff" class="d-text-2">y₁</text><text x="0" y="115" text-anchor="middle" style="fill:#fff" class="d-text-2">h₁</text><text x="0" y="185" text-anchor="middle" style="fill:#fff" class="d-text-2">x₁</text></g>
+      <g transform="translate(370,0)"><circle cx="0" cy="40" r="18" class="d-y"/><circle cx="0" cy="110" r="20" class="d-acc"/><circle cx="0" cy="180" r="18" class="d-in"/><text x="0" y="45" text-anchor="middle" style="fill:#fff" class="d-text-2">y₂</text><text x="0" y="115" text-anchor="middle" style="fill:#fff" class="d-text-2">h₂</text><text x="0" y="185" text-anchor="middle" style="fill:#fff" class="d-text-2">x₂</text></g>
+      <g transform="translate(490,0)"><circle cx="0" cy="40" r="18" class="d-y"/><circle cx="0" cy="110" r="20" class="d-acc"/><circle cx="0" cy="180" r="18" class="d-in"/><text x="0" y="45" text-anchor="middle" style="fill:#fff" class="d-text-2">y₃</text><text x="0" y="115" text-anchor="middle" style="fill:#fff" class="d-text-2">h₃</text><text x="0" y="185" text-anchor="middle" style="fill:#fff" class="d-text-2">x₃</text></g>
+      <g transform="translate(640,0)"><circle cx="0" cy="40" r="18" class="d-y"/><circle cx="0" cy="110" r="20" class="d-acc"/><circle cx="0" cy="180" r="18" class="d-in"/><text x="0" y="45" text-anchor="middle" style="fill:#fff" class="d-text-2">yₜ</text><text x="0" y="115" text-anchor="middle" style="fill:#fff" class="d-text-2">hₜ</text><text x="0" y="185" text-anchor="middle" style="fill:#fff" class="d-text-2">xₜ</text></g>
+      <g class="d-arrow">
+        <path d="M250 160 V132" marker-end="url(#ar5)"/><path d="M250 90 V60" marker-end="url(#ar5)"/>
+        <path d="M370 160 V132" marker-end="url(#ar5)"/><path d="M370 90 V60" marker-end="url(#ar5)"/>
+        <path d="M490 160 V132" marker-end="url(#ar5)"/><path d="M490 90 V60" marker-end="url(#ar5)"/>
+        <path d="M640 160 V132" marker-end="url(#ar5)"/><path d="M640 90 V60" marker-end="url(#ar5)"/>
+        <path d="M272 110 H346" marker-end="url(#ar5)"/><path d="M392 110 H466" marker-end="url(#ar5)"/><path d="M512 110 H560" marker-end="url(#ar5)"/><path d="M580 110 H616" marker-end="url(#ar5)"/>
+      </g>
+      <text x="570" y="114" text-anchor="middle" class="d-text-3">…</text>
+      <text x="310" y="102" text-anchor="middle" class="d-text-3">C</text><text x="430" y="102" text-anchor="middle" class="d-text-3">C</text>
+    </g>
+  </svg>
+  <figcaption>Izquierda: RNN "plegada" (un lazo). Derecha: la misma red desplegada en el tiempo; todas las copias comparten los pesos A, B, C.</figcaption>
+</figure>
+
+<ul>
+  <li><strong>Parámetros compartidos:</strong> las feedforward tienen pesos distintos en cada nodo; la RNN usa <strong>los mismos pesos</strong> en cada paso. Se siguen ajustando con backprop y gradiente descendente.</li>
+  <li><strong>BPTT (Backpropagation Through Time):</strong> mismos principios que backprop (el error viaja de la salida hacia la entrada), pero <strong>suma los errores de cada paso de tiempo</strong>, porque los parámetros se comparten. Las feedforward no necesitan sumar errores.</li>
+</ul>
+<div class="formula">$$\mathcal{L} = \sum_{t=1}^{T} \mathcal{L}_t(y_t, \hat{y}_t) \qquad\qquad \frac{\partial \mathcal{L}}{\partial W} = \sum_{t=1}^{T} \frac{\partial \mathcal{L}_t}{\partial W}$$</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_08_rnn.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_08_rnn.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · RNN simple &quot;a mano&quot;: la MISMA función (mismos pesos) en cada paso de tiempo
+import numpy as np
+
+np.set_printoptions(precision=4, suppress=True)
+
+# Secuencia de 3 pasos, cada entrada con 2 variables
+X = np.array([[1.0, 0.0],
+              [0.0, 1.0],
+              [1.0, 1.0]])
+
+W_xh = np.array([[0.5, -0.3],     # entrada -&gt; oculto (2 unidades ocultas)
+                 [0.8,  0.2]])
+W_hh = np.array([[0.1,  0.4],     # oculto(t-1) -&gt; oculto(t)  ← esto es la &quot;memoria&quot;
+                 [-0.2, 0.3]])
+b_h = np.zeros(2)
+W_hy = np.array([1.0, -1.0])      # oculto -&gt; salida
+
+h = np.zeros(2)                   # estado oculto inicial h0
+for t, x_t in enumerate(X, start=1):
+    h = np.tanh(W_xh @ x_t + W_hh @ h + b_h)   # h_t = tanh(Wxh·x_t + Whh·h_{t-1} + b)
+    y_t = W_hy @ h
+    print(f&quot;t={t}: x_t={x_t}, h_t={h}, y_t={y_t:.4f}&quot;)
+
+# ¿Por qué se desvanece / explota el gradiente? BPTT multiplica factores paso a paso
+print(&quot;\nFactor^pasos (lo que le pasa al gradiente al retroceder en el tiempo):&quot;)
+for factor in [0.5, 0.9, 1.0, 1.1, 1.5]:
+    print(f&quot;  {factor}^50 = {factor ** 50:.3e}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>t=1: x_t=[1. 0.], h_t=[0.4621 0.664 ], y_t=-0.2019
+t=2: x_t=[0. 1.], h_t=[0.0118 0.2975], y_t=-0.2857
+t=3: x_t=[1. 1.], h_t=[0.3097 0.7957], y_t=-0.4861
+
+Factor^pasos (lo que le pasa al gradiente al retroceder en el tiempo):
+  0.5^50 = 8.882e-16
+  0.9^50 = 5.154e-03
+  1.0^50 = 1.000e+00
+  1.1^50 = 1.174e+02
+  1.5^50 = 6.376e+08</pre></div>
+</div>
+
+<h3 id="vanishing">6.3 Gradientes que desaparecen y gradientes explosivos</h3>
+<p>Al retroceder en el tiempo, BPTT multiplica muchas veces factores parecidos (las derivadas de cada paso). Si el factor es menor que 1, el gradiente <strong>se hace cada vez más pequeño</strong> hasta ser insignificante (≈0) y el algoritmo <strong>deja de aprender</strong> (vanishing). Si es mayor que 1, el gradiente <strong>crece sin control</strong>, el modelo se vuelve inestable y los pesos terminan como <strong>NaN</strong> (exploding).</p>
+<div class="chart-card">
+  <h4>Lo que le pasa a un gradiente que se multiplica por el mismo factor en cada paso</h4>
+  <p class="sub">Escala logarítmica. Con 50 pasos: 0.9⁵⁰ ≈ 0.005 y 1.1⁵⁰ ≈ 117.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>factor 0.5</span><span><i style="background:var(--s2)"></i>factor 0.9</span><span><i style="background:var(--muted-series)"></i>factor 1.0</span><span><i style="background:var(--s7)"></i>factor 1.1</span></div>
+  <div class="chart-box"><canvas id="chart-vanish" aria-label="Gradiente que se desvanece o explota"></canvas></div>
+</div>
+<div class="callout exam">
+  <div class="callout-title">📝 Soluciones (la de la diapositiva y las que se usan en la práctica)</div>
+  <ul>
+    <li><strong>La de la clase:</strong> reducir la cantidad de capas ocultas (quitar complejidad al modelo RNN).</li>
+    <li>Usar celdas con puertas: <strong>LSTM</strong> (creada justo para el vanishing gradient) o <strong>GRU</strong>.</li>
+    <li>Para explosión: <em>gradient clipping</em> (recortar la norma del gradiente).</li>
+    <li>Activaciones tipo ReLU e inicialización adecuada de pesos.</li>
+  </ul>
+</div>
+
+<h3 id="tipos-rnn">6.4 Tipos de redes recurrentes (según entrada/salida)</h3>
+<p>Las feedforward mapean una entrada a una salida. Las RNN no tienen esa restricción: entrada y salida pueden variar en longitud.</p>
+<figure class="figure">
+  <svg viewBox="0 0 800 250" role="img" aria-label="Cinco tipos de RNN según entrada y salida">
+    <defs><marker id="ar6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <!-- uno a uno -->
+    <g transform="translate(40,0)"><circle cx="0" cy="50" r="13" class="d-y"/><circle cx="0" cy="110" r="15" class="d-hid"/><circle cx="0" cy="170" r="13" class="d-in"/><path d="M0 155 V127 M0 95 V65" class="d-arrow" marker-end="url(#ar6)"/><text x="0" y="215" text-anchor="middle" class="d-text" font-weight="700">Uno a uno</text><text x="0" y="232" text-anchor="middle" class="d-text-3">clasificar 1 imagen</text></g>
+    <!-- uno a muchos -->
+    <g transform="translate(140,0)"><g><circle cx="0" cy="50" r="13" class="d-y"/><circle cx="50" cy="50" r="13" class="d-y"/><circle cx="100" cy="50" r="13" class="d-y"/><circle cx="0" cy="110" r="15" class="d-hid"/><circle cx="50" cy="110" r="15" class="d-hid"/><circle cx="100" cy="110" r="15" class="d-hid"/><circle cx="0" cy="170" r="13" class="d-in"/></g><g class="d-arrow"><path d="M0 155 V127" marker-end="url(#ar6)"/><path d="M0 95 V65 M50 95 V65 M100 95 V65" marker-end="url(#ar6)"/><path d="M15 110 H33 M65 110 H83" marker-end="url(#ar6)"/></g><text x="50" y="215" text-anchor="middle" class="d-text" font-weight="700">Uno a muchos</text><text x="50" y="232" text-anchor="middle" class="d-text-3">generar música / describir imagen</text></g>
+    <!-- muchos a uno -->
+    <g transform="translate(320,0)"><g><circle cx="100" cy="50" r="13" class="d-y"/><circle cx="0" cy="110" r="15" class="d-hid"/><circle cx="50" cy="110" r="15" class="d-hid"/><circle cx="100" cy="110" r="15" class="d-hid"/><circle cx="0" cy="170" r="13" class="d-in"/><circle cx="50" cy="170" r="13" class="d-in"/><circle cx="100" cy="170" r="13" class="d-in"/></g><g class="d-arrow"><path d="M0 155 V127 M50 155 V127 M100 155 V127" marker-end="url(#ar6)"/><path d="M100 95 V65" marker-end="url(#ar6)"/><path d="M15 110 H33 M65 110 H83" marker-end="url(#ar6)"/></g><text x="50" y="215" text-anchor="middle" class="d-text" font-weight="700">Muchos a uno</text><text x="50" y="232" text-anchor="middle" class="d-text-3">sentimiento de una reseña</text></g>
+    <!-- muchos a muchos (sincronizado) -->
+    <g transform="translate(490,0)"><g><circle cx="0" cy="50" r="13" class="d-y"/><circle cx="50" cy="50" r="13" class="d-y"/><circle cx="100" cy="50" r="13" class="d-y"/><circle cx="0" cy="110" r="15" class="d-hid"/><circle cx="50" cy="110" r="15" class="d-hid"/><circle cx="100" cy="110" r="15" class="d-hid"/><circle cx="0" cy="170" r="13" class="d-in"/><circle cx="50" cy="170" r="13" class="d-in"/><circle cx="100" cy="170" r="13" class="d-in"/></g><g class="d-arrow"><path d="M0 155 V127 M50 155 V127 M100 155 V127" marker-end="url(#ar6)"/><path d="M0 95 V65 M50 95 V65 M100 95 V65" marker-end="url(#ar6)"/><path d="M15 110 H33 M65 110 H83" marker-end="url(#ar6)"/></g><text x="50" y="215" text-anchor="middle" class="d-text" font-weight="700">Muchos a muchos</text><text x="50" y="232" text-anchor="middle" class="d-text-3">etiquetar cada palabra (POS)</text></g>
+    <!-- muchos a muchos encoder-decoder -->
+    <g transform="translate(650,0)"><g><circle cx="75" cy="50" r="13" class="d-y"/><circle cx="125" cy="50" r="13" class="d-y"/><circle cx="-25" cy="110" r="13" class="d-hid"/><circle cx="25" cy="110" r="13" class="d-hid"/><circle cx="75" cy="110" r="13" class="d-hid"/><circle cx="125" cy="110" r="13" class="d-hid"/><circle cx="-25" cy="170" r="12" class="d-in"/><circle cx="25" cy="170" r="12" class="d-in"/></g><g class="d-arrow"><path d="M-25 157 V125 M25 157 V125" marker-end="url(#ar6)"/><path d="M75 96 V65 M125 96 V65" marker-end="url(#ar6)"/><path d="M-12 110 H10 M38 110 H60 M88 110 H110" marker-end="url(#ar6)"/></g><text x="50" y="215" text-anchor="middle" class="d-text" font-weight="700">Muchos a muchos</text><text x="50" y="232" text-anchor="middle" class="d-text-3">traducción (largos distintos)</text></g>
+  </svg>
+  <figcaption>Naranja = entradas, verde = estados ocultos, amarillo = salidas. Los dos "muchos a muchos" de la clase: el sincronizado (misma longitud) y el codificador–decodificador (longitudes distintas).</figcaption>
+</figure>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Tipo</th><th>Entrada → salida</th><th>Ejemplo</th><th>En Keras</th></tr></thead>
+<tbody>
+<tr><td>Uno a uno</td><td>1 → 1</td><td>red "normal": clasificar una imagen</td><td><code>Dense</code></td></tr>
+<tr><td>Uno a muchos</td><td>1 → secuencia</td><td>generación de música, subtítulos de una imagen</td><td><code>RepeatVector</code> + RNN</td></tr>
+<tr><td>Muchos a uno</td><td>secuencia → 1</td><td>clasificación de sentimiento, actividad en un video</td><td><code>LSTM(32)</code> (solo último estado)</td></tr>
+<tr><td>Muchos a muchos (=)</td><td>secuencia → secuencia (misma longitud)</td><td>etiquetado de partes de la oración, NER</td><td><code>LSTM(32, return_sequences=True)</code></td></tr>
+<tr><td>Muchos a muchos (≠)</td><td>secuencia → secuencia (otra longitud)</td><td>traducción automática, reconocimiento de voz</td><td>encoder–decoder</td></tr>
+</tbody></table></div>
+
+<h3 id="variantes-rnn">6.5 Arquitecturas: BRNN, LSTM y GRU</h3>
+<div class="glossary">
+  <div class="gterm"><b>BRNN (bidireccional)</b><span>Además de las entradas anteriores, usa <strong>datos futuros</strong> para mejorar la precisión. Ejemplo: en "feeling <u>under</u> the weather" adivina mejor la 2.ª palabra si ya conoce la última ("weather/clima"). En Keras: <code>Bidirectional(LSTM(32))</code>.</span></div>
+  <div class="gterm"><b>LSTM (Long Short-Term Memory)</b><span>De <strong>Sepp Hochreiter y Jürgen Schmidhuber</strong>, como solución al <strong>vanishing gradient</strong> y a las dependencias de largo plazo. Tiene "celdas" con <strong>3 puertas: entrada, salida y olvido</strong>, que controlan qué información fluye. Ejemplo: "Alice es alérgica a las nueces… no puede comer mantequilla de maní": si el contexto quedó varias oraciones atrás, una RNN simple no lo conecta; la LSTM sí puede.</span></div>
+  <div class="gterm"><b>GRU (Gated Recurrent Unit)</b><span>Similar a la LSTM, también ataca la memoria de corto plazo, pero en vez de un "estado de celda" usa <strong>estados ocultos</strong> y tiene <strong>2 puertas: reinicio (reset) y actualización (update)</strong>.</span></div>
+</div>
+
+<h3 id="rnn-aplicaciones">6.6 Aplicaciones de las RNN</h3>
+<ol>
+  <li><strong>Reconocimiento de voz:</strong> entra un clip de audio y sale su transcripción. Entrada <em>y</em> salida son secuencias.</li>
+  <li><strong>Clasificación de sentimientos:</strong> categorizar la opinión de un texto (la entrada es una secuencia de palabras; la salida, p. ej., estrellas).</li>
+  <li><strong>Reconocimiento de actividad en video:</strong> un video es una secuencia de fotogramas; la salida es la actividad ("corriendo").</li>
+</ol>
+
+<!-- ===================================================== -->
+<h2 id="embeddings">7. Word Embeddings: representar palabras como vectores</h2>
+
+<h3 id="onehot">7.1 El problema del one-hot</h3>
+<p>Tomemos "Have a good day" y "Have a great day": casi significan lo mismo. Con el vocabulario \(V = \{\text{Have, a, good, great, day}\}\), el one-hot de cada palabra es un vector de longitud \(|V|=5\) con un solo 1:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Palabra</th><th>Vector one-hot</th></tr></thead>
+<tbody>
+<tr><td>Have</td><td><code>[1, 0, 0, 0, 0]ᵀ</code></td></tr>
+<tr><td>a</td><td><code>[0, 1, 0, 0, 0]ᵀ</code></td></tr>
+<tr><td>good</td><td><code>[0, 0, 1, 0, 0]ᵀ</code></td></tr>
+<tr><td>great</td><td><code>[0, 0, 0, 1, 0]ᵀ</code></td></tr>
+<tr><td>day</td><td><code>[0, 0, 0, 0, 1]ᵀ</code></td></tr>
+</tbody></table></div>
+<p>En ese espacio de 5 dimensiones cada palabra ocupa su propio eje y no tiene proyección sobre los demás: <strong>"good" y "great" quedan tan lejos como "day" y "have"</strong>, lo cual es falso. Además, con un vocabulario real (10,000+ palabras) los vectores son enormes y casi todo ceros (dispersos). Las palabras son <strong>independientes</strong> entre sí.</p>
+
+<h3 id="embedding-def">7.2 La idea del embedding</h3>
+<p>Un <strong>word embedding</strong> es una representación <strong>densa y eficiente</strong> donde <strong>palabras similares tienen codificaciones similares</strong>. Es un vector de números de punto flotante cuya longitud <strong>tú eliges</strong> (hiperparámetro): típicamente de <strong>8 dimensiones</strong> (datos pequeños) hasta <strong>1024</strong> (datos grandes). Más dimensiones capturan relaciones más finas pero requieren más datos. Lo importante: <strong>no se especifica a mano</strong>, son <strong>parámetros entrenables</strong> (pesos que el modelo aprende, igual que los de una capa densa).</p>
+<p>La premisa (hipótesis distribucional): <strong>una palabra se puede caracterizar por las palabras que la acompañan</strong>. Como los vectores son coordenadas en un espacio, palabras cercanas = semántica similar. El objetivo es que palabras de contexto similar tengan un <strong>coseno cercano a 1</strong> (ángulo cercano a 0) — una <em>representación distribuida</em> donde cada palabra depende de las demás.</p>
+
+<div class="formula">
+$$\cos(\theta) = \frac{\vec a \cdot \vec b}{\lVert \vec a \rVert\,\lVert \vec b \rVert} \qquad\qquad d_{\text{euclidiana}}(\vec a, \vec b) = \sqrt{\textstyle\sum_i (a_i - b_i)^2}$$
+<div class="where">Coseno = 1 → misma dirección (muy similares); 0 → ortogonales (nada que ver, como todo el one-hot); −1 → opuestas.</div>
+</div>
+
+<div class="widget" id="w-emb">
+  <div class="widget-title"><span class="tag">Simulador</span> Mapa de embeddings (2D de juguete)</div>
+  <p class="hint">Elige dos palabras para ver su similitud del coseno. En un embedding real hay cientos de dimensiones, pero la idea es la misma: palabras parecidas apuntan en direcciones parecidas.</p>
+  <div class="controls">
+    <label>Palabra A <select id="emb-a"></select></label>
+    <label>Palabra B <select id="emb-b"></select></label>
+  </div>
+  <svg id="emb-svg" viewBox="0 0 640 340" role="img" aria-label="Palabras como vectores en 2D"></svg>
+  <div class="readout" id="emb-out"></div>
+</div>
+
+<h3 id="analogias">7.3 Analogías: rey − hombre + mujer ≈ reina</h3>
+<p>Modelos como <strong>Word2Vec</strong> aprenden direcciones con significado: la diferencia entre "rey" y "hombre" se parece a la diferencia entre "reina" y "mujer" (la dirección "género"). Por eso la aritmética de vectores produce analogías.</p>
+
+<h3 id="keras-embedding">7.4 La capa <code>Embedding</code> de Keras</h3>
+<p>Keras ofrece una capa de incrustación para texto. Requiere que la entrada esté <strong>codificada en enteros</strong> (cada palabra = un entero único), lo que se hace con la API <code>Tokenizer</code> (o hoy <code>TextVectorization</code>). La capa se inicializa con <strong>pesos aleatorios</strong> y aprende un embedding para todas las palabras del entrenamiento. Internamente es una <strong>tabla de búsqueda</strong>: una matriz de tamaño (vocabulario × dimensión) donde el entero de la palabra selecciona una fila.</p>
+<figure class="figure">
+  <svg viewBox="0 0 700 210" role="img" aria-label="La capa embedding como tabla de búsqueda">
+    <defs><marker id="ar7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <text x="20" y="30" class="d-text" font-weight="700">Texto</text>
+    <text x="20" y="62" class="d-mono">"I saw a cat ."</text>
+    <path d="M150 58 H190" class="d-arrow" marker-end="url(#ar7)"/>
+    <text x="200" y="30" class="d-text" font-weight="700">Índices (Tokenizer)</text>
+    <text x="200" y="62" class="d-mono">[39, 1592, 10, 2548, 5]</text>
+    <path d="M410 58 H450" class="d-arrow" marker-end="url(#ar7)"/>
+    <text x="460" y="30" class="d-text" font-weight="700">Matriz de embedding</text>
+    <g>
+      <rect x="470" y="44" width="150" height="150" rx="6" class="d-box"/>
+      <rect x="470" y="98" width="150" height="16" class="d-fill-3"/>
+      <line x1="470" y1="62" x2="620" y2="62" class="d-line"/><line x1="470" y1="80" x2="620" y2="80" class="d-line"/><line x1="470" y1="132" x2="620" y2="132" class="d-line"/><line x1="470" y1="150" x2="620" y2="150" class="d-line"/><line x1="470" y1="168" x2="620" y2="168" class="d-line"/>
+      <text x="458" y="111" text-anchor="end" class="d-mono">39</text>
+      <text x="545" y="111" text-anchor="middle" class="d-text-3">vector denso de "I"</text>
+      <path d="M632 46 V192" class="d-line-2"/><text x="640" y="124" class="d-text-3">input_dim</text><text x="640" y="138" class="d-text-3">(vocabulario)</text>
+      <path d="M470 204 H620" class="d-line-2"/><text x="545" y="200" text-anchor="middle" class="d-text-3">output_dim</text>
+    </g>
+    <text x="20" y="120" class="d-text-2">Ejemplo 4-dim (diapositiva):</text>
+    <text x="20" y="144" class="d-mono">cat → [1.2, −0.1,  4.3, 3.2]</text>
+    <text x="20" y="164" class="d-mono">mat → [0.4,  2.5, −0.9, 0.5]</text>
+    <text x="20" y="184" class="d-mono">on  → [2.1,  0.3,  0.1, 0.4]</text>
+  </svg>
+  <figcaption>El índice de la palabra selecciona una fila de la matriz. Parámetros de la capa = input_dim × output_dim.</figcaption>
+</figure>
+
+<p>Usos de la capa (los tres de la diapositiva):</p>
+<ol>
+  <li>Sola, para <strong>aprender un embedding</strong> que se guarda y se usa después en otro modelo.</li>
+  <li>Como parte de un modelo de deep learning, donde el embedding se aprende <strong>junto con el modelo</strong>.</li>
+  <li>Para <strong>cargar un embedding preentrenado</strong> (word2vec, GloVe): una forma de <strong>transfer learning</strong>.</li>
+</ol>
+<p>Se define como la <strong>primera capa oculta</strong> y tiene <strong>3 argumentos</strong>:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Argumento</th><th>Significado</th><th>Ejemplo de la clase</th></tr></thead>
+<tbody>
+<tr><td><code>input_dim</code></td><td>Tamaño del vocabulario</td><td>enteros de 0 a 10 → <strong>11</strong> palabras</td></tr>
+<tr><td><code>output_dim</code></td><td>Dimensión del espacio vectorial (hiperparámetro)</td><td>32, 100 o más</td></tr>
+<tr><td><code>input_length</code></td><td>Longitud de las secuencias de entrada</td><td>documentos de 1000 palabras → <strong>1000</strong></td></tr>
+</tbody></table></div>
+<div class="callout note"><div class="callout-title">ℹ️ Nota de versión</div><p>En Keras 3 (TensorFlow ≥ 2.16) el argumento <code>input_length</code> ya no se pasa a la capa; la longitud se indica con <code>keras.Input(shape=(1000,))</code>. El concepto es el mismo y es lo que te preguntarán.</p></div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_09_embeddings.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_09_embeddings.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · One-hot vs Word Embeddings y similitud del coseno
+import numpy as np
+
+def coseno(a, b):
+    return a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+
+# --- One-hot con V = {Have, a, good, great, day} ---
+V = [&quot;Have&quot;, &quot;a&quot;, &quot;good&quot;, &quot;great&quot;, &quot;day&quot;]
+one_hot = {w: np.eye(len(V))[i] for i, w in enumerate(V)}
+print(&quot;one-hot &#x27;good&#x27; :&quot;, one_hot[&quot;good&quot;])
+print(&quot;one-hot &#x27;great&#x27;:&quot;, one_hot[&quot;great&quot;])
+print(&quot;cos(good, great) =&quot;, coseno(one_hot[&quot;good&quot;], one_hot[&quot;great&quot;]))
+print(&quot;cos(day, Have)   =&quot;, coseno(one_hot[&quot;day&quot;], one_hot[&quot;Have&quot;]))
+print(&quot;-&gt; con one-hot TODAS las palabras son igual de distintas (ángulo de 90°)\n&quot;)
+
+# --- Embedding de 4 dimensiones (valores de la diapositiva) ---
+emb = {&quot;cat&quot;: np.array([1.2, -0.1, 4.3, 3.2]),
+       &quot;mat&quot;: np.array([0.4, 2.5, -0.9, 0.5]),
+       &quot;on&quot;:  np.array([2.1, 0.3, 0.1, 0.4])}
+for a, b in [(&quot;cat&quot;, &quot;mat&quot;), (&quot;cat&quot;, &quot;on&quot;), (&quot;mat&quot;, &quot;on&quot;)]:
+    print(f&quot;cos({a}, {b}) = {coseno(emb[a], emb[b]): .4f}&quot;)
+
+# --- Analogía estilo Word2Vec con vectores de juguete [realeza, masculino, femenino] ---
+w2v = {&quot;rey&quot;:    np.array([0.95, 0.90, 0.05]),
+       &quot;reina&quot;:  np.array([0.95, 0.05, 0.90]),
+       &quot;hombre&quot;: np.array([0.10, 0.92, 0.04]),
+       &quot;mujer&quot;:  np.array([0.10, 0.03, 0.91]),
+       &quot;manzana&quot;: np.array([0.01, 0.10, 0.12])}
+objetivo = w2v[&quot;rey&quot;] - w2v[&quot;hombre&quot;] + w2v[&quot;mujer&quot;]
+ranking = sorted(((coseno(objetivo, v), w) for w, v in w2v.items()
+                  if w not in (&quot;rey&quot;, &quot;hombre&quot;, &quot;mujer&quot;)), reverse=True)
+print(&quot;\nrey - hombre + mujer ≈&quot;, [(w, round(float(s), 4)) for s, w in ranking])
+
+# --- Lo que hace por dentro la capa Embedding: buscar una FILA de una matriz ---
+vocab_size, dim = 11, 4                   # índices 0..10 -&gt; input_dim = 11
+rng = np.random.default_rng(0)
+E = rng.normal(size=(vocab_size, dim)).round(2)   # pesos entrenables (inician aleatorios)
+oracion = [3, 7, 1]                        # palabras ya convertidas a enteros
+print(&quot;\nMatriz E:&quot;, E.shape, &quot;-&gt; parámetros =&quot;, E.size)
+print(&quot;Embedding de la oración [3, 7, 1]:\n&quot;, E[oracion])</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>one-hot &#x27;good&#x27; : [0. 0. 1. 0. 0.]
+one-hot &#x27;great&#x27;: [0. 0. 0. 1. 0.]
+cos(good, great) = 0.0
+cos(day, Have)   = 0.0
+-&gt; con one-hot TODAS las palabras son igual de distintas (ángulo de 90°)
+
+cos(cat, mat) = -0.1359
+cos(cat, on) =  0.3538
+cos(mat, on) =  0.2878
+
+rey - hombre + mujer ≈ [(&#x27;reina&#x27;, 0.9995), (&#x27;manzana&#x27;, 0.584)]
+
+Matriz E: (11, 4) -&gt; parámetros = 44
+Embedding de la oración [3, 7, 1]:
+ [[-2.33 -0.22 -1.25 -0.73]
+ [-0.46  0.22 -1.01 -0.21]
+ [-0.54  0.36  1.3   0.95]]</pre></div>
+</div>
+
+<h3 id="embedding-aplicaciones">7.5 Aplicaciones</h3>
+<p>Búsqueda de documentos y recuperación de información, traducción, detectores de spam, clasificación de documentos, topic modeling, sistemas de recomendación de música/video, etc.</p>
+
+<h3 id="sentimiento-keras">7.6 Todo junto: Embedding + RNN/LSTM/GRU en Keras</h3>
+<p>Primero comparamos cuántos parámetros tiene cada celda recurrente (misma entrada de 16 dimensiones y 32 unidades), luego entrenamos un mini clasificador de sentimiento (muchos a uno).</p>
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_k3_rnn_keras.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k3_rnn_keras.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Embedding + SimpleRNN / LSTM / GRU con Keras (clasificación de sentimiento)
+import os
+os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;
+import numpy as np
+import keras
+from keras import layers
+
+keras.utils.set_random_seed(42)
+
+# ---------- Parte A: comparar cuántos parámetros tiene cada celda ----------
+VOCAB, DIM, LARGO = 10000, 16, 100
+for Celda in (layers.SimpleRNN, layers.LSTM, layers.GRU):
+    m = keras.Sequential([
+        keras.Input(shape=(LARGO,)),                 # 100 enteros (índices de palabras)
+        layers.Embedding(input_dim=VOCAB, output_dim=DIM),
+        Celda(32),                                   # muchos-a-uno: solo la última salida
+        layers.Dense(1, activation=&quot;sigmoid&quot;),
+    ])
+    capas = [(l.name, l.count_params()) for l in m.layers]
+    print(f&quot;{Celda.__name__:&lt;10} -&gt; {capas}  total = {m.count_params():,}&quot;)
+
+# ---------- Parte B: mini ejemplo de sentimiento (1 = positivo, 0 = negativo) ----------
+textos = [&quot;me encanta esta película&quot;, &quot;excelente actuación y gran historia&quot;,
+          &quot;muy buena la recomiendo&quot;, &quot;una obra maestra increíble&quot;,
+          &quot;me gustó muchísimo&quot;, &quot;gran película muy divertida&quot;,
+          &quot;pésima no la recomiendo&quot;, &quot;muy aburrida y lenta&quot;,
+          &quot;la peor película del año&quot;, &quot;terrible actuación mala historia&quot;,
+          &quot;no me gustó nada&quot;, &quot;aburrida y sin sentido&quot;]
+etiquetas = np.array([1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+
+vectorizador = layers.TextVectorization(max_tokens=100, output_sequence_length=6)
+vectorizador.adapt(textos)                           # equivale al Tokenizer: palabra -&gt; entero
+X = vectorizador(np.array(textos))
+print(&quot;\n&#x27;me encanta esta película&#x27; -&gt;&quot;, X[0].numpy(), &quot;(0 = relleno/padding)&quot;)
+vocab_size = len(vectorizador.get_vocabulary())
+
+modelo = keras.Sequential([
+    keras.Input(shape=(6,)),
+    layers.Embedding(input_dim=vocab_size, output_dim=8),
+    layers.LSTM(8),
+    layers.Dense(1, activation=&quot;sigmoid&quot;),
+])
+modelo.compile(optimizer=keras.optimizers.Adam(0.01), loss=&quot;binary_crossentropy&quot;,
+               metrics=[&quot;accuracy&quot;])
+modelo.fit(X, etiquetas, epochs=60, verbose=0)
+print(&quot;Accuracy en entrenamiento:&quot;, round(modelo.evaluate(X, etiquetas, verbose=0)[1], 3))
+
+nuevas = np.array([&quot;muy buena historia&quot;, &quot;pésima y aburrida&quot;])
+for frase, p in zip(nuevas, modelo.predict(vectorizador(nuevas), verbose=0).ravel()):
+    print(f&quot;&#x27;{frase}&#x27; -&gt; P(positivo) = {p:.3f}&quot;)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>SimpleRNN  -&gt; [(&#x27;embedding&#x27;, 160000), (&#x27;simple_rnn&#x27;, 1568), (&#x27;dense&#x27;, 33)]  total = 161,601
+LSTM       -&gt; [(&#x27;embedding_1&#x27;, 160000), (&#x27;lstm&#x27;, 6272), (&#x27;dense_1&#x27;, 33)]  total = 166,305
+GRU        -&gt; [(&#x27;embedding_2&#x27;, 160000), (&#x27;gru&#x27;, 4800), (&#x27;dense_2&#x27;, 33)]  total = 164,833
+
+&#x27;me encanta esta película&#x27; -&gt; [ 5 29 28  3  0  0] (0 = relleno/padding)
+Accuracy en entrenamiento: 1.0
+&#x27;muy buena historia&#x27; -&gt; P(positivo) = 0.996
+&#x27;pésima y aburrida&#x27; -&gt; P(positivo) = 0.004</pre></div>
+  <div class="code-note">Verifica: SimpleRNN = 32·(32+16+1) = 1,568 · LSTM = 4·1,568 = 6,272 · GRU (Keras, reset_after=True) = 3·32·(32+16+2) = 4,800 · Embedding = 10,000·16 = 160,000. Las probabilidades del mini ejemplo pueden variar ligeramente.</div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="lstm-gru">8. LSTM vs GRU y redes neuronales recursivas</h2>
+
+<p>Una RNN contiene capas de neuronas <strong>compartidas a través del tiempo</strong>, lo que permite modelar datos temporales (video, clima, precios de acciones). Hay muchas formas de diseñar una <strong>celda recurrente</strong>, que es la que controla el flujo de información de un paso a otro y puede darle a la red una <strong>memoria funcional</strong>. Las dos más populares: LSTM y GRU.</p>
+
+<h3 id="lstm">8.1 La celda LSTM</h3>
+<p>La LSTM mantiene un <strong>estado de celda</strong> \(c_t\) (la memoria de largo plazo) en el que se lee y se escribe. Según la clase 07 hay <strong>4 puertas/bloques</strong> que regulan lectura, escritura y salida:</p>
+<ol class="steps">
+  <li><strong>Olvido \(G_f\):</strong> decide qué se olvida.</li>
+  <li><strong>Actualización/entrada \(G_u\):</strong> decide en qué parte del estado de celda se escribe.</li>
+  <li><strong>Candidato \(\tilde c_t\):</strong> decide los contenidos que se escriben.</li>
+  <li><strong>Salida \(G_o\):</strong> lee el estado de celda para producir la salida.</li>
+</ol>
+<div class="callout warn"><div class="callout-title">⚠️ ¿3 o 4 puertas?</div><p>La clase 05 dice "<strong>tres puertas</strong>: entrada, salida y olvido"; la clase 07 cuenta "<strong>4 puertas</strong>" porque incluye el bloque candidato \(\tilde c_t\) (que técnicamente usa tanh, no es una compuerta sigmoide). Si te preguntan, explica ambas: 3 compuertas sigmoides (\(G_f, G_u, G_o\)) + 1 candidato; por eso una LSTM tiene <strong>4 veces</strong> los parámetros de una RNN simple.</p></div>
+
+<div class="formula">
+$$\begin{aligned}
+\tilde{c}_t &= \tanh\!\big(W_c\,[a_{t-1}, x_t] + b_c\big) &&\text{candidato a memoria}\\
+G_u &= \sigma\!\big(W_u\,[a_{t-1}, x_t] + b_u\big) &&\text{puerta de actualización (entrada)}\\
+G_f &= \sigma\!\big(W_f\,[a_{t-1}, x_t] + b_f\big) &&\text{puerta de olvido}\\
+G_o &= \sigma\!\big(W_o\,[a_{t-1}, x_t] + b_o\big) &&\text{puerta de salida}\\
+c_t &= G_u * \tilde{c}_t + G_f * c_{t-1} &&\text{nueva memoria}\\
+a_t &= G_o * \tanh(c_t) &&\text{nuevo estado oculto (salida)}
+\end{aligned}$$
+<div class="where">\(*\) es multiplicación elemento a elemento; \([a_{t-1}, x_t]\) es la concatenación del estado anterior con la entrada. Las sigmoides dan valores entre 0 (cerrar) y 1 (dejar pasar).</div>
+</div>
+
+<figure class="figure">
+  <svg viewBox="0 0 720 300" role="img" aria-label="Diagrama de la celda LSTM">
+    <defs><marker id="ar8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <rect x="110" y="30" width="500" height="230" rx="18" class="d-fill-3"/>
+    <text x="360" y="22" text-anchor="middle" class="d-text" font-weight="700">Celda LSTM</text>
+    <!-- cell state line -->
+    <path d="M40 70 H680" class="d-arrow" marker-end="url(#ar8)"/>
+    <text x="40" y="60" class="d-text-2">c₍ₜ₋₁₎</text><text x="645" y="60" class="d-text-2">cₜ</text>
+    <circle cx="230" cy="70" r="13" class="d-box-strong"/><text x="230" y="75" text-anchor="middle" class="d-text">×</text>
+    <circle cx="390" cy="70" r="13" class="d-box-strong"/><text x="390" y="75" text-anchor="middle" class="d-text">+</text>
+    <!-- gates -->
+    <rect x="200" y="170" width="60" height="34" rx="8" class="d-fill-8"/><text x="230" y="192" text-anchor="middle" class="d-text">σ</text><text x="230" y="221" text-anchor="middle" class="d-text-3">olvido</text><text x="230" y="234" text-anchor="middle" class="d-text-3">G_f</text>
+    <rect x="290" y="170" width="60" height="34" rx="8" class="d-fill-8"/><text x="320" y="192" text-anchor="middle" class="d-text">σ</text><text x="320" y="221" text-anchor="middle" class="d-text-3">actualización</text><text x="320" y="234" text-anchor="middle" class="d-text-3">G_u</text>
+    <rect x="370" y="170" width="60" height="34" rx="8" class="d-fill-1"/><text x="400" y="192" text-anchor="middle" class="d-text">tanh</text><text x="400" y="221" text-anchor="middle" class="d-text-3">candidato</text><text x="400" y="234" text-anchor="middle" class="d-text-3">c̃ₜ</text>
+    <rect x="470" y="170" width="60" height="34" rx="8" class="d-fill-8"/><text x="500" y="192" text-anchor="middle" class="d-text">σ</text><text x="500" y="221" text-anchor="middle" class="d-text-3">salida</text><text x="500" y="234" text-anchor="middle" class="d-text-3">G_o</text>
+    <circle cx="360" cy="130" r="13" class="d-box-strong"/><text x="360" y="135" text-anchor="middle" class="d-text">×</text>
+    <circle cx="560" cy="150" r="13" class="d-box-strong"/><text x="560" y="155" text-anchor="middle" class="d-text">×</text>
+    <rect x="530" y="96" width="60" height="26" rx="8" class="d-fill-1"/><text x="560" y="114" text-anchor="middle" class="d-text-2">tanh</text>
+    <!-- input line -->
+    <path d="M40 250 H560" class="d-line-2"/>
+    <text x="40" y="242" class="d-text-2">a₍ₜ₋₁₎, xₜ</text>
+    <g class="d-arrow">
+      <path d="M230 250 V208" marker-end="url(#ar8)"/><path d="M320 250 V208" marker-end="url(#ar8)"/><path d="M400 250 V208" marker-end="url(#ar8)"/><path d="M500 250 V208" marker-end="url(#ar8)"/>
+      <path d="M230 168 V86" marker-end="url(#ar8)"/>
+      <path d="M320 168 V140 H344" marker-end="url(#ar8)"/><path d="M400 168 V140 H376" marker-end="url(#ar8)"/>
+      <path d="M360 116 V96 H390 V86" marker-end="url(#ar8)"/>
+      <path d="M560 70 V92" marker-end="url(#ar8)"/><path d="M560 124 V134" marker-end="url(#ar8)"/>
+      <path d="M500 168 V150 H544" marker-end="url(#ar8)"/>
+      <path d="M574 150 H680" marker-end="url(#ar8)"/>
+    </g>
+    <text x="650" y="142" class="d-text-2">aₜ</text>
+  </svg>
+  <figcaption>La "autopista" horizontal de arriba es el estado de celda: la información puede viajar muchos pasos casi sin cambios (por eso resiste el vanishing gradient).</figcaption>
+</figure>
+
+<h3 id="gru">8.2 La celda GRU</h3>
+<p>Similar a la LSTM pero con diferencias importantes:</p>
+<ul>
+  <li><strong>No existe un estado oculto separado:</strong> el estado de la celda asume esa función (\(a_t = c_t\)).</li>
+  <li>Los procesos de "qué olvidar" y "dónde escribir" se <strong>consolidan en una sola puerta</strong> (\(G_u\)): <strong>solo se escribe en la parte que se borró</strong> (\(G_u\) para lo nuevo, \(1-G_u\) para lo viejo).</li>
+  <li>El <strong>estado completo</strong> se da como salida (la LSTM elige qué leer con \(G_o\)).</li>
+  <li>Resultado: diseño <strong>más simple con menos parámetros</strong>, a costa de posiblemente <strong>menor expresividad</strong>.</li>
+</ul>
+<div class="formula">
+$$\begin{aligned}
+\tilde{c}_t &= \tanh\!\big(W_c\,[G_r * c_{t-1}, x_t] + b_c\big) &&\text{candidato}\\
+G_u &= \sigma\!\big(W_u\,[c_{t-1}, x_t] + b_u\big) &&\text{puerta de actualización}\\
+G_r &= \sigma\!\big(W_r\,[c_{t-1}, x_t] + b_r\big) &&\text{puerta de reinicio (relevancia)}\\
+c_t &= G_u * \tilde{c}_t + (1 - G_u) * c_{t-1} &&\text{mezcla nuevo/viejo}\\
+a_t &= c_t
+\end{aligned}$$
+</div>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_10_lstm_gru.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_10_lstm_gru.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Un paso de una celda LSTM y de una celda GRU (notación de las diapositivas)
+import numpy as np
+
+np.set_printoptions(precision=4, suppress=True)
+sig = lambda z: 1 / (1 + np.exp(-z))
+
+x_t = np.array([1.0, 0.5])        # entrada en el tiempo t
+a_prev = np.array([0.2, -0.1])    # a_{t-1} (estado oculto anterior)
+c_prev = np.array([0.5, 0.3])     # c_{t-1} (estado de celda anterior)
+concat = np.concatenate([a_prev, x_t])     # [a_{t-1}, x_t]
+
+rng = np.random.default_rng(1)
+Wc, Wu, Wf, Wo = (rng.normal(scale=0.5, size=(2, 4)) for _ in range(4))
+bc = bu = bf = bo = np.zeros(2)
+
+# ----------------- LSTM -----------------
+c_tilde = np.tanh(Wc @ concat + bc)        # candidato a memoria
+G_u = sig(Wu @ concat + bu)                # puerta de actualización (entrada)
+G_f = sig(Wf @ concat + bf)                # puerta de olvido
+G_o = sig(Wo @ concat + bo)                # puerta de salida
+c_t = G_u * c_tilde + G_f * c_prev         # nueva memoria
+a_t = G_o * np.tanh(c_t)                   # nuevo estado oculto
+print(&quot;LSTM&quot;)
+print(&quot; c~_t =&quot;, c_tilde, &quot; G_u =&quot;, G_u, &quot; G_f =&quot;, G_f, &quot; G_o =&quot;, G_o)
+print(&quot; c_t  =&quot;, c_t, &quot;  a_t =&quot;, a_t)
+
+# ----------------- GRU -----------------
+Wr = rng.normal(scale=0.5, size=(2, 4))
+G_r = sig(Wr @ concat)                                   # puerta de reinicio
+G_u2 = sig(Wu @ concat)                                  # puerta de actualización
+c_tilde2 = np.tanh(Wc @ np.concatenate([G_r * c_prev, x_t]))
+c_t2 = G_u2 * c_tilde2 + (1 - G_u2) * c_prev             # mezcla: nuevo vs. viejo
+a_t2 = c_t2                                              # en GRU a_t = c_t
+print(&quot;\nGRU&quot;)
+print(&quot; G_r =&quot;, G_r, &quot; G_u =&quot;, G_u2, &quot; c~_t =&quot;, c_tilde2)
+print(&quot; c_t = a_t =&quot;, c_t2)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>LSTM
+ c~_t = [-0.1656 -0.0549]  G_u = [0.5431 0.4609]  G_f = [0.3925 0.7137]  G_o = [0.4086 0.6881]
+ c_t  = [0.1064 0.1888]   a_t = [0.0433 0.1284]
+
+GRU
+ G_r = [0.5864 0.5354]  G_u = [0.5431 0.4609]  c~_t = [-0.0439  0.0454]
+ c_t = a_t = [0.2046 0.1826]</pre></div>
+</div>
+
+<h3 id="lstm-vs-gru">8.3 LSTM vs GRU: ¿cuál usar?</h3>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>LSTM</th><th>GRU</th></tr></thead>
+<tbody>
+<tr><td>Puertas</td><td>olvido, entrada/actualización, salida (+ candidato)</td><td>actualización, reinicio</td></tr>
+<tr><td>Estados</td><td>estado de celda \(c_t\) <em>y</em> estado oculto \(a_t\)</td><td>uno solo (\(a_t = c_t\))</td></tr>
+<tr><td>Parámetros</td><td>4 × (unidades·(unidades+entrada) + unidades)</td><td>≈ 3 × (…) → ~25 % menos</td></tr>
+<tr><td>Velocidad</td><td>más lenta</td><td>entrena más rápido</td></tr>
+<tr><td>Pocos datos (modelado de lenguaje)</td><td>—</td><td>tiende a funcionar mejor</td></tr>
+<tr><td>Secuencias muy largas</td><td>en teoría recuerda más y gana en relaciones a larga distancia</td><td>—</td></tr>
+<tr><td>Modificar / extender</td><td>más código</td><td>más simple de modificar (agregar puertas)</td></tr>
+</tbody></table></div>
+<div class="callout exam"><div class="callout-title">📝 Conclusión que pide la clase</div><p>El paper de evaluación de GRU muestra que ambas superan claramente a una RNN simple, pero <strong>no se puede concluir cuál de las dos es mejor</strong>: depende del problema y hay que probar.</p></div>
+
+<h3 id="recursivas">8.4 Redes neuronales recursivas (Recursive NN)</h3>
+<p>Una red <strong>recursiva</strong> es un símil de la recurrente: si el <strong>mismo conjunto de pesos se aplica de forma recursiva sobre una entrada estructurada</strong> (un árbol), nace la red recursiva. Trabajan sobre <strong>entradas estructuradas</strong>, especialmente <strong>grafos acíclicos</strong>, con topología de <strong>árbol profundo</strong>: permiten ramificaciones y jerarquías (por ejemplo, el árbol sintáctico de una oración completa).</p>
+<figure class="figure">
+  <svg viewBox="0 0 720 250" role="img" aria-label="Red recurrente en cadena vs red recursiva en árbol">
+    <text x="170" y="22" text-anchor="middle" class="d-text" font-weight="700">Recurrente: cadena (tiempo)</text>
+    <g>
+      <rect x="20" y="90" width="50" height="30" rx="6" class="d-fill-2"/><rect x="95" y="90" width="50" height="30" rx="6" class="d-fill-2"/><rect x="170" y="90" width="50" height="30" rx="6" class="d-fill-2"/><rect x="245" y="90" width="50" height="30" rx="6" class="d-fill-2"/>
+      <text x="45" y="110" text-anchor="middle" class="d-text-2">A</text><text x="120" y="110" text-anchor="middle" class="d-text-2">A</text><text x="195" y="110" text-anchor="middle" class="d-text-2">A</text><text x="270" y="110" text-anchor="middle" class="d-text-2">A</text>
+      <path d="M70 105 H95 M145 105 H170 M220 105 H245" class="d-arrow"/>
+      <text x="45" y="150" text-anchor="middle" class="d-text-3">that</text><text x="120" y="150" text-anchor="middle" class="d-text-3">movie</text><text x="195" y="150" text-anchor="middle" class="d-text-3">was</text><text x="270" y="150" text-anchor="middle" class="d-text-3">cool</text>
+    </g>
+    <text x="530" y="22" text-anchor="middle" class="d-text" font-weight="700">Recursiva: árbol (estructura)</text>
+    <g>
+      <rect x="505" y="40" width="60" height="28" rx="6" class="d-fill-7"/><text x="535" y="59" text-anchor="middle" class="d-text-2">A rama</text>
+      <rect x="430" y="100" width="60" height="28" rx="6" class="d-fill-7"/><text x="460" y="119" text-anchor="middle" class="d-text-2">A rama</text>
+      <rect x="390" y="165" width="48" height="26" rx="6" class="d-fill-8"/><rect x="455" y="165" width="48" height="26" rx="6" class="d-fill-8"/><rect x="560" y="165" width="48" height="26" rx="6" class="d-fill-8"/><rect x="625" y="165" width="48" height="26" rx="6" class="d-fill-8"/>
+      <text x="414" y="183" text-anchor="middle" class="d-text-3">hoja</text><text x="479" y="183" text-anchor="middle" class="d-text-3">hoja</text><text x="584" y="183" text-anchor="middle" class="d-text-3">hoja</text><text x="649" y="183" text-anchor="middle" class="d-text-3">hoja</text>
+      <path d="M414 165 L455 128 M479 165 L465 128 M460 100 L525 68 M584 165 L545 68 M649 165 L555 68" class="d-line-2"/>
+      <text x="414" y="215" text-anchor="middle" class="d-text-3">that</text><text x="479" y="215" text-anchor="middle" class="d-text-3">movie</text><text x="584" y="215" text-anchor="middle" class="d-text-3">was</text><text x="649" y="215" text-anchor="middle" class="d-text-3">cool</text>
+    </g>
+    <text x="360" y="244" text-anchor="middle" class="d-text-3">Mismos pesos A en todos los nodos; la recurrente sigue el orden temporal, la recursiva sigue la jerarquía.</text>
+  </svg>
+  <figcaption>La recurrente es un caso particular de recursiva (un "árbol" que es una cadena).</figcaption>
+</figure>
+<ul>
+  <li>Se usan para <strong>predicción de salidas estructuradas</strong> y también escalares, sobre estructuras de entrada de <strong>tamaño variable</strong>, recorriéndolas en <strong>orden topológico</strong>.</li>
+  <li>Surgieron para aprender representaciones distribuidas de estructuras (por ejemplo, términos lógicos).</li>
+  <li><strong>Ventaja:</strong> pueden capturar dependencias de larga distancia: dos tokens lejanos en la secuencia pueden ser <strong>adyacentes en el árbol sintáctico</strong> (un verbo y su objeto directo separados por muchos adjetivos).</li>
+  <li><strong>Desventajas:</strong> son intrínsecamente complejas y más costosas en todas las etapas; el análisis (parsing) es <strong>lento y dependiente del dominio</strong>, por eso no se adoptan tan ampliamente.</li>
+</ul>
+<div class="callout warn"><div class="callout-title">⚠️ Cuidado con las siglas</div><p>"RNN" se usa tanto para <em>Recurrent</em> como para <em>Recursive</em> Neural Network (la diapositiva lo hace). En el examen aclara: <strong>recurrente = secuencia/tiempo</strong>; <strong>recursiva = árbol/estructura</strong>.</p></div>
+
+<!-- ===================================================== -->
+<h2 id="transfer">9. Transfer Learning ("just learning")</h2>
+
+<p>El <strong>aprendizaje por transferencia</strong> es un método en el que <strong>un modelo desarrollado para una tarea se reutiliza como punto de partida para un modelo en una segunda tarea relacionada</strong>. Es muy popular en visión por computadora y NLP porque entrenar esos modelos desde cero requiere enormes recursos de cómputo y tiempo (días o semanas con hardware moderno), y los modelos preentrenados dan saltos enormes de habilidad en problemas relacionados.</p>
+<div class="callout warn"><div class="callout-title">⚠️ Condición clave</div><p>Solo funciona en deep learning si las características aprendidas en la primera tarea son <strong>generales</strong> (adecuadas para la tarea base y la objetivo), no específicas de la tarea base. Por ejemplo, los bordes y texturas que aprende una red en ImageNet sirven para casi cualquier foto.</p></div>
+
+<figure class="figure">
+  <svg viewBox="0 0 760 270" role="img" aria-label="Entrenar desde cero vs transfer learning">
+    <defs><marker id="ar9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker></defs>
+    <text x="20" y="26" class="d-text" font-weight="700">Desde cero</text>
+    <rect x="20" y="40" width="110" height="50" rx="8" class="d-box"/><text x="75" y="70" text-anchor="middle" class="d-text-2">Tus pocas fotos</text>
+    <rect x="160" y="40" width="320" height="50" rx="8" class="d-fill-4"/><text x="320" y="62" text-anchor="middle" class="d-text-2">Todas las capas con pesos aleatorios</text><text x="320" y="79" text-anchor="middle" class="d-text-3">(hay que aprender bordes, texturas, formas… con pocos datos)</text>
+    <rect x="510" y="40" width="110" height="50" rx="8" class="d-fill-1"/><text x="565" y="70" text-anchor="middle" class="d-text-2">auto / camión</text>
+    <path d="M130 65 H156 M480 65 H506" class="d-arrow" marker-end="url(#ar9)"/>
+    <text x="20" y="140" class="d-text" font-weight="700">Transfer learning</text>
+    <rect x="20" y="154" width="110" height="50" rx="8" class="d-box"/><text x="75" y="184" text-anchor="middle" class="d-text-2">Tus pocas fotos</text>
+    <rect x="160" y="154" width="230" height="50" rx="8" class="d-fill-3"/><text x="275" y="176" text-anchor="middle" class="d-text-2">Base preentrenada (VGG16, ResNet…)</text><text x="275" y="193" text-anchor="middle" class="d-text-3">🔒 congelada: ya sabe "ver"</text>
+    <rect x="410" y="154" width="90" height="50" rx="8" class="d-fill-7"/><text x="455" y="176" text-anchor="middle" class="d-text-2">Cabeza</text><text x="455" y="193" text-anchor="middle" class="d-text-3">nueva</text>
+    <rect x="530" y="154" width="110" height="50" rx="8" class="d-fill-1"/><text x="585" y="184" text-anchor="middle" class="d-text-2">auto / camión</text>
+    <path d="M130 179 H156 M390 179 H406 M500 179 H526" class="d-arrow" marker-end="url(#ar9)"/>
+    <text x="20" y="240" class="d-text-3">Se entrena solo la cabeza (rápido, con pocos datos). Opcional: "fine-tuning" de las últimas capas con un learning rate muy bajo.</text>
+  </svg>
+  <figcaption>Idea de la diapositiva "Training from scratch vs Transfer learning".</figcaption>
+</figure>
+
+<h3 id="inductiva">9.1 Transferencia inductiva</h3>
+<p>Primero se entrena una <strong>red base</strong> con un conjunto de datos y tarea base; luego se <strong>reutilizan (transfieren)</strong> las características aprendidas a una <strong>red destino</strong> que se entrena con el conjunto y tarea destino. A esta forma se le llama <strong>transferencia inductiva</strong>: el alcance de los modelos posibles (el <strong>sesgo del modelo</strong> o espacio de hipótesis permitidas) <strong>se reduce de forma benéfica</strong> usando un modelo ajustado a una tarea diferente pero relacionada. Es decir, la búsqueda empieza más cerca de una buena solución.</p>
+
+<h3 id="cuando-transfer">9.2 ¿Cuándo usarlo? Los tres beneficios</h3>
+<p>Transfer learning es una <strong>optimización</strong>, un atajo para ahorrar tiempo o tener mejor rendimiento. Normalmente no es obvio que ayudará hasta que se desarrolla y evalúa el modelo. Hay tres beneficios posibles:</p>
+<div class="chart-card">
+  <h4>Desempeño durante el entrenamiento, con y sin transferencia</h4>
+  <p class="sub">Curvas ilustrativas (como la diapositiva 10 de la clase 08).</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>con transferencia</span><span><i style="background:var(--muted-series)"></i>sin transferencia</span></div>
+  <div class="chart-box"><canvas id="chart-transfer" aria-label="Curvas de aprendizaje con y sin transferencia"></canvas></div>
+</div>
+<ol class="steps">
+  <li><strong>Comienzo superior (higher start):</strong> la habilidad inicial, antes de refinar, es mayor de lo que sería de otra manera.</li>
+  <li><strong>Pendiente más alta (higher slope):</strong> la habilidad mejora más rápido durante el entrenamiento.</li>
+  <li><strong>Asíntota superior (higher asymptote):</strong> la habilidad final a la que converge el modelo es mejor.</li>
+</ol>
+
+<h3 id="como-transfer">9.3 Cómo se hace (enfoque de modelo preentrenado)</h3>
+<ol class="steps">
+  <li><strong>Seleccionar el modelo de origen:</strong> elegir un modelo preentrenado. Muchas instituciones publican modelos entrenados en conjuntos grandes y desafiantes.</li>
+  <li><strong>Reutilizar el modelo:</strong> usarlo como punto de partida, total o parcialmente según la técnica.</li>
+  <li><strong>Optimizar el modelo (opcional):</strong> adaptarlo o refinarlo (<em>fine-tuning</em>) con los datos de entrada-salida de la nueva tarea.</li>
+</ol>
+<div class="two-col">
+  <div class="callout tip"><div class="callout-title">Extracción de características</div><p>Congelar toda la base (<code>base.trainable = False</code>) y entrenar solo una cabeza nueva. Ideal con <strong>pocos datos</strong> o tareas muy parecidas.</p></div>
+  <div class="callout tip"><div class="callout-title">Fine-tuning</div><p>Después, descongelar las últimas capas y re-entrenar con un <strong>learning rate muy bajo</strong> (p. ej. 1e-5) para no destruir lo aprendido. Útil con más datos o tareas algo distintas.</p></div>
+</div>
+<p>En la diapositiva 11 se ve el efecto: un CNN propio llegó a <strong>76 %</strong> de accuracy de validación y el modelo con transfer learning a <strong>96 %</strong>.</p>
+
+<h3 id="modelos-preentrenados">9.4 Modelos preentrenados que menciona la clase</h3>
+<div class="two-col">
+<div class="table-wrap"><table>
+<thead><tr><th>Imágenes</th><th>Quién</th></tr></thead>
+<tbody>
+<tr><td>VGG (VGG16/19)</td><td>Oxford (Visual Geometry Group)</td></tr>
+<tr><td>Inception (GoogLeNet)</td><td>Google</td></tr>
+<tr><td>ResNet</td><td>Microsoft</td></tr>
+</tbody></table></div>
+<div class="table-wrap"><table>
+<thead><tr><th>Texto (word embeddings)</th><th>Quién</th></tr></thead>
+<tbody>
+<tr><td>word2vec</td><td>Google</td></tr>
+<tr><td>GloVe</td><td>Stanford</td></tr>
+</tbody></table></div>
+</div>
+<p>En visión, estos modelos se entrenaron para la competencia ImageNet y se publican con licencias permisivas; se descargan e incorporan directamente a modelos nuevos que reciben imágenes. En NLP se reutilizan embeddings: un mapeo de palabras a un espacio vectorial continuo donde palabras con significado similar tienen vectores similares, entrenados con corpus enormes.</p>
+
+<div class="code-card">
+  <div class="code-head"><span class="fname">codigo/modulo4/m4_k4_transfer_learning.py</span><span class="spacer"></span><button class="code-btn" type="button" data-copy>Copiar</button><a class="code-btn" href="codigo/modulo4/m4_k4_transfer_learning.py" download>Descargar .py</a></div>
+  <pre><code class="language-python"># Módulo 4 · Transfer learning con VGG16 (Oxford) preentrenada en ImageNet
+# 1) Extracción de características: congelar la base y entrenar solo la &quot;cabeza&quot; nueva.
+# 2) Fine-tuning: descongelar el último bloque y re-entrenar con learning rate MUY bajo.
+import os
+os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;2&quot;
+import keras
+from keras import layers
+from keras.applications import VGG16
+
+PESOS = &quot;imagenet&quot;     # descarga ~58 MB la primera vez (usa None para probar sin internet)
+
+base = VGG16(weights=PESOS, include_top=False,       # sin las capas densas originales
+             input_shape=(224, 224, 3))
+base.trainable = False                               # congelar TODO lo aprendido
+print(&quot;Salida de la base convolucional:&quot;, base.output.shape)
+
+modelo = keras.Sequential([
+    keras.Input(shape=(224, 224, 3)),
+    base,
+    layers.GlobalAveragePooling2D(),                  # (7, 7, 512) -&gt; 512
+    layers.Dense(256, activation=&quot;relu&quot;),
+    layers.Dropout(0.5),
+    layers.Dense(3, activation=&quot;softmax&quot;),            # nuestra tarea: 3 clases
+])
+modelo.compile(optimizer=keras.optimizers.Adam(1e-3),
+               loss=&quot;categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+
+def resumen(m, titulo):
+    entrenables = sum(keras.ops.size(w) for w in m.trainable_weights)
+    congelados = sum(keras.ops.size(w) for w in m.non_trainable_weights)
+    print(f&quot;{titulo}: entrenables = {int(entrenables):,} | congelados = {int(congelados):,}&quot;)
+
+resumen(modelo, &quot;Fase 1 (base congelada)&quot;)
+# modelo.fit(train_ds, validation_data=val_ds, epochs=10)
+
+# ----- Fase 2: fine-tuning del último bloque (block5) -----
+base.trainable = True
+for capa in base.layers:
+    capa.trainable = capa.name.startswith(&quot;block5&quot;)
+modelo.compile(optimizer=keras.optimizers.Adam(1e-5),   # LR 100 veces menor
+               loss=&quot;categorical_crossentropy&quot;, metrics=[&quot;accuracy&quot;])
+resumen(modelo, &quot;Fase 2 (fine-tuning block5)&quot;)
+# modelo.fit(train_ds, validation_data=val_ds, epochs=5)</code></pre>
+  <div class="output"><div class="out-label">Salida que debes obtener</div><pre>Salida de la base convolucional: (None, 7, 7, 512)
+Fase 1 (base congelada): entrenables = 132,099 | congelados = 14,714,688
+Fase 2 (fine-tuning block5): entrenables = 7,211,523 | congelados = 7,635,264</pre></div>
+  <div class="code-note">Fase 1: solo se entrenan 132,099 parámetros (la cabeza: 512·256+256 = 131,328 y 256·3+3 = 771) y quedan congelados los 14,714,688 de VGG16. Fase 2: se descongelan las 3 convoluciones de block5 (3 × 2,359,808 = 7,079,424). La salida se verificó con weights=None (mismos conteos, sin descargar); con weights='imagenet' Keras descarga los pesos (~58 MB) la primera vez.</div>
+</div>
+
+<!-- ===================================================== -->
+<h2 id="resumen-m4">10. Resumen: ¿qué red uso para qué?</h2>
+<div class="table-wrap"><table class="compare">
+<thead><tr><th></th><th>Feedforward (MLP)</th><th>CNN</th><th>RNN / LSTM / GRU</th></tr></thead>
+<tbody>
+<tr><td>Datos</td><td>tabulares (vector de variables)</td><td>imágenes, cuadrículas (tensores espaciales)</td><td>secuencias: texto, audio, video, series de tiempo</td></tr>
+<tr><td>Flujo</td><td>adelante, sin ciclos</td><td>adelante, sin ciclos</td><td>con ciclos: memoria del pasado</td></tr>
+<tr><td>Pesos</td><td>uno por conexión</td><td>compartidos en el espacio (kernel)</td><td>compartidos en el tiempo</td></tr>
+<tr><td>Capa estrella</td><td>Dense</td><td>Conv2D + Pooling</td><td>SimpleRNN, LSTM, GRU (+ Embedding para texto)</td></tr>
+<tr><td>Entrenamiento</td><td>backprop</td><td>backprop</td><td>BPTT (suma errores en el tiempo)</td></tr>
+<tr><td>Problema típico</td><td>sobreajuste</td><td>muchos datos/GPU, ejemplos adversarios</td><td>vanishing/exploding gradient</td></tr>
+<tr><td>Regularización</td><td colspan="3">dropout, data augmentation (imágenes), transfer learning cuando hay pocos datos</td></tr>
+</tbody></table></div>
+
+<div class="callout exam">
+  <div class="callout-title">📝 Ahora practica</div>
+  <p>Ve a la página <a href="examen-m4.html"><strong>Examen M4</strong></a>: hoja de fórmulas, 14 ejercicios numéricos resueltos paso a paso, 70 preguntas de opción múltiple con explicación y tarjetas de repaso.</p>
+</div>
+
+<nav class="pager" aria-label="Navegación entre páginas">
+  <a href="modulo3.html"><small>← Anterior</small>Módulo 3 · No supervisado</a>
+  <a class="next" href="examen-m4.html"><small>Siguiente →</small>Examen M4 · práctica</a>
+</nav>
+
+
+</main>
+</div>
+<footer class="footer">Apuntes de estudio elaborados a partir del material del Diplomado en Ciencia de Datos (UNAM · FES Acatlán). Los ejemplos de código se ejecutaron con Python 3.13, scikit-learn 1.9 y TensorFlow/Keras 2.21.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="assets/js/main.js?v=54416b98" defer></script>
+<script src="assets/js/m4.js?v=56501269" defer></script>
+</body>
+</html>

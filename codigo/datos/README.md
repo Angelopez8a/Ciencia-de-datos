@@ -1,6 +1,6 @@
 # Datos reales usados en los ejemplos
 
-Todos los archivos son copias **sin modificar** de fuentes públicas. Cada programa intenta leer primero la copia
+Todos los archivos son copias **sin modificar** de fuentes públicas (en el caso de GloVe, un subconjunto de renglones copiados tal cual). Cada programa intenta leer primero la copia
 local y, si no existe (por ejemplo, cuando se descarga un solo `.py`), la descarga desde la dirección original
 que aparece en su código.
 

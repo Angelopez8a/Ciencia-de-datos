@@ -2,7 +2,9 @@
 
 Guía de estudio en HTML de los 4 módulos del diplomado (UNAM · FES Acatlán), hecha a partir de las
 presentaciones, documentos y notebooks del curso. Cada tema incluye explicación, fórmulas, diagramas,
-gráficas, simuladores interactivos y código Python **con la salida real que produce**.
+gráficas, simuladores interactivos y código Python **con la salida real que produce**. Los ejemplos usan
+datos reales de fuentes públicas y documentadas (ver `codigo/datos/README.md`). El diseño es de estilo
+neumórfico, con modo claro y oscuro.
 
 | Página | Contenido |
 |---|---|
@@ -24,7 +26,8 @@ sitio-web/
 │   └── js/                   main.js (común), m1..m4.js (gráficas y simuladores), quiz-m1.js, quiz.js (M4), data.js
 ├── codigo/
 │   ├── requirements.txt
-│   └── modulo1..4/*.py       47 programas; su salida es la que aparece en las páginas
+│   ├── datos/                conjuntos de datos reales copiados sin modificar, con sus fuentes (README.md)
+│   └── modulo1..4/*.py       48 programas; su salida es la que aparece en las páginas
 └── .nojekyll                 le indica a GitHub Pages que publique los archivos tal cual
 ```
 
@@ -69,13 +72,20 @@ pip install -r codigo/requirements.txt
 python codigo/modulo4/m4_04_convolucion_pooling.py
 ```
 
-- Los programas `m4_k*.py` usan TensorFlow/Keras; `m4_k4_transfer_learning.py` descarga los pesos de VGG16
-  (~58 MB) la primera vez (o usa `PESOS = None` para probar sin internet; los conteos de parámetros son los mismos).
-- Los ejemplos que entrenan redes usan semillas fijas, pero el accuracy puede variar ligeramente entre equipos.
-- Verificado con Python 3.13, NumPy 2.5, pandas 3.0, scikit-learn 1.9 y TensorFlow 2.21.
+- Los programas leen sus datos de `codigo/datos/`; si un archivo no está (por ejemplo, al descargar un solo
+  `.py`), lo descargan de su fuente original, que aparece en el propio código.
+- Los programas `m4_k*.py` usan TensorFlow/Keras. La primera vez, Keras descarga los datos de IMDB y MNIST y
+  `m4_k4_transfer_learning.py` descarga los pesos de VGG16 (~58 MB; con `PESOS = None` se obtienen los mismos
+  conteos de parámetros sin internet).
+- Los ejemplos que entrenan redes usan semillas fijas y operaciones deterministas; en otro equipo o con otra
+  versión de TensorFlow los resultados pueden variar ligeramente.
+- Verificado con Python 3.13, NumPy 2.5, pandas 3.0, SciPy 1.18, scikit-learn 1.9, statsmodels 0.15 y
+  TensorFlow 2.21.
 
 ## Notas
 
 - El Módulo 3 no tenía presentaciones en la carpeta original (solo la lista de prácticas), así que su contenido
   se desarrolló a partir de esos temas: reducción de dimensiones, clustering jerárquico, DBSCAN y ciclo de clustering.
+- Cuando un ejemplo usa datos sintéticos o una tabla ilustrativa del curso (por ejemplo, las «lunas» de DBSCAN o la
+  tabla de autos de Bayes ingenuo), la página lo indica de forma explícita.
 - Material de estudio personal elaborado a partir de los apuntes del curso.
